@@ -20,6 +20,8 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls }) {
   const nav = renderNav(pages, currentSlug);
   const main = renderMain(pageData, faviconUrls);
 
+  const search = renderSearch();
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,16 +32,27 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls }) {
   <link rel="stylesheet" href="/custom.css">
 </head>
 <body>
+  <a href="#main-content" class="c-skip-link">Skip to content</a>
   <header class="c-header">
     <h1 class="c-header__title">${escapeHtml(title)}</h1>
 ${nav}
+${search}
   </header>
-  <main>
+  <main id="main-content">
 ${main}
   </main>
+  <p class="c-search-empty js-search-empty" hidden>No bookmarks match your search.</p>
+  <div class="u-visually-hidden" aria-live="polite" id="js-search-status"></div>
   <script src="/scripts/app.js" type="module"></script>
 </body>
 </html>`;
+}
+
+function renderSearch() {
+  return `    <search class="c-search">
+      <label for="js-search" class="u-visually-hidden">Search bookmarks</label>
+      <input type="search" id="js-search" class="c-search__input" placeholder="Search bookmarks…" autocomplete="off">
+    </search>`;
 }
 
 function renderNav(pages, currentSlug) {
@@ -94,7 +107,9 @@ function renderBookmark(bookmark, faviconUrls) {
     ? `\n            <p class="c-bookmark__description">${escapeHtml(bookmark.description)}</p>`
     : '';
 
-  return `          <li class="c-bookmark">
+  const searchText = [bookmark.title, bookmark.description || '', bookmark.url].join(' ');
+
+  return `          <li class="c-bookmark" data-search="${escapeAttr(searchText.toLowerCase())}">
             <a href="${escapeAttr(bookmark.url)}" class="c-bookmark__link">
               <img src="${escapeAttr(faviconUrl)}" alt="" class="c-bookmark__icon" loading="lazy" width="32" height="32">
               <span class="c-bookmark__title">${escapeHtml(bookmark.title)}</span>
