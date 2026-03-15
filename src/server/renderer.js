@@ -118,19 +118,19 @@ function renderToolbar() {
 
   return `      <div class="c-toolbar" role="toolbar" aria-label="View options">
         <div class="c-toolbar__group" role="radiogroup" aria-label="Layout">
-          <button type="button" class="c-toolbar__btn js-layout-btn" data-value="grid" aria-pressed="true" title="Grid layout">${iconGrid} Grid</button>
-          <button type="button" class="c-toolbar__btn js-layout-btn" data-value="columns" aria-pressed="false" title="Columns layout">${iconColumns} Columns</button>
+          <button type="button" class="c-toolbar__btn js-layout-btn" data-value="grid" aria-pressed="true" title="Grid layout">${iconGrid} <span class="c-toolbar__label">Grid</span></button>
+          <button type="button" class="c-toolbar__btn js-layout-btn" data-value="columns" aria-pressed="false" title="Columns layout">${iconColumns} <span class="c-toolbar__label">Columns</span></button>
         </div>
         <div class="c-toolbar__separator" aria-hidden="true"></div>
         <div class="c-toolbar__group" role="radiogroup" aria-label="Density">
-          <button type="button" class="c-toolbar__btn js-density-btn" data-value="detailed" aria-pressed="true" title="Detailed view">${iconDetailed} Detailed</button>
-          <button type="button" class="c-toolbar__btn js-density-btn" data-value="condensed" aria-pressed="false" title="Condensed view">${iconCondensed} Condensed</button>
+          <button type="button" class="c-toolbar__btn js-density-btn" data-value="detailed" aria-pressed="true" title="Detailed view">${iconDetailed} <span class="c-toolbar__label">Detailed</span></button>
+          <button type="button" class="c-toolbar__btn js-density-btn" data-value="condensed" aria-pressed="false" title="Condensed view">${iconCondensed} <span class="c-toolbar__label">Condensed</span></button>
         </div>
         <div class="c-toolbar__separator" aria-hidden="true"></div>
         <div class="c-toolbar__group" role="radiogroup" aria-label="Color mode">
-          <button type="button" class="c-toolbar__btn js-color-btn" data-value="system" aria-pressed="true" title="System theme">${iconSystem} System</button>
-          <button type="button" class="c-toolbar__btn js-color-btn" data-value="light" aria-pressed="false" title="Light theme">${iconSun} Light</button>
-          <button type="button" class="c-toolbar__btn js-color-btn" data-value="dark" aria-pressed="false" title="Dark theme">${iconMoon} Dark</button>
+          <button type="button" class="c-toolbar__btn js-color-btn" data-value="system" aria-pressed="true" title="System theme">${iconSystem} <span class="c-toolbar__label">System</span></button>
+          <button type="button" class="c-toolbar__btn js-color-btn" data-value="light" aria-pressed="false" title="Light theme">${iconSun} <span class="c-toolbar__label">Light</span></button>
+          <button type="button" class="c-toolbar__btn js-color-btn" data-value="dark" aria-pressed="false" title="Dark theme">${iconMoon} <span class="c-toolbar__label">Dark</span></button>
         </div>
       </div>`;
 }
