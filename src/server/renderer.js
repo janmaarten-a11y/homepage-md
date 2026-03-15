@@ -103,7 +103,7 @@ function renderSearch() {
 }
 
 function renderAddButton() {
-  return `    <button type="button" class="c-btn c-btn--primary js-add-open" aria-label="Add bookmark">+ Add</button>`;
+  return `    <button type="button" class="c-btn c-btn--primary js-add-open" aria-label="Add bookmark">+ Add link</button>`;
 }
 
 function renderToolbar() {
