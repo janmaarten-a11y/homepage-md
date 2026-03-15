@@ -165,15 +165,17 @@ document.addEventListener('keydown', (event) => {
 
 const addDialog = document.querySelector('.js-add-dialog');
 const addForm = document.querySelector('.js-add-form');
-const addOpenBtn = document.querySelector('.js-add-open');
+const addOpenBtns = document.querySelectorAll('.js-add-open');
 const addCancelBtn = document.querySelector('.js-add-cancel');
 const fetchMetaBtn = document.querySelector('.js-fetch-meta');
 const addUrlInput = document.querySelector('.js-add-url');
 const addTitleInput = document.querySelector('.js-add-title');
 const addDescInput = document.querySelector('.js-add-description');
 
-if (addOpenBtn && addDialog) {
-  addOpenBtn.addEventListener('click', () => addDialog.showModal());
+if (addDialog) {
+  for (const btn of addOpenBtns) {
+    btn.addEventListener('click', () => addDialog.showModal());
+  }
 }
 
 if (addCancelBtn && addDialog) {
@@ -369,6 +371,53 @@ if (deleteConfirmBtn) {
     } catch (err) {
       alert(`Failed to delete bookmark: ${err.message}`);
     }
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Mobile drawers — hamburger menu + view options
+// ---------------------------------------------------------------------------
+
+const menuToggle = document.querySelector('.js-menu-toggle');
+const menuDrawer = document.querySelector('.js-menu-drawer');
+const viewMenuToggle = document.querySelector('.js-view-menu-toggle');
+const viewDrawer = document.querySelector('.js-view-drawer');
+
+function toggleDrawer(toggle, drawer, otherToggle, otherDrawer) {
+  const isOpen = !drawer.hidden;
+  // Close the other drawer first
+  if (otherDrawer && !otherDrawer.hidden) {
+    otherDrawer.hidden = true;
+    otherToggle?.setAttribute('aria-expanded', 'false');
+  }
+  drawer.hidden = isOpen;
+  toggle.setAttribute('aria-expanded', String(!isOpen));
+
+  // Hide search when any drawer is open
+  const anyOpen = (menuDrawer && !menuDrawer.hidden) || (viewDrawer && !viewDrawer.hidden);
+  document.querySelector('.c-header')?.classList.toggle('is-drawer-open', anyOpen);
+}
+
+if (menuToggle && menuDrawer) {
+  menuToggle.addEventListener('click', () => {
+    toggleDrawer(menuToggle, menuDrawer, viewMenuToggle, viewDrawer);
+  });
+}
+
+if (viewMenuToggle && viewDrawer) {
+  viewMenuToggle.addEventListener('click', () => {
+    toggleDrawer(viewMenuToggle, viewDrawer, menuToggle, menuDrawer);
+  });
+}
+
+// Close drawers when a category link is clicked
+for (const link of document.querySelectorAll('.js-drawer-category')) {
+  link.addEventListener('click', () => {
+    if (menuDrawer) {
+      menuDrawer.hidden = true;
+      menuToggle?.setAttribute('aria-expanded', 'false');
+    }
+    document.querySelector('.c-header')?.classList.remove('is-drawer-open');
   });
 }
 

@@ -28,6 +28,10 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultP
   const addDialog = renderAddDialog(categories, currentSlug);
   const deleteDialog = renderDeleteDialog();
 
+  const iconMenu = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/></svg>';
+  const iconSettings = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="2.5"/><path d="M10 1.5v2M10 16.5v2M1.5 10h2M16.5 10h2M3.4 3.4l1.4 1.4M15.2 15.2l1.4 1.4M3.4 16.6l1.4-1.4M15.2 4.8l1.4-1.4"/></svg>';
+  const iconPlus = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,19 +47,36 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultP
   <a href="#main-content" class="c-skip-link">Skip to content</a>
   <header class="c-header">
     <div class="c-header__top">
+      <button type="button" class="c-header__menu-btn js-menu-toggle" aria-expanded="false" aria-controls="js-menu-drawer" aria-label="Menu">${iconMenu}</button>
       <h1 class="c-header__title">${escapeHtml(title)}</h1>
+      <button type="button" class="c-header__view-btn js-view-menu-toggle" aria-expanded="false" aria-controls="js-view-drawer" aria-label="View options">${iconSettings}</button>
 ${nav}
+${search}
     </div>
     <div class="c-header__toolbar">
-${search}
-${toolbar}
 ${addBtn}
+${toolbar}
     </div>
   </header>
+  <aside class="c-drawer js-menu-drawer" id="js-menu-drawer" hidden>
+    <nav class="c-drawer__nav" aria-label="Pages">
+${pages.length > 1 ? pages.map((p) => {
+    const ariaCurrent = p.slug === currentSlug ? ' aria-current="page"' : '';
+    return `      <a href="/${encodeURIComponent(p.slug)}" class="c-drawer__link"${ariaCurrent}>${escapeHtml(p.name)}</a>`;
+  }).join('\n') : ''}
+    </nav>
+${pageData.categories.length > 1 ? `    <nav class="c-drawer__categories" aria-label="Categories">
+${pageData.categories.map((cat) => `      <a href="#${escapeAttr(cat.id)}" class="c-drawer__link js-drawer-category">${escapeHtml(cat.name)}</a>`).join('\n')}
+    </nav>` : ''}
+  </aside>
+  <aside class="c-drawer c-drawer--end js-view-drawer" id="js-view-drawer" hidden>
+${toolbar}
+  </aside>
 ${jumpLinks}
   <main id="main-content">
 ${main}
   </main>
+  <button type="button" class="c-fab js-add-open" aria-label="Add link">${iconPlus}</button>
   <p class="c-search-empty js-search-empty" hidden>No bookmarks match your search.</p>
   <div class="u-visually-hidden" aria-live="polite" id="js-search-status"></div>
 ${addDialog}
@@ -103,7 +124,7 @@ function renderSearch() {
 }
 
 function renderAddButton() {
-  return `    <button type="button" class="c-btn c-btn--primary js-add-open" aria-label="Add bookmark">+ Add link</button>`;
+  return `    <button type="button" class="c-btn c-btn--primary js-add-open" aria-label="Add link">+ Add link</button>`;
 }
 
 function renderToolbar() {
@@ -168,7 +189,7 @@ function renderAddDialog(categories, currentSlug) {
 
   return `  <dialog class="c-dialog js-add-dialog">
     <form method="dialog" class="c-dialog__form js-add-form">
-      <h2 class="c-dialog__title">Add Bookmark</h2>
+      <h2 class="c-dialog__title">Add Link</h2>
       <input type="hidden" name="page" value="${escapeAttr(currentSlug)}">
       <label class="c-dialog__label">
         URL
@@ -199,7 +220,7 @@ ${categoryOptions}
         <input type="url" name="icon" class="c-dialog__input js-add-icon" placeholder="https://…">
       </label>
       <div class="c-dialog__actions">
-        <button type="submit" class="c-btn c-btn--primary">Add Bookmark</button>
+        <button type="submit" class="c-btn c-btn--primary">Add Link</button>
         <button type="button" class="c-btn js-add-cancel">Cancel</button>
       </div>
     </form>

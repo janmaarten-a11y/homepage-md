@@ -220,6 +220,19 @@ npm test       # Run all tests (Node.js built-in test runner)
 
 Install the [Tailscale package for Synology](https://tailscale.com/kb/1131/synology). Access HomepageMD from any device on your tailnet.
 
+### Public sharing via Tailscale Funnel (advanced)
+
+[Tailscale Funnel](https://tailscale.com/kb/1223/funnel) can expose HomepageMD to the public internet without port forwarding or a reverse proxy:
+
+```bash
+# On your Synology (with Tailscale installed)
+tailscale funnel 2525
+```
+
+This creates a public URL like `https://your-synology.ts.net` that anyone can access. Combined with `AUTH_TOKEN`, you can allow public read access while protecting write endpoints. Funnel handles HTTPS termination automatically.
+
+**Note:** Without Funnel, HomepageMD is only accessible within your tailnet. URL sharing only works with recipients who are on the same tailnet or have Tailscale node sharing configured.
+
 ### Sync
 
 Sync only the `bookmarks/` and `icons/` directories to family devices via Sync.com, Syncthing, or similar. Edits sync to the server, and the dashboard updates live via SSE.

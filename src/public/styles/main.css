@@ -280,7 +280,6 @@
   }
 
   .c-search__input {
-    font-size: 0.875rem;
     padding-block: var(--space-s);
     padding-inline: var(--space-s) var(--space-l);
     border: 1px solid var(--color-border);
@@ -310,7 +309,7 @@
     position: absolute;
     inset-inline-end: var(--space-s);
     font-family: var(--font-mono);
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     padding-block: 0.0625rem;
     padding-inline: var(--space-xs);
     border: 1px solid var(--color-border);
@@ -424,7 +423,7 @@
 
   .c-bookmark__description {
     margin: 0;
-    font-size: 0.875rem;
+    font-size: .875rem;
     color: var(--color-muted);
     padding-inline-start: calc(2rem + var(--space-s));
   }
@@ -451,12 +450,12 @@
 
   /* Buttons */
   .c-btn {
-    font-size: 0.875rem;
+    font-size: 1rem;
     font-weight: 500;
-    padding-block: var(--space-s);
+    padding-block: var(--space-xs);
     padding-inline: var(--space-m);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-s);
+    border-radius: var(--radius-m);
     background-color: var(--color-surface);
     color: var(--color-text);
     cursor: pointer;
@@ -485,7 +484,7 @@
   }
 
   .c-btn--small {
-    font-size: 0.75rem;
+    font-size: 0.875rem;
     padding-block: var(--space-xs);
     padding-inline: var(--space-s);
     min-block-size: 1.5rem;
@@ -552,7 +551,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-xs);
-    font-size: 0.875rem;
+    font-size: 1rem;
     font-weight: 500;
   }
 
@@ -563,7 +562,7 @@
 
   .c-dialog__input {
     font-family: var(--font-base);
-    font-size: 0.875rem;
+    font-size: 1rem;
     padding-block: var(--space-xs);
     padding-inline: var(--space-s);
     border: 1px solid var(--color-border);
@@ -739,7 +738,7 @@
 
   .c-dialog__message {
     margin: 0;
-    font-size: 0.9375rem;
+    font-size: 1rem;
   }
 
   /* Color mode classes */
@@ -805,10 +804,23 @@
 }
 
 /* ---------------------------------------------------------------------------
- * Responsive — hide toolbar labels on small viewports
+ * Responsive
  * ------------------------------------------------------------------------- */
-@media (max-width: 48rem) {
-  .c-toolbar__label {
+
+/* Narrow desktop: tighten toolbar, hide separators */
+@media (max-width: 55rem) {
+  .c-toolbar__separator {
+    display: none;
+  }
+
+  .c-toolbar {
+    gap: var(--space-xs);
+  }
+}
+
+/* Narrower: hide Layout labels (Grid/Columns), keep icons */
+@media (max-width: 53rem) {
+  .c-toolbar__group[aria-label="Layout"] .c-toolbar__label {
     position: absolute;
     inline-size: 1px;
     block-size: 1px;
@@ -818,5 +830,198 @@
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
+  }
+}
+
+/* Mobile: hamburger/view buttons visible, desktop nav/toolbar hidden */
+.c-header__menu-btn,
+.c-header__view-btn {
+  display: none;
+}
+
+.c-drawer {
+  display: none;
+}
+
+.c-fab {
+  display: none;
+}
+
+@media (max-width: 48rem) {
+  /* Show mobile controls */
+  .c-header__menu-btn,
+  .c-header__view-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xs);
+    border: none;
+    background: none;
+    color: var(--color-text);
+    cursor: pointer;
+    min-block-size: 2.75rem;
+    min-inline-size: 2.75rem;
+    border-radius: var(--radius-s);
+  }
+
+  .c-header__menu-btn:focus-visible,
+  .c-header__view-btn:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  /* Hide desktop nav and toolbar on mobile */
+  .c-header__top .c-nav {
+    display: none;
+  }
+
+  .c-header__toolbar {
+    display: none;
+  }
+
+  /* Search stays visible in top row, expands full width */
+  .c-header__top .c-search {
+    order: 10;
+    inline-size: 100%;
+  }
+  .c-search__wrap {
+    width: 100%;
+  }
+  .c-header__top .c-search__input {
+    inline-size: 100%;
+  }
+
+  /* Hide search when a drawer is open */
+  .c-header.is-drawer-open .c-search {
+    display: none;
+  }
+
+  /* View drawer — toolbar vertically, no layout group */
+  .c-drawer--end .c-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    margin-inline-start: 0;
+    gap: var(--space-s);
+  }
+
+  .c-drawer--end .c-toolbar__separator {
+    inline-size: 100%;
+    block-size: 1px;
+  }
+
+  .c-drawer--end .c-toolbar__group[aria-label="Layout"] {
+    display: none;
+  }
+
+  .c-drawer--end .c-toolbar__group {
+    display: flex;
+  }
+
+  .c-drawer--end .c-toolbar__btn {
+    flex: 1;
+  }
+
+  .c-toolbar__btn {
+    flex: 1;
+  }
+
+  .c-toolbar__separator {
+    display: none;
+  }
+
+  /* Compact header */
+  .c-header__top {
+    padding-block: var(--space-s);
+    padding-inline: var(--space-s);
+    gap: var(--space-s);
+  }
+
+  .c-header__title {
+    font-size: 1.125rem;
+    flex: 1;
+    min-inline-size: 0;
+  }
+
+  /* Drawers */
+  .c-drawer:not([hidden]) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-s);
+    padding: var(--space-m);
+    background-color: var(--color-surface);
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .c-drawer__link {
+    display: block;
+    padding-block: var(--space-s);
+    padding-inline: var(--space-s);
+    border-radius: var(--radius-s);
+    text-decoration: none;
+    color: var(--color-text);
+    font-weight: 500;
+  }
+
+  .c-drawer__link:hover {
+    background-color: var(--color-bg);
+  }
+
+  .c-drawer__link[aria-current="page"] {
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
+    text-underline-offset: 4px;
+  }
+
+  .c-drawer__categories {
+    border-block-start: 1px solid var(--color-border);
+    padding-block-start: var(--space-s);
+  }
+
+  /* Hide jump links on mobile — they're in the hamburger */
+  .c-jump-links {
+    display: none;
+  }
+
+  /* FAB — floating action button */
+  .c-fab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    inset-block-end: var(--space-l);
+    inset-inline-end: var(--space-l);
+    inline-size: 3.5rem;
+    block-size: 3.5rem;
+    border-radius: 50%;
+    border: none;
+    background-color: var(--color-primary);
+    color: var(--color-bg);
+    box-shadow: var(--shadow-l);
+    cursor: pointer;
+    z-index: 50;
+  }
+
+  .c-fab:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  .c-fab:hover {
+    background-color: oklch(40% 0.16 260);
+  }
+
+  /* Hide desktop Add button on mobile */
+  .c-header .js-add-open:not(.c-fab) {
+    display: none;
+  }
+
+  /* Compact dialogs on mobile */
+  .c-dialog {
+    padding: var(--space-m);
+    inline-size: 95vw;
+  }
+
+  .c-dialog__form {
+    gap: var(--space-s);
   }
 }
