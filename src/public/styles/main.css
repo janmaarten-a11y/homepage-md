@@ -44,30 +44,90 @@
 }
 
 /* ---------------------------------------------------------------------------
- * Resets
+ * Resets — Piccalilli modern CSS reset + app-specific additions
+ * https://piccalil.li/blog/a-more-modern-css-reset/
  * ------------------------------------------------------------------------- */
 @layer resets {
+  /* Box sizing rules */
   *,
   *::before,
   *::after {
     box-sizing: border-box;
   }
 
+  /* Prevent font size inflation */
+  html {
+    -moz-text-size-adjust: none;
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
+  }
+
+  /* Remove default margin in favour of better control in authored CSS */
+  body, h1, h2, h3, h4, p,
+  figure, blockquote, dl, dd {
+    margin-block-end: 0;
+  }
+
+  /* Remove list styles on ul, ol elements with a list role */
+  ul[role='list'],
+  ol[role='list'] {
+    list-style: none;
+  }
+
+  /* Set core body defaults */
   body {
-    margin: 0;
+    min-height: 100vh;
+    line-height: 1.5;
     font-family: var(--font-base);
     font-size: 1rem;
-    line-height: 1.5;
     color: var(--color-text);
     background-color: var(--color-bg);
+    margin: 0;
   }
 
-  img {
+  /* Set shorter line heights on headings and interactive elements */
+  h1, h2, h3, h4,
+  button, input, label {
+    line-height: 1.1;
+  }
+
+  /* Balance text wrapping on headings */
+  h1, h2,
+  h3, h4 {
+    text-wrap: balance;
+  }
+
+  /* A elements that don't have a class get default styles */
+  a:not([class]) {
+    text-decoration-skip-ink: auto;
+    color: currentColor;
+  }
+
+  /* Make images easier to work with */
+  img,
+  picture {
+    max-width: 100%;
     display: block;
-    max-inline-size: 100%;
-    block-size: auto;
   }
 
+  /* Inherit fonts for inputs and buttons */
+  input, button,
+  textarea, select {
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  /* Make sure textareas without a rows attribute are not tiny */
+  textarea:not([rows]) {
+    min-height: 10em;
+  }
+
+  /* Anything that has been anchored to should have extra scroll margin */
+  :target {
+    scroll-margin-block: 5ex;
+  }
+
+  /* App-specific reset additions */
   a {
     color: var(--color-primary);
     text-decoration-thickness: 1px;
@@ -85,14 +145,12 @@
   }
 
   ul {
-    list-style: none;
     margin: 0;
     padding: 0;
   }
 
   h1, h2, h3 {
     margin-block: 0;
-    line-height: 1.2;
   }
 }
 
@@ -318,23 +376,17 @@
     display: none;
   }
 
-  /* Bookmark actions (edit/delete) — hidden until hover or focus-within */
+  /* Bookmark actions (edit/delete) — hidden until hover or roving focus */
   .c-bookmark__actions {
     display: flex;
     gap: var(--space-xs);
     padding-inline-start: calc(2rem + var(--space-s));
     margin-block-start: var(--space-xs);
     opacity: 0;
-    transition: opacity 0.1s ease;
   }
 
   .c-bookmark:hover .c-bookmark__actions,
   .c-bookmark:focus-within .c-bookmark__actions {
-    opacity: 1;
-  }
-
-  /* Keep actions visible when a button inside is focused */
-  .c-bookmark__actions:focus-within {
     opacity: 1;
   }
 
@@ -492,51 +544,36 @@
     margin-block-start: 0;
   }
 
-  /* Columns layout */
+  /* Columns layout — subcategories become horizontal columns, direct bookmarks remain grid */
   .is-columns .c-category {
-    overflow-x: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-l);
+    align-items: start;
+  }
+
+  .is-columns .c-category > h2 {
+    inline-size: 100%;
   }
 
   .is-columns .c-category > .c-bookmark-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-s);
-  }
-
-  .is-columns .c-category > .c-bookmark-list .c-bookmark {
-    border: none;
-    background: none;
-    padding: var(--space-xs) 0;
+    inline-size: 100%;
   }
 
   .is-columns .c-subcategory {
-    display: inline-block;
-    vertical-align: top;
-    min-inline-size: 14rem;
-    max-inline-size: 20rem;
-    margin-inline-end: var(--space-l);
-    margin-block-start: var(--space-s);
+    flex: 0 0 auto;
+    inline-size: clamp(14rem, 25%, 22rem);
+    margin-block-start: 0;
   }
 
   .is-columns .c-subcategory .c-bookmark-list {
     display: flex;
     flex-direction: column;
-    gap: var(--space-xs);
+    gap: var(--space-s);
   }
 
-  .is-columns .c-subcategory .c-bookmark {
-    border: none;
-    background: none;
-    padding: var(--space-xs) 0;
-  }
-
-  .is-columns .c-bookmark__description {
+  .is-columns .c-subcategory .c-bookmark__description {
     display: none;
-  }
-
-  .is-columns .c-bookmark__actions {
-    padding-inline-start: 0;
-    margin-block-start: 0;
   }
 
   /* View menu */
@@ -628,6 +665,10 @@
 
   .c-bookmark {
     transition: box-shadow 0.15s ease;
+  }
+
+  .c-bookmark__actions {
+    transition: opacity 0.1s ease;
   }
 
   .c-bookmark:hover {
