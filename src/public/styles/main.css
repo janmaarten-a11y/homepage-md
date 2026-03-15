@@ -236,6 +236,8 @@
     -webkit-overflow-scrolling: touch;
     max-inline-size: 100%;
     flex-shrink: 1;
+    padding: var(--space-xs);
+    margin: calc(-1 * var(--space-xs));
   }
 
   .c-nav::-webkit-scrollbar {
