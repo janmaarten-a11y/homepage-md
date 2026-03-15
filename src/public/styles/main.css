@@ -864,6 +864,11 @@
     inline-size: 100%;
   }
 
+  /* Hide search when a drawer is open */
+  .c-header.is-drawer-open .c-search {
+    display: none;
+  }
+
   /* View drawer — toolbar vertically, no layout group */
   .c-drawer--end .c-toolbar {
     flex-direction: column;

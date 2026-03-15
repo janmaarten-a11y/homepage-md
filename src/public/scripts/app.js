@@ -392,6 +392,10 @@ function toggleDrawer(toggle, drawer, otherToggle, otherDrawer) {
   }
   drawer.hidden = isOpen;
   toggle.setAttribute('aria-expanded', String(!isOpen));
+
+  // Hide search when any drawer is open
+  const anyOpen = (menuDrawer && !menuDrawer.hidden) || (viewDrawer && !viewDrawer.hidden);
+  document.querySelector('.c-header')?.classList.toggle('is-drawer-open', anyOpen);
 }
 
 if (menuToggle && menuDrawer) {
@@ -413,6 +417,7 @@ for (const link of document.querySelectorAll('.js-drawer-category')) {
       menuDrawer.hidden = true;
       menuToggle?.setAttribute('aria-expanded', 'false');
     }
+    document.querySelector('.c-header')?.classList.remove('is-drawer-open');
   });
 }
 
