@@ -24,7 +24,7 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultP
 
   const search = renderSearch();
   const addBtn = renderAddButton();
-  const viewDropdown = renderViewDropdown();
+  const toolbar = renderToolbar();
   const addDialog = renderAddDialog(categories, currentSlug);
   const deleteDialog = renderDeleteDialog();
 
@@ -34,17 +34,23 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultP
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${escapeHtml(title)} — HomepageMD</title>
+  <link rel="preconnect" href="https://fonts.bunny.net">
+  <link rel="stylesheet" href="https://fonts.bunny.net/css?family=inter:400,500,600,700">
   <link rel="stylesheet" href="/styles/main.css">
   <link rel="stylesheet" href="/custom.css">
 </head>
 <body data-slug="${escapeAttr(currentSlug)}">
   <a href="#main-content" class="c-skip-link">Skip to content</a>
   <header class="c-header">
-    <h1 class="c-header__title">${escapeHtml(title)}</h1>
+    <div class="c-header__top">
+      <h1 class="c-header__title">${escapeHtml(title)}</h1>
 ${nav}
+    </div>
+    <div class="c-header__toolbar">
 ${search}
-${viewDropdown}
+${toolbar}
 ${addBtn}
+    </div>
   </header>
 ${jumpLinks}
   <main id="main-content">
@@ -100,30 +106,33 @@ function renderAddButton() {
   return `    <button type="button" class="c-btn c-btn--primary js-add-open" aria-label="Add bookmark">+ Add</button>`;
 }
 
-function renderViewDropdown() {
-  return `    <div class="c-view-menu">
-      <button type="button" class="c-btn c-btn--small js-view-toggle" aria-expanded="false" aria-haspopup="true">View ▾</button>
-      <div class="c-view-menu__dropdown js-view-dropdown" hidden>
-        <fieldset class="c-view-menu__group">
-          <legend class="c-view-menu__legend">Density</legend>
-          <label class="c-view-menu__option">
-            <input type="radio" name="density" value="detailed" class="js-view-density" checked> Detailed
-          </label>
-          <label class="c-view-menu__option">
-            <input type="radio" name="density" value="condensed" class="js-view-density"> Condensed
-          </label>
-        </fieldset>
-        <fieldset class="c-view-menu__group">
-          <legend class="c-view-menu__legend">Layout</legend>
-          <label class="c-view-menu__option">
-            <input type="radio" name="layout" value="grid" class="js-view-layout" checked> Grid
-          </label>
-          <label class="c-view-menu__option">
-            <input type="radio" name="layout" value="columns" class="js-view-layout"> Columns
-          </label>
-        </fieldset>
-      </div>
-    </div>`;
+function renderToolbar() {
+  // Inline SVG icons (16×16, currentColor)
+  const iconGrid = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>';
+  const iconColumns = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="1" y="1" width="4" height="14" rx="1"/><rect x="6" y="1" width="4" height="14" rx="1"/><rect x="11" y="1" width="4" height="14" rx="1"/></svg>';
+  const iconDetailed = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="1" y1="3" x2="15" y2="3"/><line x1="1" y1="6" x2="10" y2="6"/><line x1="1" y1="10" x2="15" y2="10"/><line x1="1" y1="13" x2="10" y2="13"/></svg>';
+  const iconCondensed = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="1" y1="3" x2="15" y2="3"/><line x1="1" y1="7" x2="15" y2="7"/><line x1="1" y1="11" x2="15" y2="11"/></svg>';
+  const iconSun = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="3"/><line x1="8" y1="1" x2="8" y2="3"/><line x1="8" y1="13" x2="8" y2="15"/><line x1="1" y1="8" x2="3" y2="8"/><line x1="13" y1="8" x2="15" y2="8"/><line x1="3.05" y1="3.05" x2="4.46" y2="4.46"/><line x1="11.54" y1="11.54" x2="12.95" y2="12.95"/><line x1="3.05" y1="12.95" x2="4.46" y2="11.54"/><line x1="11.54" y1="4.46" x2="12.95" y2="3.05"/></svg>';
+  const iconMoon = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 8.5a5.5 5.5 0 0 1-6-6 5.5 5.5 0 1 0 6 6z"/></svg>';
+  const iconSystem = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="9" rx="1.5"/><line x1="5" y1="14" x2="11" y2="14"/><line x1="8" y1="11" x2="8" y2="14"/></svg>';
+
+  return `      <div class="c-toolbar" role="toolbar" aria-label="View options">
+        <div class="c-toolbar__group" role="radiogroup" aria-label="Layout">
+          <button type="button" class="c-toolbar__btn js-layout-btn" data-value="grid" aria-pressed="true" title="Grid layout">${iconGrid}</button>
+          <button type="button" class="c-toolbar__btn js-layout-btn" data-value="columns" aria-pressed="false" title="Columns layout">${iconColumns}</button>
+        </div>
+        <div class="c-toolbar__separator" aria-hidden="true"></div>
+        <div class="c-toolbar__group" role="radiogroup" aria-label="Density">
+          <button type="button" class="c-toolbar__btn js-density-btn" data-value="detailed" aria-pressed="true" title="Detailed view">${iconDetailed}</button>
+          <button type="button" class="c-toolbar__btn js-density-btn" data-value="condensed" aria-pressed="false" title="Condensed view">${iconCondensed}</button>
+        </div>
+        <div class="c-toolbar__separator" aria-hidden="true"></div>
+        <div class="c-toolbar__group" role="radiogroup" aria-label="Color mode">
+          <button type="button" class="c-toolbar__btn js-color-btn" data-value="system" aria-pressed="true" title="System theme">${iconSystem}</button>
+          <button type="button" class="c-toolbar__btn js-color-btn" data-value="light" aria-pressed="false" title="Light theme">${iconSun}</button>
+          <button type="button" class="c-toolbar__btn js-color-btn" data-value="dark" aria-pressed="false" title="Dark theme">${iconMoon}</button>
+        </div>
+      </div>`;
 }
 
 function renderDeleteDialog() {
@@ -259,15 +268,20 @@ function renderBookmark(bookmark, faviconUrls) {
   const searchText = [bookmark.title, bookmark.description || '', bookmark.url].join(' ');
   const iconData = bookmark.icon ? ` data-icon="${escapeAttr(bookmark.icon)}"` : '';
 
+  const ICON_EDIT = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 1.5l3 3L5 14H2v-3z"/></svg>';
+  const ICON_DELETE = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="4" x2="13" y2="4"/><path d="M5 4V2.5A.5.5 0 0 1 5.5 2h5a.5.5 0 0 1 .5.5V4"/><path d="M4 4l.7 9.1a1 1 0 0 0 1 .9h4.6a1 1 0 0 0 1-.9L12 4"/></svg>';
+
   return `          <li class="c-bookmark" data-search="${escapeAttr(searchText.toLowerCase())}" data-url="${escapeAttr(bookmark.url)}"${iconData}>
-            <a href="${escapeAttr(bookmark.url)}" class="c-bookmark__link">
-              <img src="${escapeAttr(faviconUrl)}" alt="" class="c-bookmark__icon" loading="lazy" width="32" height="32">
-              <span class="c-bookmark__title">${escapeHtml(bookmark.title)}</span>
-            </a>${description}
-            <div class="c-bookmark__actions">
-              <button type="button" class="c-btn c-btn--small js-edit-open" aria-label="Edit ${escapeAttr(bookmark.title)}" tabindex="-1">Edit</button>
-              <button type="button" class="c-btn c-btn--small c-btn--danger js-delete" aria-label="Delete ${escapeAttr(bookmark.title)}" tabindex="-1">Delete</button>
-            </div>
+            <div class="c-bookmark__header">
+              <a href="${escapeAttr(bookmark.url)}" class="c-bookmark__link">
+                <img src="${escapeAttr(faviconUrl)}" alt="" class="c-bookmark__icon" loading="lazy" width="32" height="32">
+                <span class="c-bookmark__title">${escapeHtml(bookmark.title)}</span>
+              </a>
+              <div class="c-bookmark__actions">
+                <button type="button" class="c-btn c-btn--icon js-edit-open" aria-label="Edit ${escapeAttr(bookmark.title)}" tabindex="-1">${ICON_EDIT}</button>
+                <button type="button" class="c-btn c-btn--icon c-btn--danger js-delete" aria-label="Delete ${escapeAttr(bookmark.title)}" tabindex="-1">${ICON_DELETE}</button>
+              </div>
+            </div>${description}
           </li>`;
 }
 

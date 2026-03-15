@@ -373,11 +373,9 @@ if (deleteConfirmBtn) {
 }
 
 // ---------------------------------------------------------------------------
-// View preferences — per-page density (detailed/condensed) × layout (grid/columns)
+// View preferences — per-page density × layout × color mode
 // ---------------------------------------------------------------------------
 
-const viewToggle = document.querySelector('.js-view-toggle');
-const viewDropdown = document.querySelector('.js-view-dropdown');
 const slug = getPageSlug();
 
 function getViewPrefs() {
@@ -385,7 +383,7 @@ function getViewPrefs() {
     const stored = localStorage.getItem(`homepage-md-view-${slug}`);
     if (stored) return JSON.parse(stored);
   } catch { /* ignore */ }
-  return { density: 'detailed', layout: 'grid' };
+  return { density: 'detailed', layout: 'grid', colorMode: 'system' };
 }
 
 function saveViewPrefs(prefs) {
@@ -398,48 +396,49 @@ function applyView(prefs) {
   document.body.classList.toggle('is-condensed', prefs.density === 'condensed');
   document.body.classList.toggle('is-columns', prefs.layout === 'columns');
 
-  // Sync radio buttons
-  for (const radio of document.querySelectorAll('.js-view-density')) {
-    radio.checked = radio.value === prefs.density;
+  // Color mode
+  document.body.classList.remove('is-light', 'is-dark');
+  if (prefs.colorMode === 'light') document.body.classList.add('is-light');
+  else if (prefs.colorMode === 'dark') document.body.classList.add('is-dark');
+
+  // Sync toolbar button states
+  for (const btn of document.querySelectorAll('.js-layout-btn')) {
+    btn.setAttribute('aria-pressed', String(btn.dataset.value === prefs.layout));
   }
-  for (const radio of document.querySelectorAll('.js-view-layout')) {
-    radio.checked = radio.value === prefs.layout;
+  for (const btn of document.querySelectorAll('.js-density-btn')) {
+    btn.setAttribute('aria-pressed', String(btn.dataset.value === prefs.density));
+  }
+  for (const btn of document.querySelectorAll('.js-color-btn')) {
+    btn.setAttribute('aria-pressed', String(btn.dataset.value === prefs.colorMode));
   }
 }
 
-// Initialize view from stored preference
+// Initialize
 const viewPrefs = getViewPrefs();
 applyView(viewPrefs);
 
-// Toggle dropdown
-if (viewToggle && viewDropdown) {
-  viewToggle.addEventListener('click', () => {
-    const isOpen = !viewDropdown.hidden;
-    viewDropdown.hidden = isOpen;
-    viewToggle.setAttribute('aria-expanded', String(!isOpen));
-  });
-
-  // Close dropdown on outside click
-  document.addEventListener('click', (event) => {
-    if (!event.target.closest('.c-view-menu')) {
-      viewDropdown.hidden = true;
-      viewToggle.setAttribute('aria-expanded', 'false');
-    }
-  });
-}
-
-// Listen for radio changes
-for (const radio of document.querySelectorAll('.js-view-density')) {
-  radio.addEventListener('change', () => {
-    viewPrefs.density = radio.value;
+// Layout toggle buttons
+for (const btn of document.querySelectorAll('.js-layout-btn')) {
+  btn.addEventListener('click', () => {
+    viewPrefs.layout = btn.dataset.value;
     saveViewPrefs(viewPrefs);
     applyView(viewPrefs);
   });
 }
 
-for (const radio of document.querySelectorAll('.js-view-layout')) {
-  radio.addEventListener('change', () => {
-    viewPrefs.layout = radio.value;
+// Density toggle buttons
+for (const btn of document.querySelectorAll('.js-density-btn')) {
+  btn.addEventListener('click', () => {
+    viewPrefs.density = btn.dataset.value;
+    saveViewPrefs(viewPrefs);
+    applyView(viewPrefs);
+  });
+}
+
+// Color mode toggle buttons
+for (const btn of document.querySelectorAll('.js-color-btn')) {
+  btn.addEventListener('click', () => {
+    viewPrefs.colorMode = btn.dataset.value;
     saveViewPrefs(viewPrefs);
     applyView(viewPrefs);
   });

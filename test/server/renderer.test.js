@@ -43,7 +43,7 @@ describe('renderPage', () => {
 
   it('includes a skip-to-content link as the first element in body', () => {
     const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
-    const bodyStart = html.indexOf('<body>');
+    const bodyStart = html.indexOf('<body');
     const skipLink = html.indexOf('<a href="#main-content" class="c-skip-link">Skip to content</a>');
     assert.ok(skipLink > bodyStart, 'skip link should appear after <body>');
     const headerStart = html.indexOf('<header');
@@ -202,8 +202,7 @@ describe('renderPage', () => {
   it('includes edit and delete buttons on each bookmark', () => {
     const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
     const editBtns = html.match(/js-edit-open/g) || [];
-    // js-delete appears on each bookmark card (2) plus in the delete dialog
-    const bookmarkDeleteBtns = html.match(/class="c-btn c-btn--small c-btn--danger js-delete"/g) || [];
+    const bookmarkDeleteBtns = html.match(/class="c-btn c-btn--icon c-btn--danger js-delete"/g) || [];
     // MINIMAL_PAGE has 2 bookmarks
     assert.equal(editBtns.length, 2);
     assert.equal(bookmarkDeleteBtns.length, 2);
@@ -262,21 +261,32 @@ describe('renderPage', () => {
     assert.ok(!html.includes('c-jump-links'));
   });
 
-  it('includes a condensed view toggle button', () => {
+  it('includes a toolbar with toggle buttons', () => {
     const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
-    assert.ok(html.includes('js-view-toggle'));
-    assert.ok(html.includes('View'));
+    assert.ok(html.includes('c-toolbar'));
+    assert.ok(html.includes('role="toolbar"'));
   });
 
-  it('includes a view dropdown with density and layout options', () => {
+  it('includes layout toggle buttons (grid/columns)', () => {
     const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
-    assert.ok(html.includes('js-view-dropdown'));
-    assert.ok(html.includes('name="density"'));
-    assert.ok(html.includes('value="detailed"'));
-    assert.ok(html.includes('value="condensed"'));
-    assert.ok(html.includes('name="layout"'));
-    assert.ok(html.includes('value="grid"'));
-    assert.ok(html.includes('value="columns"'));
+    assert.ok(html.includes('js-layout-btn'));
+    assert.ok(html.includes('data-value="grid"'));
+    assert.ok(html.includes('data-value="columns"'));
+  });
+
+  it('includes density toggle buttons (detailed/condensed)', () => {
+    const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
+    assert.ok(html.includes('js-density-btn'));
+    assert.ok(html.includes('data-value="detailed"'));
+    assert.ok(html.includes('data-value="condensed"'));
+  });
+
+  it('includes color mode toggle buttons (system/light/dark)', () => {
+    const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
+    assert.ok(html.includes('js-color-btn'));
+    assert.ok(html.includes('data-value="system"'));
+    assert.ok(html.includes('data-value="light"'));
+    assert.ok(html.includes('data-value="dark"'));
   });
 
   it('includes a delete confirmation dialog', () => {
