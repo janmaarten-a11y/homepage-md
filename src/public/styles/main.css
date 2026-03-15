@@ -32,7 +32,7 @@
     --shadow-l: 0 8px 24px oklch(20% 0.01 260 / 12%);
 
     /* Typography */
-    --font-base: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-base: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
   }
 
@@ -168,22 +168,40 @@
  * Components
  * ------------------------------------------------------------------------- */
 @layer components {
-  /* Header */
+  /* Header — two rows: title/nav + toolbar */
   .c-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    border-block-end: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+  }
+
+  .c-header__top {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: var(--space-m);
     padding-block: var(--space-l);
     padding-inline: var(--space-l);
-    border-block-end: 1px solid var(--color-border);
-    background-color: var(--color-surface);
   }
 
   .c-header__title {
     font-size: 1.375rem;
-    letter-spacing: -0.01em;
+    font-weight: 700;
+    letter-spacing: -0.02em;
     margin-inline-end: auto;
+  }
+
+  .c-header__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-m);
+    padding-block: var(--space-s);
+    padding-inline: var(--space-l);
+    border-block-start: 1px solid var(--color-border);
+    background-color: var(--color-bg);
   }
 
   /* Skip link */
@@ -340,7 +358,6 @@
 
   /* Bookmark card */
   .c-bookmark {
-    position: relative;
     display: flex;
     flex-direction: column;
     gap: var(--space-xs);
@@ -349,6 +366,13 @@
     border: 1px solid var(--color-border);
     border-radius: var(--radius-l);
     box-shadow: var(--shadow-s);
+    width:100%;
+  }
+
+  .c-bookmark__header {
+    display: flex;
+    align-items: start;
+    gap: var(--space-s);
   }
 
   .c-bookmark__link {
@@ -361,6 +385,8 @@
     border-radius: var(--radius-s);
     padding: var(--space-xs);
     margin: calc(-1 * var(--space-xs));
+    flex: 1;
+    min-inline-size: 0;
   }
 
   .c-bookmark__link:focus-visible {
@@ -382,9 +408,8 @@
   }
 
   .c-bookmark__title {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .c-bookmark__description {
@@ -401,13 +426,12 @@
     display: none;
   }
 
-  /* Bookmark actions (edit/delete) — floating overlay, hidden from tab order */
+  /* Bookmark actions (edit/delete) — in header row, hidden until hover/focus */
   .c-bookmark__actions {
-    position: absolute;
-    inset-block-start: var(--space-xs);
-    inset-inline-end: var(--space-xs);
     display: none;
     gap: var(--space-xs);
+    flex-shrink: 0;
+    margin-inline-start: auto;
   }
 
   .c-bookmark:hover .c-bookmark__actions,
@@ -454,6 +478,20 @@
     padding-block: var(--space-xs);
     padding-inline: var(--space-s);
     min-block-size: 1.5rem;
+  }
+
+  .c-btn--icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xs);
+    min-block-size: 1.75rem;
+    min-inline-size: 1.75rem;
+    border-radius: var(--radius-s);
+  }
+
+  .c-btn--icon svg {
+    flex-shrink: 0;
   }
 
   .c-btn--danger {
@@ -570,8 +608,7 @@
   }
 
   .is-condensed .c-bookmark__actions {
-    inset-block-start: var(--space-xs);
-    inset-inline-end: var(--space-xs);
+    margin-inline-start: auto;
   }
 
   /* Columns layout — subcategories become horizontal columns, direct bookmarks remain grid */
@@ -606,55 +643,56 @@
     display: none;
   }
 
-  /* View menu */
-  .c-view-menu {
-    position: relative;
-  }
-
-  .c-view-menu__dropdown {
-    position: absolute;
-    inset-block-start: 100%;
-    inset-inline-end: 0;
-    margin-block-start: var(--space-xs);
-    padding: var(--space-m);
-    background-color: var(--color-bg);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-l);
-    box-shadow: var(--shadow-m);
-    z-index: 20;
-    min-inline-size: 12rem;
-  }
-
-  .c-view-menu__dropdown[hidden] {
-    display: none;
-  }
-
-  .c-view-menu__group {
-    border: none;
-    padding: 0;
-    margin: 0 0 var(--space-s) 0;
-  }
-
-  .c-view-menu__group:last-child {
-    margin-block-end: 0;
-  }
-
-  .c-view-menu__legend {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--color-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-block-end: var(--space-xs);
-  }
-
-  .c-view-menu__option {
+  /* Toolbar — toggle button groups */
+  .c-toolbar {
     display: flex;
     align-items: center;
-    gap: var(--space-xs);
-    font-size: 0.875rem;
-    padding-block: 0.125rem;
+    gap: var(--space-s);
+    margin-inline-start: auto;
+  }
+
+  .c-toolbar__group {
+    display: flex;
+    gap: 1px;
+    background-color: var(--color-border);
+    border-radius: var(--radius-s);
+    overflow: hidden;
+  }
+
+  .c-toolbar__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xs) var(--space-s);
+    min-block-size: 2rem;
+    min-inline-size: 2rem;
+    border: none;
+    background-color: var(--color-surface);
+    color: var(--color-muted);
     cursor: pointer;
+    font-size: 0;
+  }
+
+  .c-toolbar__btn:hover {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+  }
+
+  .c-toolbar__btn:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: -2px;
+    z-index: 1;
+  }
+
+  .c-toolbar__btn[aria-pressed="true"] {
+    background-color: var(--color-primary);
+    color: var(--color-bg);
+  }
+
+  .c-toolbar__separator {
+    inline-size: 1px;
+    block-size: 1.25rem;
+    background-color: var(--color-border);
   }
 
   /* Small dialog variant (delete confirmation) */
@@ -665,6 +703,33 @@
   .c-dialog__message {
     margin: 0;
     font-size: 0.9375rem;
+  }
+
+  /* Color mode classes */
+  .is-light {
+    --color-bg: oklch(97% 0.005 260);
+    --color-text: oklch(20% 0.01 260);
+    --color-primary: oklch(48% 0.16 260);
+    --color-surface: oklch(100% 0 0);
+    --color-border: oklch(88% 0.005 260);
+    --color-focus: oklch(48% 0.2 260);
+    --color-muted: oklch(52% 0.01 260);
+    --shadow-s: 0 1px 3px oklch(20% 0.01 260 / 8%);
+    --shadow-m: 0 4px 12px oklch(20% 0.01 260 / 10%);
+    --shadow-l: 0 8px 24px oklch(20% 0.01 260 / 12%);
+  }
+
+  .is-dark {
+    --color-bg: oklch(18% 0.015 260);
+    --color-text: oklch(92% 0.005 260);
+    --color-primary: oklch(72% 0.14 260);
+    --color-surface: oklch(22% 0.015 260);
+    --color-border: oklch(30% 0.015 260);
+    --color-focus: oklch(72% 0.18 260);
+    --color-muted: oklch(62% 0.01 260);
+    --shadow-s: 0 1px 3px oklch(0% 0 0 / 20%);
+    --shadow-m: 0 4px 12px oklch(0% 0 0 / 25%);
+    --shadow-l: 0 8px 24px oklch(0% 0 0 / 30%);
   }
 }
 
