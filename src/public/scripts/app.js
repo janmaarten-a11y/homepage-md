@@ -293,62 +293,119 @@ if (editForm) {
 }
 
 // ---------------------------------------------------------------------------
-// Delete bookmark
+// Delete bookmark (modal dialog instead of confirm())
 // ---------------------------------------------------------------------------
 
-document.addEventListener('click', async (event) => {
+const deleteDialog = document.querySelector('.js-delete-dialog');
+const deleteMessage = document.querySelector('.js-delete-message');
+const deleteUrlInput = document.querySelector('.js-delete-url');
+const deleteConfirmBtn = document.querySelector('.js-delete-confirm');
+const deleteCancelBtn = document.querySelector('.js-delete-cancel');
+
+if (deleteCancelBtn && deleteDialog) {
+  deleteCancelBtn.addEventListener('click', () => deleteDialog.close());
+}
+
+document.addEventListener('click', (event) => {
   const deleteBtn = event.target.closest('.js-delete');
   if (!deleteBtn) return;
 
   const card = deleteBtn.closest('.c-bookmark');
-  if (!card) return;
+  if (!card || !deleteDialog) return;
 
   const url = card.dataset.url || '';
   const titleEl = card.querySelector('.c-bookmark__title');
   const title = titleEl?.textContent || url;
 
-  if (!confirm(`Delete "${title}"?`)) return;
-
-  const slug = getPageSlug();
-
-  try {
-    await apiRequest('DELETE', slug, { url });
-    window.location.reload();
-  } catch (err) {
-    alert(`Failed to delete bookmark: ${err.message}`);
-  }
+  deleteMessage.textContent = `Delete "${title}"?`;
+  deleteUrlInput.value = url;
+  deleteDialog.showModal();
 });
 
+if (deleteConfirmBtn) {
+  deleteConfirmBtn.addEventListener('click', async () => {
+    const url = deleteUrlInput.value;
+    const slug = getPageSlug();
+
+    try {
+      await apiRequest('DELETE', slug, { url });
+      deleteDialog.close();
+      window.location.reload();
+    } catch (err) {
+      alert(`Failed to delete bookmark: ${err.message}`);
+    }
+  });
+}
+
 // ---------------------------------------------------------------------------
-// Condensed view toggle
+// View preferences — per-page density (detailed/condensed) × layout (grid/columns)
 // ---------------------------------------------------------------------------
 
-const condensedToggle = document.querySelector('.js-condensed-toggle');
+const viewToggle = document.querySelector('.js-view-toggle');
+const viewDropdown = document.querySelector('.js-view-dropdown');
+const slug = getPageSlug();
 
-function setCondensed(enabled) {
-  document.body.classList.toggle('is-condensed', enabled);
-  if (condensedToggle) {
-    condensedToggle.setAttribute('aria-pressed', String(enabled));
-  }
+function getViewPrefs() {
   try {
-    localStorage.setItem('homepage-md-condensed', enabled ? '1' : '0');
-  } catch {
-    // localStorage may be unavailable
+    const stored = localStorage.getItem(`homepage-md-view-${slug}`);
+    if (stored) return JSON.parse(stored);
+  } catch { /* ignore */ }
+  return { density: 'detailed', layout: 'grid' };
+}
+
+function saveViewPrefs(prefs) {
+  try {
+    localStorage.setItem(`homepage-md-view-${slug}`, JSON.stringify(prefs));
+  } catch { /* ignore */ }
+}
+
+function applyView(prefs) {
+  document.body.classList.toggle('is-condensed', prefs.density === 'condensed');
+  document.body.classList.toggle('is-columns', prefs.layout === 'columns');
+
+  // Sync radio buttons
+  for (const radio of document.querySelectorAll('.js-view-density')) {
+    radio.checked = radio.value === prefs.density;
+  }
+  for (const radio of document.querySelectorAll('.js-view-layout')) {
+    radio.checked = radio.value === prefs.layout;
   }
 }
 
-// Restore preference from localStorage
-try {
-  if (localStorage.getItem('homepage-md-condensed') === '1') {
-    setCondensed(true);
-  }
-} catch {
-  // Ignore
+// Initialize view from stored preference
+const viewPrefs = getViewPrefs();
+applyView(viewPrefs);
+
+// Toggle dropdown
+if (viewToggle && viewDropdown) {
+  viewToggle.addEventListener('click', () => {
+    const isOpen = !viewDropdown.hidden;
+    viewDropdown.hidden = isOpen;
+    viewToggle.setAttribute('aria-expanded', String(!isOpen));
+  });
+
+  // Close dropdown on outside click
+  document.addEventListener('click', (event) => {
+    if (!event.target.closest('.c-view-menu')) {
+      viewDropdown.hidden = true;
+      viewToggle.setAttribute('aria-expanded', 'false');
+    }
+  });
 }
 
-if (condensedToggle) {
-  condensedToggle.addEventListener('click', () => {
-    const isCurrently = document.body.classList.contains('is-condensed');
-    setCondensed(!isCurrently);
+// Listen for radio changes
+for (const radio of document.querySelectorAll('.js-view-density')) {
+  radio.addEventListener('change', () => {
+    viewPrefs.density = radio.value;
+    saveViewPrefs(viewPrefs);
+    applyView(viewPrefs);
+  });
+}
+
+for (const radio of document.querySelectorAll('.js-view-layout')) {
+  radio.addEventListener('change', () => {
+    viewPrefs.layout = radio.value;
+    saveViewPrefs(viewPrefs);
+    applyView(viewPrefs);
   });
 }

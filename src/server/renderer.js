@@ -24,8 +24,9 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultP
 
   const search = renderSearch();
   const addBtn = renderAddButton();
-  const condensedToggle = renderCondensedToggle();
+  const viewDropdown = renderViewDropdown();
   const addDialog = renderAddDialog(categories, currentSlug);
+  const deleteDialog = renderDeleteDialog();
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -36,13 +37,13 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultP
   <link rel="stylesheet" href="/styles/main.css">
   <link rel="stylesheet" href="/custom.css">
 </head>
-<body>
+<body data-slug="${escapeAttr(currentSlug)}">
   <a href="#main-content" class="c-skip-link">Skip to content</a>
   <header class="c-header">
     <h1 class="c-header__title">${escapeHtml(title)}</h1>
 ${nav}
 ${search}
-${condensedToggle}
+${viewDropdown}
 ${addBtn}
   </header>
 ${jumpLinks}
@@ -79,6 +80,7 @@ ${addDialog}
       </div>
     </form>
   </dialog>
+${deleteDialog}
   <script src="/scripts/app.js" type="module"></script>
 </body>
 </html>`;
@@ -98,8 +100,44 @@ function renderAddButton() {
   return `    <button type="button" class="c-btn c-btn--primary js-add-open" aria-label="Add bookmark">+ Add</button>`;
 }
 
-function renderCondensedToggle() {
-  return `    <button type="button" class="c-btn c-btn--small js-condensed-toggle" aria-pressed="false" title="Toggle condensed view">Condensed</button>`;
+function renderViewDropdown() {
+  return `    <div class="c-view-menu">
+      <button type="button" class="c-btn c-btn--small js-view-toggle" aria-expanded="false" aria-haspopup="true">View ▾</button>
+      <div class="c-view-menu__dropdown js-view-dropdown" hidden>
+        <fieldset class="c-view-menu__group">
+          <legend class="c-view-menu__legend">Density</legend>
+          <label class="c-view-menu__option">
+            <input type="radio" name="density" value="detailed" class="js-view-density" checked> Detailed
+          </label>
+          <label class="c-view-menu__option">
+            <input type="radio" name="density" value="condensed" class="js-view-density"> Condensed
+          </label>
+        </fieldset>
+        <fieldset class="c-view-menu__group">
+          <legend class="c-view-menu__legend">Layout</legend>
+          <label class="c-view-menu__option">
+            <input type="radio" name="layout" value="grid" class="js-view-layout" checked> Grid
+          </label>
+          <label class="c-view-menu__option">
+            <input type="radio" name="layout" value="columns" class="js-view-layout"> Columns
+          </label>
+        </fieldset>
+      </div>
+    </div>`;
+}
+
+function renderDeleteDialog() {
+  return `  <dialog class="c-dialog c-dialog--small js-delete-dialog">
+    <form method="dialog" class="c-dialog__form">
+      <h2 class="c-dialog__title">Delete Bookmark</h2>
+      <p class="c-dialog__message js-delete-message">Are you sure?</p>
+      <input type="hidden" class="js-delete-url">
+      <div class="c-dialog__actions">
+        <button type="button" class="c-btn c-btn--danger js-delete-confirm">Delete</button>
+        <button type="button" class="c-btn js-delete-cancel">Cancel</button>
+      </div>
+    </form>
+  </dialog>`;
 }
 
 function renderJumpLinks(categories) {
