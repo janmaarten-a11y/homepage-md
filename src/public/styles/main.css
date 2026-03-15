@@ -70,6 +70,7 @@
     -moz-text-size-adjust: none;
     -webkit-text-size-adjust: none;
     text-size-adjust: none;
+    font-size: 100%;
   }
 
   /* Remove default margin in favour of better control in authored CSS */
@@ -654,7 +655,7 @@
   .is-columns .c-subcategory .c-bookmark-list {
     display: flex;
     flex-direction: column;
-    gap: var(--space-m);
+    gap: var(--space-s);
   }
 
   .is-columns .c-subcategory .c-bookmark__description {
