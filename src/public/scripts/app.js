@@ -352,7 +352,7 @@ document.addEventListener('click', (event) => {
   const titleEl = card.querySelector('.c-bookmark__title');
   const title = titleEl?.textContent || url;
 
-  deleteMessage.textContent = `Delete "${title}"?`;
+  deleteMessage.textContent = `Are you sure you want to delete "${title}"?`;
   deleteUrlInput.value = url;
   deleteDialog.showModal();
 });
