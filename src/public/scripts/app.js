@@ -165,15 +165,17 @@ document.addEventListener('keydown', (event) => {
 
 const addDialog = document.querySelector('.js-add-dialog');
 const addForm = document.querySelector('.js-add-form');
-const addOpenBtn = document.querySelector('.js-add-open');
+const addOpenBtns = document.querySelectorAll('.js-add-open');
 const addCancelBtn = document.querySelector('.js-add-cancel');
 const fetchMetaBtn = document.querySelector('.js-fetch-meta');
 const addUrlInput = document.querySelector('.js-add-url');
 const addTitleInput = document.querySelector('.js-add-title');
 const addDescInput = document.querySelector('.js-add-description');
 
-if (addOpenBtn && addDialog) {
-  addOpenBtn.addEventListener('click', () => addDialog.showModal());
+if (addDialog) {
+  for (const btn of addOpenBtns) {
+    btn.addEventListener('click', () => addDialog.showModal());
+  }
 }
 
 if (addCancelBtn && addDialog) {

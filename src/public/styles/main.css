@@ -850,7 +850,50 @@
     display: none;
   }
 
+  /* On mobile, show toolbar as a visible row (search + view options) */
   .c-header__toolbar {
+    flex-wrap: wrap;
+    padding-block: var(--space-s);
+    padding-inline: var(--space-s);
+    gap: var(--space-s);
+  }
+
+  /* Search full width on mobile */
+  .c-header__toolbar .c-search {
+    flex: none;
+    inline-size: 100%;
+  }
+
+  .c-header__toolbar .c-search__input {
+    inline-size: 100%;
+  }
+
+  /* Hide desktop Add button on mobile (FAB replaces it) */
+  .c-header__toolbar .js-add-open {
+    display: none;
+  }
+
+  /* Toolbar: hide layout group on mobile, full-width groups */
+  .c-toolbar {
+    inline-size: 100%;
+    margin-inline-start: 0;
+    flex-wrap: wrap;
+    gap: var(--space-s);
+  }
+
+  .c-toolbar__group[aria-label="Layout"] {
+    display: none;
+  }
+
+  .c-toolbar__group {
+    flex: 1;
+  }
+
+  .c-toolbar__btn {
+    flex: 1;
+  }
+
+  .c-toolbar__separator {
     display: none;
   }
 
@@ -865,12 +908,6 @@
     font-size: 1.125rem;
     flex: 1;
     min-inline-size: 0;
-  }
-
-  /* Show search below header on mobile */
-  .c-header::after {
-    content: '';
-    display: block;
   }
 
   /* Drawers */
@@ -906,33 +943,6 @@
   .c-drawer__categories {
     border-block-start: 1px solid var(--color-border);
     padding-block-start: var(--space-s);
-  }
-
-  /* Inline search on mobile — show it in header top row */
-  .c-header__top .c-search {
-    order: 10;
-    inline-size: 100%;
-  }
-
-  .c-header__top .c-search__input {
-    inline-size: 100%;
-  }
-
-  /* Move search into the header top row on mobile */
-  .c-search {
-    flex: none;
-  }
-
-  /* View drawer — toolbar displayed vertically */
-  .c-drawer--end .c-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-    margin-inline-start: 0;
-  }
-
-  .c-drawer--end .c-toolbar__separator {
-    inline-size: 100%;
-    block-size: 1px;
   }
 
   /* Hide jump links on mobile — they're in the hamburger */
@@ -971,18 +981,5 @@
   /* Hide desktop Add button on mobile */
   .c-header .js-add-open:not(.c-fab) {
     display: none;
-  }
-
-  /* Toolbar label always hidden on mobile */
-  .c-toolbar__label {
-    position: absolute;
-    inline-size: 1px;
-    block-size: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
   }
 }

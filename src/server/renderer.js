@@ -51,9 +51,9 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultP
       <h1 class="c-header__title">${escapeHtml(title)}</h1>
       <button type="button" class="c-header__view-btn js-view-menu-toggle" aria-expanded="false" aria-controls="js-view-drawer" aria-label="View options">${iconSettings}</button>
 ${nav}
-${search}
     </div>
     <div class="c-header__toolbar">
+${search}
 ${toolbar}
 ${addBtn}
     </div>
