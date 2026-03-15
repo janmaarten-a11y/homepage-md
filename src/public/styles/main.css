@@ -280,7 +280,7 @@
   }
 
   .c-search__input {
-    font-size: 0.875rem;
+    font-size: 1rem;
     padding-block: var(--space-s);
     padding-inline: var(--space-s) var(--space-l);
     border: 1px solid var(--color-border);
@@ -310,7 +310,7 @@
     position: absolute;
     inset-inline-end: var(--space-s);
     font-family: var(--font-mono);
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     padding-block: 0.0625rem;
     padding-inline: var(--space-xs);
     border: 1px solid var(--color-border);
@@ -424,7 +424,7 @@
 
   .c-bookmark__description {
     margin: 0;
-    font-size: 0.875rem;
+    font-size: 1rem;
     color: var(--color-muted);
     padding-inline-start: calc(2rem + var(--space-s));
   }
@@ -485,7 +485,7 @@
   }
 
   .c-btn--small {
-    font-size: 0.75rem;
+    font-size: 0.875rem;
     padding-block: var(--space-xs);
     padding-inline: var(--space-s);
     min-block-size: 1.5rem;
@@ -552,7 +552,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-xs);
-    font-size: 0.875rem;
+    font-size: 1rem;
     font-weight: 500;
   }
 
@@ -563,7 +563,7 @@
 
   .c-dialog__input {
     font-family: var(--font-base);
-    font-size: 0.875rem;
+    font-size: 1rem;
     padding-block: var(--space-xs);
     padding-inline: var(--space-s);
     border: 1px solid var(--color-border);
@@ -739,7 +739,7 @@
 
   .c-dialog__message {
     margin: 0;
-    font-size: 0.9375rem;
+    font-size: 1rem;
   }
 
   /* Color mode classes */
