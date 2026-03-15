@@ -54,8 +54,8 @@ ${nav}
 ${search}
     </div>
     <div class="c-header__toolbar">
-${toolbar}
 ${addBtn}
+${toolbar}
     </div>
   </header>
   <aside class="c-drawer js-menu-drawer" id="js-menu-drawer" hidden>
@@ -76,7 +76,7 @@ ${jumpLinks}
   <main id="main-content">
 ${main}
   </main>
-  <button type="button" class="c-fab js-add-open" aria-label="Add bookmark">${iconPlus}</button>
+  <button type="button" class="c-fab js-add-open" aria-label="Add link">${iconPlus}</button>
   <p class="c-search-empty js-search-empty" hidden>No bookmarks match your search.</p>
   <div class="u-visually-hidden" aria-live="polite" id="js-search-status"></div>
 ${addDialog}
@@ -124,7 +124,7 @@ function renderSearch() {
 }
 
 function renderAddButton() {
-  return `    <button type="button" class="c-btn c-btn--primary js-add-open" aria-label="Add bookmark">+ Add link</button>`;
+  return `    <button type="button" class="c-btn c-btn--primary js-add-open" aria-label="Add link">+ Add link</button>`;
 }
 
 function renderToolbar() {
@@ -189,7 +189,7 @@ function renderAddDialog(categories, currentSlug) {
 
   return `  <dialog class="c-dialog js-add-dialog">
     <form method="dialog" class="c-dialog__form js-add-form">
-      <h2 class="c-dialog__title">Add Bookmark</h2>
+      <h2 class="c-dialog__title">Add Link</h2>
       <input type="hidden" name="page" value="${escapeAttr(currentSlug)}">
       <label class="c-dialog__label">
         URL
@@ -220,7 +220,7 @@ ${categoryOptions}
         <input type="url" name="icon" class="c-dialog__input js-add-icon" placeholder="https://…">
       </label>
       <div class="c-dialog__actions">
-        <button type="submit" class="c-btn c-btn--primary">Add Bookmark</button>
+        <button type="submit" class="c-btn c-btn--primary">Add Link</button>
         <button type="button" class="c-btn js-add-cancel">Cancel</button>
       </div>
     </form>

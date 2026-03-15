@@ -820,7 +820,7 @@
 }
 
 /* Narrower: hide Layout labels (Grid/Columns), keep icons */
-@media (max-width: 50rem) {
+@media (max-width: 53rem) {
   .c-toolbar__group[aria-label="Layout"] .c-toolbar__label {
     position: absolute;
     inline-size: 1px;
@@ -885,7 +885,9 @@
     order: 10;
     inline-size: 100%;
   }
-
+  .c-search__wrap {
+    width: 100%;
+  }
   .c-header__top .c-search__input {
     inline-size: 100%;
   }
@@ -1012,5 +1014,15 @@
   /* Hide desktop Add button on mobile */
   .c-header .js-add-open:not(.c-fab) {
     display: none;
+  }
+
+  /* Compact dialogs on mobile */
+  .c-dialog {
+    padding: var(--space-m);
+    inline-size: 95vw;
+  }
+
+  .c-dialog__form {
+    gap: var(--space-s);
   }
 }
