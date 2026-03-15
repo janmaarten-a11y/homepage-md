@@ -6,24 +6,30 @@
 @layer config {
   :root {
     /* Colors */
-    --color-bg: oklch(98% 0 0);
-    --color-text: oklch(20% 0 0);
-    --color-primary: oklch(50% 0.15 250);
+    --color-bg: oklch(97% 0.005 260);
+    --color-text: oklch(20% 0.01 260);
+    --color-primary: oklch(48% 0.16 260);
     --color-surface: oklch(100% 0 0);
-    --color-border: oklch(85% 0 0);
-    --color-focus: oklch(55% 0.2 250);
-    --color-muted: oklch(55% 0 0);
+    --color-border: oklch(88% 0.005 260);
+    --color-focus: oklch(48% 0.2 260);
+    --color-muted: oklch(52% 0.01 260);
 
     /* Spacing */
     --space-xs: 0.25rem;
     --space-s: 0.5rem;
     --space-m: 1rem;
-    --space-l: 2rem;
-    --space-xl: 4rem;
+    --space-l: 1.5rem;
+    --space-xl: 3rem;
 
     /* Border radius */
     --radius-s: 0.25rem;
     --radius-m: 0.5rem;
+    --radius-l: 0.75rem;
+
+    /* Shadows */
+    --shadow-s: 0 1px 3px oklch(20% 0.01 260 / 8%);
+    --shadow-m: 0 4px 12px oklch(20% 0.01 260 / 10%);
+    --shadow-l: 0 8px 24px oklch(20% 0.01 260 / 12%);
 
     /* Typography */
     --font-base: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -32,13 +38,17 @@
 
   @media (prefers-color-scheme: dark) {
     :root {
-      --color-bg: oklch(20% 0.02 260);
-      --color-text: oklch(90% 0 0);
-      --color-primary: oklch(70% 0.15 250);
-      --color-surface: oklch(25% 0.02 260);
-      --color-border: oklch(35% 0.02 260);
-      --color-focus: oklch(70% 0.2 250);
-      --color-muted: oklch(65% 0 0);
+      --color-bg: oklch(18% 0.015 260);
+      --color-text: oklch(92% 0.005 260);
+      --color-primary: oklch(72% 0.14 260);
+      --color-surface: oklch(22% 0.015 260);
+      --color-border: oklch(30% 0.015 260);
+      --color-focus: oklch(72% 0.18 260);
+      --color-muted: oklch(62% 0.01 260);
+
+      --shadow-s: 0 1px 3px oklch(0% 0 0 / 20%);
+      --shadow-m: 0 4px 12px oklch(0% 0 0 / 25%);
+      --shadow-l: 0 8px 24px oklch(0% 0 0 / 30%);
     }
   }
 }
@@ -167,10 +177,12 @@
     padding-block: var(--space-l);
     padding-inline: var(--space-l);
     border-block-end: 1px solid var(--color-border);
+    background-color: var(--color-surface);
   }
 
   .c-header__title {
-    font-size: 1.5rem;
+    font-size: 1.375rem;
+    letter-spacing: -0.01em;
     margin-inline-end: auto;
   }
 
@@ -212,13 +224,16 @@
   }
 
   .c-nav__link {
-    padding-block: var(--space-xs);
+    padding-block: var(--space-s);
     padding-inline: var(--space-s);
     border-radius: var(--radius-s);
     text-decoration: none;
     font-weight: 500;
     white-space: nowrap;
     flex-shrink: 0;
+    min-block-size: 2.75rem;
+    display: inline-flex;
+    align-items: center;
   }
 
   .c-nav__link:hover {
@@ -243,9 +258,8 @@
   }
 
   .c-search__input {
-    font-family: var(--font-base);
     font-size: 0.875rem;
-    padding-block: var(--space-xs);
+    padding-block: var(--space-s);
     padding-inline: var(--space-s) var(--space-l);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-m);
@@ -253,6 +267,7 @@
     color: var(--color-text);
     inline-size: 16rem;
     max-inline-size: 100%;
+    min-block-size: 2.75rem;
   }
 
   .c-search__input::placeholder {
@@ -325,13 +340,15 @@
 
   /* Bookmark card */
   .c-bookmark {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: var(--space-xs);
     padding: var(--space-m);
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-m);
+    border-radius: var(--radius-l);
+    box-shadow: var(--shadow-s);
   }
 
   .c-bookmark__link {
@@ -341,6 +358,14 @@
     text-decoration: none;
     color: var(--color-text);
     font-weight: 500;
+    border-radius: var(--radius-s);
+    padding: var(--space-xs);
+    margin: calc(-1 * var(--space-xs));
+  }
+
+  .c-bookmark__link:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
   }
 
   .c-bookmark__link:hover .c-bookmark__title {
@@ -376,33 +401,33 @@
     display: none;
   }
 
-  /* Bookmark actions (edit/delete) — hidden until hover or roving focus */
+  /* Bookmark actions (edit/delete) — floating overlay, hidden from tab order */
   .c-bookmark__actions {
-    display: flex;
+    position: absolute;
+    inset-block-start: var(--space-xs);
+    inset-inline-end: var(--space-xs);
+    display: none;
     gap: var(--space-xs);
-    padding-inline-start: calc(2rem + var(--space-s));
-    margin-block-start: var(--space-xs);
-    opacity: 0;
   }
 
   .c-bookmark:hover .c-bookmark__actions,
   .c-bookmark:focus-within .c-bookmark__actions {
-    opacity: 1;
+    display: flex;
   }
 
   /* Buttons */
   .c-btn {
-    font-family: var(--font-base);
     font-size: 0.875rem;
     font-weight: 500;
-    padding-block: var(--space-xs);
-    padding-inline: var(--space-s);
+    padding-block: var(--space-s);
+    padding-inline: var(--space-m);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-s);
     background-color: var(--color-surface);
     color: var(--color-text);
     cursor: pointer;
     line-height: 1.4;
+    min-block-size: 2.25rem;
   }
 
   .c-btn:hover {
@@ -426,8 +451,9 @@
 
   .c-btn--small {
     font-size: 0.75rem;
-    padding-block: 0.125rem;
-    padding-inline: var(--space-xs);
+    padding-block: var(--space-xs);
+    padding-inline: var(--space-s);
+    min-block-size: 1.5rem;
   }
 
   .c-btn--danger {
@@ -443,12 +469,13 @@
   /* Dialog */
   .c-dialog {
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-m);
+    border-radius: var(--radius-l);
     padding: var(--space-l);
     background-color: var(--color-bg);
     color: var(--color-text);
     max-inline-size: 32rem;
     inline-size: 90vw;
+    box-shadow: var(--shadow-l);
   }
 
   .c-dialog::backdrop {
@@ -518,12 +545,15 @@
 
   .c-jump-links__link {
     font-size: 0.8125rem;
-    padding-block: var(--space-xs);
+    padding-block: var(--space-s);
     padding-inline: var(--space-s);
     border-radius: var(--radius-s);
     text-decoration: none;
     color: var(--color-text);
     font-weight: 500;
+    min-block-size: 2.75rem;
+    display: inline-flex;
+    align-items: center;
   }
 
   .c-jump-links__link:hover {
@@ -540,8 +570,8 @@
   }
 
   .is-condensed .c-bookmark__actions {
-    padding-inline-start: calc(2rem + var(--space-s));
-    margin-block-start: 0;
+    inset-block-start: var(--space-xs);
+    inset-inline-end: var(--space-xs);
   }
 
   /* Columns layout — subcategories become horizontal columns, direct bookmarks remain grid */
@@ -589,8 +619,8 @@
     padding: var(--space-m);
     background-color: var(--color-bg);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-m);
-    box-shadow: 0 4px 12px oklch(0% 0 0 / 10%);
+    border-radius: var(--radius-l);
+    box-shadow: var(--shadow-m);
     z-index: 20;
     min-inline-size: 12rem;
   }
@@ -667,11 +697,7 @@
     transition: box-shadow 0.15s ease;
   }
 
-  .c-bookmark__actions {
-    transition: opacity 0.1s ease;
-  }
-
   .c-bookmark:hover {
-    box-shadow: 0 2px 8px oklch(0% 0 0 / 10%);
+    box-shadow: var(--shadow-m);
   }
 }
