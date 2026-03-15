@@ -169,4 +169,53 @@ describe('renderPage', () => {
     assert.ok(html.includes('<main id="main-content">'));
     assert.ok(html.includes('</main>'));
   });
+
+  it('includes data-url attributes on bookmark items', () => {
+    const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
+    assert.ok(html.includes('data-url="https://example.com"'));
+    assert.ok(html.includes('data-url="https://sub.example.com"'));
+  });
+
+  it('includes an Add Bookmark button', () => {
+    const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
+    assert.ok(html.includes('js-add-open'));
+    assert.ok(html.includes('Add'));
+  });
+
+  it('includes an Add Bookmark dialog with form', () => {
+    const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
+    assert.ok(html.includes('js-add-dialog'));
+    assert.ok(html.includes('js-add-form'));
+    assert.ok(html.includes('name="url"'));
+    assert.ok(html.includes('name="title"'));
+    assert.ok(html.includes('name="category"'));
+  });
+
+  it('includes category options in the add dialog datalist', () => {
+    const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
+    assert.ok(html.includes('Category One'));
+    assert.ok(html.includes('js-category-list'));
+  });
+
+  it('includes edit and delete buttons on each bookmark', () => {
+    const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
+    const editBtns = html.match(/js-edit-open/g) || [];
+    const deleteBtns = html.match(/js-delete/g) || [];
+    // MINIMAL_PAGE has 2 bookmarks
+    assert.equal(editBtns.length, 2);
+    assert.equal(deleteBtns.length, 2);
+  });
+
+  it('includes an Edit Bookmark dialog', () => {
+    const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
+    assert.ok(html.includes('js-edit-dialog'));
+    assert.ok(html.includes('js-edit-form'));
+    assert.ok(html.includes('Edit Bookmark'));
+  });
+
+  it('includes a Fetch Metadata button in the add dialog', () => {
+    const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
+    assert.ok(html.includes('js-fetch-meta'));
+    assert.ok(html.includes('Fetch title'));
+  });
 });

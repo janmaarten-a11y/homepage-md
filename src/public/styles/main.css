@@ -281,6 +281,126 @@
   .c-subcategory[hidden] {
     display: none;
   }
+
+  /* Bookmark actions (edit/delete) */
+  .c-bookmark__actions {
+    display: flex;
+    gap: var(--space-xs);
+    padding-inline-start: calc(2rem + var(--space-s));
+    margin-block-start: var(--space-xs);
+  }
+
+  /* Buttons */
+  .c-btn {
+    font-family: var(--font-base);
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding-block: var(--space-xs);
+    padding-inline: var(--space-s);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-s);
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+    line-height: 1.4;
+  }
+
+  .c-btn:hover {
+    background-color: var(--color-border);
+  }
+
+  .c-btn:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  .c-btn--primary {
+    background-color: var(--color-primary);
+    color: var(--color-bg);
+    border-color: var(--color-primary);
+  }
+
+  .c-btn--primary:hover {
+    opacity: 0.9;
+  }
+
+  .c-btn--small {
+    font-size: 0.75rem;
+    padding-block: 0.125rem;
+    padding-inline: var(--space-xs);
+  }
+
+  .c-btn--danger {
+    color: oklch(55% 0.2 25);
+    border-color: oklch(55% 0.2 25);
+  }
+
+  .c-btn--danger:hover {
+    background-color: oklch(55% 0.2 25);
+    color: var(--color-bg);
+  }
+
+  /* Dialog */
+  .c-dialog {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-m);
+    padding: var(--space-l);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    max-inline-size: 32rem;
+    inline-size: 90vw;
+  }
+
+  .c-dialog::backdrop {
+    background-color: oklch(0% 0 0 / 50%);
+  }
+
+  .c-dialog__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+  }
+
+  .c-dialog__title {
+    font-size: 1.25rem;
+    margin: 0;
+  }
+
+  .c-dialog__label {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .c-dialog__hint {
+    font-weight: 400;
+    color: var(--color-muted);
+  }
+
+  .c-dialog__input {
+    font-family: var(--font-base);
+    font-size: 0.875rem;
+    padding-block: var(--space-xs);
+    padding-inline: var(--space-s);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-s);
+    background-color: var(--color-surface);
+    color: var(--color-text);
+  }
+
+  .c-dialog__input:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+    border-color: var(--color-primary);
+  }
+
+  .c-dialog__actions {
+    display: flex;
+    gap: var(--space-s);
+    justify-content: flex-end;
+  }
 }
 
 /* ---------------------------------------------------------------------------

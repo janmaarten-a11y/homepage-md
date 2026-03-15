@@ -19,8 +19,11 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls }) {
   const title = pageData.title || 'HomepageMD';
   const nav = renderNav(pages, currentSlug);
   const main = renderMain(pageData, faviconUrls);
+  const categories = pageData.categories.map((c) => c.name);
 
   const search = renderSearch();
+  const addBtn = renderAddButton();
+  const addDialog = renderAddDialog(categories, currentSlug);
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -37,12 +40,36 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls }) {
     <h1 class="c-header__title">${escapeHtml(title)}</h1>
 ${nav}
 ${search}
+${addBtn}
   </header>
   <main id="main-content">
 ${main}
   </main>
   <p class="c-search-empty js-search-empty" hidden>No bookmarks match your search.</p>
   <div class="u-visually-hidden" aria-live="polite" id="js-search-status"></div>
+${addDialog}
+  <dialog class="c-dialog js-edit-dialog">
+    <form method="dialog" class="c-dialog__form js-edit-form">
+      <h2 class="c-dialog__title">Edit Bookmark</h2>
+      <input type="hidden" name="originalUrl" class="js-edit-original-url">
+      <label class="c-dialog__label">
+        Title
+        <input type="text" name="title" class="c-dialog__input js-edit-title" required>
+      </label>
+      <label class="c-dialog__label">
+        URL
+        <input type="url" name="url" class="c-dialog__input js-edit-url" required>
+      </label>
+      <label class="c-dialog__label">
+        Description
+        <input type="text" name="description" class="c-dialog__input js-edit-description">
+      </label>
+      <div class="c-dialog__actions">
+        <button type="submit" class="c-btn c-btn--primary">Save</button>
+        <button type="button" class="c-btn js-edit-cancel">Cancel</button>
+      </div>
+    </form>
+  </dialog>
   <script src="/scripts/app.js" type="module"></script>
 </body>
 </html>`;
@@ -53,6 +80,51 @@ function renderSearch() {
       <label for="js-search" class="u-visually-hidden">Search bookmarks</label>
       <input type="search" id="js-search" class="c-search__input" placeholder="Search bookmarks…" autocomplete="off">
     </search>`;
+}
+
+function renderAddButton() {
+  return `    <button type="button" class="c-btn c-btn--primary js-add-open" aria-label="Add bookmark">+ Add</button>`;
+}
+
+function renderAddDialog(categories, currentSlug) {
+  const categoryOptions = categories
+    .map((name) => `        <option value="${escapeAttr(name)}">${escapeHtml(name)}</option>`)
+    .join('\n');
+
+  return `  <dialog class="c-dialog js-add-dialog">
+    <form method="dialog" class="c-dialog__form js-add-form">
+      <h2 class="c-dialog__title">Add Bookmark</h2>
+      <input type="hidden" name="page" value="${escapeAttr(currentSlug)}">
+      <label class="c-dialog__label">
+        URL
+        <input type="url" name="url" class="c-dialog__input js-add-url" required placeholder="https://…">
+      </label>
+      <button type="button" class="c-btn c-btn--small js-fetch-meta">Fetch title &amp; description</button>
+      <label class="c-dialog__label">
+        Title
+        <input type="text" name="title" class="c-dialog__input js-add-title" required>
+      </label>
+      <label class="c-dialog__label">
+        Description
+        <input type="text" name="description" class="c-dialog__input js-add-description">
+      </label>
+      <label class="c-dialog__label">
+        Category
+        <input type="text" name="category" list="js-category-list" class="c-dialog__input js-add-category" required>
+        <datalist id="js-category-list">
+${categoryOptions}
+        </datalist>
+      </label>
+      <label class="c-dialog__label">
+        Subcategory <span class="c-dialog__hint">(optional)</span>
+        <input type="text" name="subcategory" class="c-dialog__input js-add-subcategory">
+      </label>
+      <div class="c-dialog__actions">
+        <button type="submit" class="c-btn c-btn--primary">Add Bookmark</button>
+        <button type="button" class="c-btn js-add-cancel">Cancel</button>
+      </div>
+    </form>
+  </dialog>`;
 }
 
 function renderNav(pages, currentSlug) {
@@ -109,11 +181,15 @@ function renderBookmark(bookmark, faviconUrls) {
 
   const searchText = [bookmark.title, bookmark.description || '', bookmark.url].join(' ');
 
-  return `          <li class="c-bookmark" data-search="${escapeAttr(searchText.toLowerCase())}">
+  return `          <li class="c-bookmark" data-search="${escapeAttr(searchText.toLowerCase())}" data-url="${escapeAttr(bookmark.url)}">
             <a href="${escapeAttr(bookmark.url)}" class="c-bookmark__link">
               <img src="${escapeAttr(faviconUrl)}" alt="" class="c-bookmark__icon" loading="lazy" width="32" height="32">
               <span class="c-bookmark__title">${escapeHtml(bookmark.title)}</span>
             </a>${description}
+            <div class="c-bookmark__actions">
+              <button type="button" class="c-btn c-btn--small js-edit-open" aria-label="Edit ${escapeAttr(bookmark.title)}">Edit</button>
+              <button type="button" class="c-btn c-btn--small c-btn--danger js-delete" aria-label="Delete ${escapeAttr(bookmark.title)}">Delete</button>
+            </div>
           </li>`;
 }
 

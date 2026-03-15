@@ -5,6 +5,9 @@ import { config } from './config.js';
 import { parseMarkdown } from './parser.js';
 import { renderPage } from './renderer.js';
 import { getFaviconUrl, refreshFavicons, extractDomain } from './favicon.js';
+import { addBookmark, removeBookmark, updateBookmark } from './writer.js';
+import { isAuthenticated, sendUnauthorized } from './auth.js';
+import { fetchMetadata } from './metadata.js';
 
 const CONTENT_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -170,6 +173,125 @@ async function startWatcher() {
 }
 
 // ---------------------------------------------------------------------------
+// JSON body parser
+// ---------------------------------------------------------------------------
+
+function readBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    let size = 0;
+    const MAX_BODY = 64 * 1024; // 64 KB
+    req.on('data', (chunk) => {
+      size += chunk.length;
+      if (size > MAX_BODY) {
+        reject(new Error('Request body too large'));
+        req.destroy();
+      } else {
+        chunks.push(chunk);
+      }
+    });
+    req.on('end', () => resolve(Buffer.concat(chunks).toString('utf-8')));
+    req.on('error', reject);
+  });
+}
+
+function sendJSON(res, status, data) {
+  res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
+  res.end(JSON.stringify(data));
+}
+
+// ---------------------------------------------------------------------------
+// API handlers
+// ---------------------------------------------------------------------------
+
+async function handleApiBookmark(req, res, slug) {
+  if (!isAuthenticated(req)) {
+    sendUnauthorized(res);
+    return;
+  }
+
+  const filePath = join(config.bookmarksDir, `${slug}.md`);
+
+  try {
+    if (req.method === 'POST') {
+      const body = JSON.parse(await readBody(req));
+      if (!body.title || !body.url || !body.category) {
+        sendJSON(res, 400, { error: 'Missing required fields: title, url, category' });
+        return;
+      }
+      await addBookmark(filePath, {
+        title: body.title,
+        url: body.url,
+        description: body.description || null,
+        icon: body.icon || null,
+        category: body.category,
+        subcategory: body.subcategory || null,
+      });
+      sendJSON(res, 201, { ok: true });
+      return;
+    }
+
+    if (req.method === 'PUT') {
+      const body = JSON.parse(await readBody(req));
+      if (!body.url) {
+        sendJSON(res, 400, { error: 'Missing required field: url (identifier)' });
+        return;
+      }
+      await updateBookmark(filePath, body.url, {
+        title: body.title,
+        url: body.newUrl,
+        description: body.description,
+        icon: body.icon,
+      });
+      sendJSON(res, 200, { ok: true });
+      return;
+    }
+
+    if (req.method === 'DELETE') {
+      const body = JSON.parse(await readBody(req));
+      if (!body.url) {
+        sendJSON(res, 400, { error: 'Missing required field: url' });
+        return;
+      }
+      await removeBookmark(filePath, body.url);
+      sendJSON(res, 200, { ok: true });
+      return;
+    }
+
+    res.writeHead(405);
+    res.end('Method not allowed');
+  } catch (err) {
+    const status = err.message.includes('not found') ? 404 : 500;
+    sendJSON(res, status, { error: err.message });
+  }
+}
+
+async function handleApiMetadata(req, res) {
+  if (!isAuthenticated(req)) {
+    sendUnauthorized(res);
+    return;
+  }
+
+  if (req.method !== 'POST') {
+    res.writeHead(405);
+    res.end('Method not allowed');
+    return;
+  }
+
+  try {
+    const body = JSON.parse(await readBody(req));
+    if (!body.url) {
+      sendJSON(res, 400, { error: 'Missing required field: url' });
+      return;
+    }
+    const metadata = await fetchMetadata(body.url);
+    sendJSON(res, 200, metadata);
+  } catch (err) {
+    sendJSON(res, 500, { error: err.message });
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Request handler
 // ---------------------------------------------------------------------------
 
@@ -180,6 +302,25 @@ async function handleRequest(req, res) {
   // SSE endpoint
   if (pathname === '/api/events') {
     handleSSE(req, res);
+    return;
+  }
+
+  // API: fetch metadata from URL
+  if (pathname === '/api/metadata') {
+    await handleApiMetadata(req, res);
+    return;
+  }
+
+  // API: bookmark CRUD — /api/bookmarks/{slug}
+  const apiMatch = pathname.match(/^\/api\/bookmarks\/([a-zA-Z0-9_-]+)$/);
+  if (apiMatch) {
+    const slug = apiMatch[1];
+    const slugs = await getPageSlugs();
+    if (!slugs.includes(slug)) {
+      sendJSON(res, 404, { error: 'Page not found' });
+      return;
+    }
+    await handleApiBookmark(req, res, slug);
     return;
   }
 
