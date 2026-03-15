@@ -393,7 +393,8 @@
     outline: none;
   }
 
-  .c-bookmark:focus-within {
+  /* Card outline only when the bookmark link is focused (not edit/delete) */
+  .c-bookmark:has(.c-bookmark__link:focus-visible) {
     outline: 2px solid var(--color-focus);
     outline-offset: 2px;
     border-radius: var(--radius-l);
@@ -498,6 +499,12 @@
 
   .c-btn--icon svg {
     flex-shrink: 0;
+  }
+
+  /* Focus ring on icon buttons when focused programmatically (arrow keys) */
+  .c-btn--icon:focus {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
   }
 
   .c-btn--danger {
