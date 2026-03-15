@@ -265,8 +265,8 @@ function renderBookmark(bookmark, faviconUrls) {
               <span class="c-bookmark__title">${escapeHtml(bookmark.title)}</span>
             </a>${description}
             <div class="c-bookmark__actions">
-              <button type="button" class="c-btn c-btn--small js-edit-open" aria-label="Edit ${escapeAttr(bookmark.title)}">Edit</button>
-              <button type="button" class="c-btn c-btn--small c-btn--danger js-delete" aria-label="Delete ${escapeAttr(bookmark.title)}">Delete</button>
+              <button type="button" class="c-btn c-btn--small js-edit-open" aria-label="Edit ${escapeAttr(bookmark.title)}" tabindex="-1">Edit</button>
+              <button type="button" class="c-btn c-btn--small c-btn--danger js-delete" aria-label="Delete ${escapeAttr(bookmark.title)}" tabindex="-1">Delete</button>
             </div>
           </li>`;
 }

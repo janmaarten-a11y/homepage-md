@@ -125,6 +125,41 @@ function isEditing(element) {
 }
 
 // ---------------------------------------------------------------------------
+// Bookmark card roving focus — arrow keys navigate link → edit → delete
+// ---------------------------------------------------------------------------
+
+document.addEventListener('keydown', (event) => {
+  const card = event.target.closest('.c-bookmark');
+  if (!card) return;
+
+  const focusable = [
+    card.querySelector('.c-bookmark__link'),
+    card.querySelector('.js-edit-open'),
+    card.querySelector('.js-delete'),
+  ].filter(Boolean);
+
+  const currentIdx = focusable.indexOf(event.target);
+  if (currentIdx === -1) return;
+
+  let nextIdx = -1;
+
+  if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+    nextIdx = currentIdx + 1;
+  } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+    nextIdx = currentIdx - 1;
+  } else if (event.key === 'Escape' && currentIdx > 0) {
+    nextIdx = 0; // Return to the link
+  } else {
+    return;
+  }
+
+  if (nextIdx >= 0 && nextIdx < focusable.length) {
+    event.preventDefault();
+    focusable[nextIdx].focus();
+  }
+});
+
+// ---------------------------------------------------------------------------
 // Add bookmark dialog
 // ---------------------------------------------------------------------------
 

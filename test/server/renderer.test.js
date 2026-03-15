@@ -209,6 +209,14 @@ describe('renderPage', () => {
     assert.equal(bookmarkDeleteBtns.length, 2);
   });
 
+  it('edit and delete buttons have tabindex=-1 for roving focus', () => {
+    const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
+    const editBtnMatches = html.match(/js-edit-open"[^>]*tabindex="-1"/g) || [];
+    const deleteBtnMatches = html.match(/js-delete"[^>]*tabindex="-1"/g) || [];
+    assert.ok(editBtnMatches.length > 0, 'edit buttons should have tabindex="-1"');
+    assert.ok(deleteBtnMatches.length > 0, 'delete buttons should have tabindex="-1"');
+  });
+
   it('includes an Edit Bookmark dialog', () => {
     const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
     assert.ok(html.includes('js-edit-dialog'));
