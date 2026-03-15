@@ -76,7 +76,7 @@ ${jumpLinks}
   <main id="main-content">
 ${main}
   </main>
-  <button type="button" class="c-fab js-add-open" aria-label="Add link">${iconPlus}</button>
+  <button type="button" class="c-fab js-add-open">${iconPlus} <span class="c-fab__label">Add link</span></button>
   <p class="c-search-empty js-search-empty" hidden>No bookmarks match your search.</p>
   <div class="u-visually-hidden" aria-live="polite" id="js-search-status"></div>
 ${addDialog}
