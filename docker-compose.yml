@@ -3,14 +3,16 @@ services:
     build: .
     container_name: homepage-md
     ports:
-      - "3000:3000"
+      - "2525:2525"
     volumes:
       - ./bookmarks:/app/bookmarks:ro
       - ./icons:/app/icons:ro
       - ./custom.css:/app/custom.css:ro
       - favicon-cache:/app/favicon-cache
+    env_file:
+      - .env
     environment:
-      - PORT=3000
+      - PORT=2525
       - DEFAULT_PAGE=homepage
       # - AUTH_TOKEN=your-secret-token
       # - FAVICON_TTL_DAYS=7

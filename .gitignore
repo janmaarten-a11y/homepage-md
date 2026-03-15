@@ -3,3 +3,4 @@ favicon-cache/
 *.log
 .DS_Store
 Thumbs.db
+.env

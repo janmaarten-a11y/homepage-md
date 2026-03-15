@@ -186,6 +186,7 @@ if (addForm) {
         title: formData.get('title'),
         url: formData.get('url'),
         description: formData.get('description') || null,
+        icon: formData.get('icon') || null,
         category: formData.get('category'),
         subcategory: formData.get('subcategory') || null,
       });
@@ -210,9 +211,42 @@ const editOriginalUrl = document.querySelector('.js-edit-original-url');
 const editTitle = document.querySelector('.js-edit-title');
 const editUrl = document.querySelector('.js-edit-url');
 const editDescription = document.querySelector('.js-edit-description');
+const editIcon = document.querySelector('.js-edit-icon');
+const editFetchMetaBtn = document.querySelector('.js-edit-fetch-meta');
 
 if (editCancelBtn && editDialog) {
   editCancelBtn.addEventListener('click', () => editDialog.close());
+}
+
+// Fetch metadata in edit dialog
+if (editFetchMetaBtn) {
+  editFetchMetaBtn.addEventListener('click', async () => {
+    const url = editUrl?.value?.trim();
+    if (!url) return;
+
+    editFetchMetaBtn.disabled = true;
+    editFetchMetaBtn.textContent = 'Fetching…';
+
+    try {
+      const res = await fetch('/api/metadata', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url }),
+      });
+      const data = await res.json();
+      if (data.title && editTitle && !editTitle.value) {
+        editTitle.value = data.title;
+      }
+      if (data.description && editDescription && !editDescription.value) {
+        editDescription.value = data.description;
+      }
+    } catch {
+      // Silently fail
+    } finally {
+      editFetchMetaBtn.disabled = false;
+      editFetchMetaBtn.textContent = 'Fetch title & description';
+    }
+  });
 }
 
 document.addEventListener('click', (event) => {
@@ -223,6 +257,7 @@ document.addEventListener('click', (event) => {
   if (!card || !editDialog) return;
 
   const url = card.dataset.url || '';
+  const iconUrl = card.dataset.icon || '';
   const titleEl = card.querySelector('.c-bookmark__title');
   const descEl = card.querySelector('.c-bookmark__description');
 
@@ -230,6 +265,7 @@ document.addEventListener('click', (event) => {
   editUrl.value = url;
   editTitle.value = titleEl?.textContent || '';
   editDescription.value = descEl?.textContent || '';
+  if (editIcon) editIcon.value = iconUrl;
 
   editDialog.showModal();
 });
@@ -246,6 +282,7 @@ if (editForm) {
         title: editTitle.value,
         newUrl: editUrl.value !== originalUrl ? editUrl.value : undefined,
         description: editDescription.value || null,
+        icon: editIcon?.value || null,
       });
       editDialog.close();
       window.location.reload();
@@ -281,3 +318,37 @@ document.addEventListener('click', async (event) => {
     alert(`Failed to delete bookmark: ${err.message}`);
   }
 });
+
+// ---------------------------------------------------------------------------
+// Condensed view toggle
+// ---------------------------------------------------------------------------
+
+const condensedToggle = document.querySelector('.js-condensed-toggle');
+
+function setCondensed(enabled) {
+  document.body.classList.toggle('is-condensed', enabled);
+  if (condensedToggle) {
+    condensedToggle.setAttribute('aria-pressed', String(enabled));
+  }
+  try {
+    localStorage.setItem('homepage-md-condensed', enabled ? '1' : '0');
+  } catch {
+    // localStorage may be unavailable
+  }
+}
+
+// Restore preference from localStorage
+try {
+  if (localStorage.getItem('homepage-md-condensed') === '1') {
+    setCondensed(true);
+  }
+} catch {
+  // Ignore
+}
+
+if (condensedToggle) {
+  condensedToggle.addEventListener('click', () => {
+    const isCurrently = document.body.classList.contains('is-condensed');
+    setCondensed(!isCurrently);
+  });
+}

@@ -167,11 +167,17 @@
     align-items: center;
   }
 
+  .c-search__wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
   .c-search__input {
     font-family: var(--font-base);
     font-size: 0.875rem;
     padding-block: var(--space-xs);
-    padding-inline: var(--space-s);
+    padding-inline: var(--space-s) var(--space-l);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-m);
     background-color: var(--color-surface);
@@ -188,6 +194,24 @@
     outline: 2px solid var(--color-focus);
     outline-offset: 2px;
     border-color: var(--color-primary);
+  }
+
+  .c-search__input:focus-visible + .c-search__shortcut {
+    display: none;
+  }
+
+  .c-search__shortcut {
+    position: absolute;
+    inset-inline-end: var(--space-s);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    padding-block: 0.0625rem;
+    padding-inline: var(--space-xs);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-s);
+    color: var(--color-muted);
+    pointer-events: none;
+    line-height: 1.4;
   }
 
   /* Search empty state */
@@ -227,6 +251,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
     gap: var(--space-m);
+    align-items: start;
   }
 
   /* Bookmark card */
@@ -400,6 +425,48 @@
     display: flex;
     gap: var(--space-s);
     justify-content: flex-end;
+  }
+
+  /* Jump links */
+  .c-jump-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    padding-block: var(--space-s);
+    padding-inline: var(--space-l);
+    border-block-end: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 10;
+  }
+
+  .c-jump-links__link {
+    font-size: 0.8125rem;
+    padding-block: var(--space-xs);
+    padding-inline: var(--space-s);
+    border-radius: var(--radius-s);
+    text-decoration: none;
+    color: var(--color-text);
+    font-weight: 500;
+  }
+
+  .c-jump-links__link:hover {
+    background-color: var(--color-border);
+  }
+
+  /* Condensed view */
+  .is-condensed .c-bookmark__description {
+    display: none;
+  }
+
+  .is-condensed .c-bookmark {
+    padding: var(--space-s);
+  }
+
+  .is-condensed .c-bookmark__actions {
+    padding-inline-start: calc(2rem + var(--space-s));
+    margin-block-start: 0;
   }
 }
 

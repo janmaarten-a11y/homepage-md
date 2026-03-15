@@ -30,6 +30,7 @@ const DEFAULT_OPTIONS = {
   pages: [{ name: 'Test Page', slug: 'test' }],
   currentSlug: 'test',
   faviconUrls: {},
+  defaultPage: 'test',
 };
 
 describe('renderPage', () => {
@@ -133,6 +134,7 @@ describe('renderPage', () => {
       ],
       currentSlug: 'a',
       faviconUrls: {},
+      defaultPage: 'a',
     };
     const html = renderPage(MINIMAL_PAGE, options);
     assert.ok(html.includes('aria-label="Pages"'));
@@ -217,5 +219,108 @@ describe('renderPage', () => {
     const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
     assert.ok(html.includes('js-fetch-meta'));
     assert.ok(html.includes('Fetch title'));
+  });
+
+  it('includes a keyboard shortcut hint on the search field', () => {
+    const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
+    assert.ok(html.includes('c-search__shortcut'));
+    assert.ok(html.includes('<kbd'));
+    assert.ok(html.includes('/'));
+  });
+
+  it('renders category jump links when there are multiple categories', () => {
+    const multiCatPage = {
+      title: 'Multi',
+      categories: [
+        { name: 'Cat A', id: 'cat-a', bookmarks: [], subcategories: [] },
+        { name: 'Cat B', id: 'cat-b', bookmarks: [], subcategories: [] },
+      ],
+    };
+    const html = renderPage(multiCatPage, DEFAULT_OPTIONS);
+    assert.ok(html.includes('c-jump-links'));
+    assert.ok(html.includes('aria-label="Categories"'));
+    assert.ok(html.includes('href="#cat-a"'));
+    assert.ok(html.includes('href="#cat-b"'));
+  });
+
+  it('does not render jump links for a single category', () => {
+    const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
+    assert.ok(!html.includes('c-jump-links'));
+  });
+
+  it('does not render jump links for an empty page', () => {
+    const html = renderPage(EMPTY_PAGE, DEFAULT_OPTIONS);
+    assert.ok(!html.includes('c-jump-links'));
+  });
+
+  it('includes a condensed view toggle button', () => {
+    const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
+    assert.ok(html.includes('js-condensed-toggle'));
+    assert.ok(html.includes('aria-pressed="false"'));
+    assert.ok(html.includes('Condensed'));
+  });
+
+  it('includes icon URL field in add dialog', () => {
+    const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
+    assert.ok(html.includes('js-add-icon'));
+    assert.ok(html.includes('Icon URL'));
+  });
+
+  it('includes icon URL field in edit dialog', () => {
+    const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
+    assert.ok(html.includes('js-edit-icon'));
+  });
+
+  it('includes fetch metadata button in edit dialog', () => {
+    const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
+    assert.ok(html.includes('js-edit-fetch-meta'));
+  });
+
+  it('includes maxlength on description fields', () => {
+    const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
+    const maxlengthCount = (html.match(/maxlength="160"/g) || []).length;
+    // Both add and edit dialogs
+    assert.equal(maxlengthCount, 2);
+  });
+
+  it('includes data-icon attribute when bookmark has an icon override', () => {
+    const page = {
+      title: 'Icons',
+      categories: [
+        {
+          name: 'Cat',
+          id: 'cat',
+          bookmarks: [
+            { title: 'A', url: 'https://a.com', description: null, icon: 'https://a.com/icon.png' },
+            { title: 'B', url: 'https://b.com', description: null, icon: null },
+          ],
+          subcategories: [],
+        },
+      ],
+    };
+    const html = renderPage(page, DEFAULT_OPTIONS);
+    assert.ok(html.includes('data-icon="https://a.com/icon.png"'));
+    // B has no icon override — should not have data-icon
+    const bSection = html.slice(html.indexOf('data-url="https://b.com"'));
+    assert.ok(!bSection.startsWith('data-icon'));
+  });
+
+  it('places default page first in nav ordering', () => {
+    const options = {
+      pages: [
+        { name: 'Zebra', slug: 'zebra' },
+        { name: 'Alpha', slug: 'alpha' },
+        { name: 'Home', slug: 'home' },
+      ],
+      currentSlug: 'zebra',
+      faviconUrls: {},
+      defaultPage: 'home',
+    };
+    const html = renderPage(MINIMAL_PAGE, options);
+    const homeIdx = html.indexOf('/home"');
+    const alphaIdx = html.indexOf('/alpha"');
+    const zebraIdx = html.indexOf('/zebra"');
+    assert.ok(homeIdx < alphaIdx, 'default page should appear before alphabetically sorted pages');
+    assert.ok(alphaIdx < zebraIdx, 'remaining pages should be alphabetically sorted');
   });
 });
