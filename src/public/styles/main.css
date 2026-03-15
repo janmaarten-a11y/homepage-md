@@ -805,9 +805,175 @@
 }
 
 /* ---------------------------------------------------------------------------
- * Responsive — hide toolbar labels on small viewports
+ * Responsive
  * ------------------------------------------------------------------------- */
+
+/* Mobile: hamburger/view buttons visible, desktop nav/toolbar hidden */
+.c-header__menu-btn,
+.c-header__view-btn {
+  display: none;
+}
+
+.c-drawer {
+  display: none;
+}
+
+.c-fab {
+  display: none;
+}
+
 @media (max-width: 48rem) {
+  /* Show mobile controls */
+  .c-header__menu-btn,
+  .c-header__view-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xs);
+    border: none;
+    background: none;
+    color: var(--color-text);
+    cursor: pointer;
+    min-block-size: 2.75rem;
+    min-inline-size: 2.75rem;
+    border-radius: var(--radius-s);
+  }
+
+  .c-header__menu-btn:focus-visible,
+  .c-header__view-btn:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  /* Hide desktop nav and toolbar */
+  .c-header__top .c-nav {
+    display: none;
+  }
+
+  .c-header__toolbar {
+    display: none;
+  }
+
+  /* Compact header */
+  .c-header__top {
+    padding-block: var(--space-s);
+    padding-inline: var(--space-s);
+    gap: var(--space-s);
+  }
+
+  .c-header__title {
+    font-size: 1.125rem;
+    flex: 1;
+    min-inline-size: 0;
+  }
+
+  /* Show search below header on mobile */
+  .c-header::after {
+    content: '';
+    display: block;
+  }
+
+  /* Drawers */
+  .c-drawer:not([hidden]) {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-s);
+    padding: var(--space-m);
+    background-color: var(--color-surface);
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .c-drawer__link {
+    display: block;
+    padding-block: var(--space-s);
+    padding-inline: var(--space-s);
+    border-radius: var(--radius-s);
+    text-decoration: none;
+    color: var(--color-text);
+    font-weight: 500;
+  }
+
+  .c-drawer__link:hover {
+    background-color: var(--color-bg);
+  }
+
+  .c-drawer__link[aria-current="page"] {
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
+    text-underline-offset: 4px;
+  }
+
+  .c-drawer__categories {
+    border-block-start: 1px solid var(--color-border);
+    padding-block-start: var(--space-s);
+  }
+
+  /* Inline search on mobile — show it in header top row */
+  .c-header__top .c-search {
+    order: 10;
+    inline-size: 100%;
+  }
+
+  .c-header__top .c-search__input {
+    inline-size: 100%;
+  }
+
+  /* Move search into the header top row on mobile */
+  .c-search {
+    flex: none;
+  }
+
+  /* View drawer — toolbar displayed vertically */
+  .c-drawer--end .c-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    margin-inline-start: 0;
+  }
+
+  .c-drawer--end .c-toolbar__separator {
+    inline-size: 100%;
+    block-size: 1px;
+  }
+
+  /* Hide jump links on mobile — they're in the hamburger */
+  .c-jump-links {
+    display: none;
+  }
+
+  /* FAB — floating action button */
+  .c-fab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    inset-block-end: var(--space-l);
+    inset-inline-end: var(--space-l);
+    inline-size: 3.5rem;
+    block-size: 3.5rem;
+    border-radius: 50%;
+    border: none;
+    background-color: var(--color-primary);
+    color: var(--color-bg);
+    box-shadow: var(--shadow-l);
+    cursor: pointer;
+    z-index: 50;
+  }
+
+  .c-fab:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  .c-fab:hover {
+    background-color: oklch(40% 0.16 260);
+  }
+
+  /* Hide desktop Add button on mobile */
+  .c-header .js-add-open:not(.c-fab) {
+    display: none;
+  }
+
+  /* Toolbar label always hidden on mobile */
   .c-toolbar__label {
     position: absolute;
     inline-size: 1px;

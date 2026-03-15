@@ -373,6 +373,48 @@ if (deleteConfirmBtn) {
 }
 
 // ---------------------------------------------------------------------------
+// Mobile drawers — hamburger menu + view options
+// ---------------------------------------------------------------------------
+
+const menuToggle = document.querySelector('.js-menu-toggle');
+const menuDrawer = document.querySelector('.js-menu-drawer');
+const viewMenuToggle = document.querySelector('.js-view-menu-toggle');
+const viewDrawer = document.querySelector('.js-view-drawer');
+
+function toggleDrawer(toggle, drawer, otherToggle, otherDrawer) {
+  const isOpen = !drawer.hidden;
+  // Close the other drawer first
+  if (otherDrawer && !otherDrawer.hidden) {
+    otherDrawer.hidden = true;
+    otherToggle?.setAttribute('aria-expanded', 'false');
+  }
+  drawer.hidden = isOpen;
+  toggle.setAttribute('aria-expanded', String(!isOpen));
+}
+
+if (menuToggle && menuDrawer) {
+  menuToggle.addEventListener('click', () => {
+    toggleDrawer(menuToggle, menuDrawer, viewMenuToggle, viewDrawer);
+  });
+}
+
+if (viewMenuToggle && viewDrawer) {
+  viewMenuToggle.addEventListener('click', () => {
+    toggleDrawer(viewMenuToggle, viewDrawer, menuToggle, menuDrawer);
+  });
+}
+
+// Close drawers when a category link is clicked
+for (const link of document.querySelectorAll('.js-drawer-category')) {
+  link.addEventListener('click', () => {
+    if (menuDrawer) {
+      menuDrawer.hidden = true;
+      menuToggle?.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
+
+// ---------------------------------------------------------------------------
 // View preferences — per-page density × layout × color mode
 // ---------------------------------------------------------------------------
 
