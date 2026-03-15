@@ -380,7 +380,7 @@ async function handleRequest(req, res) {
       const pages = await getPageList();
       const bookmarks = flattenBookmarks(pageData);
       const faviconUrls = await resolveFavicons(bookmarks);
-      const html = renderPage(pageData, { pages, currentSlug: slug, faviconUrls });
+      const html = renderPage(pageData, { pages, currentSlug: slug, faviconUrls, defaultPage: config.defaultPage });
 
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       res.end(html);

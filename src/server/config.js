@@ -1,5 +1,5 @@
 const config = {
-  port: parseInt(process.env.PORT || '3000', 10),
+  port: parseInt(process.env.PORT || '2525', 10),
   defaultPage: process.env.DEFAULT_PAGE || 'homepage',
   bookmarksDir: process.env.BOOKMARKS_DIR || './bookmarks',
   iconsDir: process.env.ICONS_DIR || './icons',
