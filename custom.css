@@ -1,0 +1,37 @@
+/* HomepageMD — User Overrides
+ *
+ * This file loads after main.css. Override any design token below
+ * to personalize your dashboard. Only uncomment what you want to change.
+ *
+ * Available custom properties:
+ *
+ *   --color-bg          Page background
+ *   --color-text        Default text color
+ *   --color-primary     Links and accents
+ *   --color-surface     Card / section backgrounds
+ *   --color-border      Borders and dividers
+ *   --color-focus       Focus ring color
+ *
+ *   --space-xs          0.25rem
+ *   --space-s           0.5rem
+ *   --space-m           1rem
+ *   --space-l           2rem
+ *   --space-xl          4rem
+ *
+ *   --radius-s          Small border radius
+ *   --radius-m          Medium border radius
+ *
+ *   --font-base         Base font stack
+ *   --font-mono         Monospace font stack
+ *
+ * Dark mode: wrap overrides in @media (prefers-color-scheme: dark) { :root { … } }
+ */
+
+/* Example:
+:root {
+  --color-bg: oklch(25% 0.02 260);
+  --color-text: oklch(90% 0 0);
+  --color-primary: oklch(70% 0.18 150);
+  --color-surface: oklch(30% 0.02 260);
+}
+*/

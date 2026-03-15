@@ -1,0 +1,20 @@
+services:
+  homepage-md:
+    build: .
+    container_name: homepage-md
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./bookmarks:/app/bookmarks:ro
+      - ./icons:/app/icons:ro
+      - ./custom.css:/app/custom.css:ro
+      - favicon-cache:/app/favicon-cache
+    environment:
+      - PORT=3000
+      - DEFAULT_PAGE=homepage
+      # - AUTH_TOKEN=your-secret-token
+      # - FAVICON_TTL_DAYS=7
+    restart: unless-stopped
+
+volumes:
+  favicon-cache:
