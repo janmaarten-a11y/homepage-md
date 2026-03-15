@@ -202,10 +202,11 @@ describe('renderPage', () => {
   it('includes edit and delete buttons on each bookmark', () => {
     const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
     const editBtns = html.match(/js-edit-open/g) || [];
-    const deleteBtns = html.match(/js-delete/g) || [];
+    // js-delete appears on each bookmark card (2) plus in the delete dialog
+    const bookmarkDeleteBtns = html.match(/class="c-btn c-btn--small c-btn--danger js-delete"/g) || [];
     // MINIMAL_PAGE has 2 bookmarks
     assert.equal(editBtns.length, 2);
-    assert.equal(deleteBtns.length, 2);
+    assert.equal(bookmarkDeleteBtns.length, 2);
   });
 
   it('includes an Edit Bookmark dialog', () => {
@@ -255,9 +256,32 @@ describe('renderPage', () => {
 
   it('includes a condensed view toggle button', () => {
     const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
-    assert.ok(html.includes('js-condensed-toggle'));
-    assert.ok(html.includes('aria-pressed="false"'));
-    assert.ok(html.includes('Condensed'));
+    assert.ok(html.includes('js-view-toggle'));
+    assert.ok(html.includes('View'));
+  });
+
+  it('includes a view dropdown with density and layout options', () => {
+    const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
+    assert.ok(html.includes('js-view-dropdown'));
+    assert.ok(html.includes('name="density"'));
+    assert.ok(html.includes('value="detailed"'));
+    assert.ok(html.includes('value="condensed"'));
+    assert.ok(html.includes('name="layout"'));
+    assert.ok(html.includes('value="grid"'));
+    assert.ok(html.includes('value="columns"'));
+  });
+
+  it('includes a delete confirmation dialog', () => {
+    const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
+    assert.ok(html.includes('js-delete-dialog'));
+    assert.ok(html.includes('js-delete-confirm'));
+    assert.ok(html.includes('js-delete-cancel'));
+    assert.ok(html.includes('Delete Bookmark'));
+  });
+
+  it('includes data-slug on the body element', () => {
+    const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
+    assert.ok(html.includes('data-slug="test"'));
   });
 
   it('includes icon URL field in add dialog', () => {
