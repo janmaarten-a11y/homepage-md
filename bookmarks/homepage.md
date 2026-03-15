@@ -1,5 +1,14 @@
 # Household Bookmarks
 
+## Home
+
+- [Family Calendar](https://calendar.google.com)
+  - description: Shared Google Calendar
+- [Grocery List](https://www.example.com/groceries)
+  - description: Shared shopping list
+- [Recipe Collection](https://www.example.com/recipes)
+  - description: Family favorites
+
 ## School
 
 - [School Portal](https://school.example.com)
@@ -10,15 +19,6 @@
   - description: Assignments and class materials
 - [Khan Academy](https://www.khanacademy.org)
   - description: Free courses and practice exercises
-
-## Home
-
-- [Family Calendar](https://calendar.google.com)
-  - description: Shared Google Calendar
-- [Grocery List](https://www.example.com/groceries)
-  - description: Shared shopping list
-- [Recipe Collection](https://www.example.com/recipes)
-  - description: Family favorites
 
 ### Smart Home
 
@@ -39,13 +39,15 @@
 
 ### Video
 
+- [Plex](https://plex.tv)
+  - description: Family media library
 - [Netflix](https://www.netflix.com)
   - description: Family streaming account
 - [Disney+](https://www.disneyplus.com)
   - description: Kids profiles are set up
 - [YouTube](https://www.youtube.com)
   - description: Shared family account
-- [Amazon Prime Video](https://www.amazon.com/gp/video/storefront)
+- [Amazon Prime Video](https://www.primevideo.com)
   - description: Included with Prime membership
 
 ### Music
