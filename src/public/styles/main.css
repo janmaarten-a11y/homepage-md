@@ -390,8 +390,13 @@
   }
 
   .c-bookmark__link:focus-visible {
+    outline: none;
+  }
+
+  .c-bookmark:focus-within {
     outline: 2px solid var(--color-focus);
     outline-offset: 2px;
+    border-radius: var(--radius-l);
   }
 
   .c-bookmark__link:hover .c-bookmark__title {
@@ -470,7 +475,8 @@
   }
 
   .c-btn--primary:hover {
-    opacity: 0.9;
+    background-color: oklch(40% 0.16 260);
+    border-color: oklch(40% 0.16 260);
   }
 
   .c-btn--small {
@@ -663,14 +669,24 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: var(--space-xs);
     padding: var(--space-xs) var(--space-s);
     min-block-size: 2rem;
-    min-inline-size: 2rem;
     border: none;
     background-color: var(--color-surface);
     color: var(--color-muted);
     cursor: pointer;
-    font-size: 0;
+    font-size: 0.75rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .c-toolbar__label {
+    /* Visible by default, hidden on small viewports below */
+  }
+
+  .c-toolbar__btn svg {
+    flex-shrink: 0;
   }
 
   .c-toolbar__btn:hover {
@@ -764,5 +780,22 @@
 
   .c-bookmark:hover {
     box-shadow: var(--shadow-m);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Responsive — hide toolbar labels on small viewports
+ * ------------------------------------------------------------------------- */
+@media (max-width: 48rem) {
+  .c-toolbar__label {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 }
