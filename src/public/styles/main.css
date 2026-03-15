@@ -29,7 +29,7 @@
     /* Shadows */
     --shadow-s: 0 1px 3px oklch(20% 0.01 260 / 8%);
     --shadow-m: 0 4px 12px oklch(20% 0.01 260 / 10%);
-    --shadow-l: 0 8px 24px oklch(20% 0.01 260 / 12%);
+    --shadow-l: 0 8px 24px oklch(20% 0.01 260 / 50%);
 
     /* Typography */
     --font-base: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
