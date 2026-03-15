@@ -1,0 +1,23 @@
+{
+  "name": "homepage-md",
+  "version": "0.1.0",
+  "description": "Your bookmarks, in Markdown. Your homepage, everywhere.",
+  "type": "module",
+  "main": "src/server/index.js",
+  "scripts": {
+    "start": "node src/server/index.js",
+    "dev": "node --watch src/server/index.js",
+    "test": "node --test test/**/*.test.js"
+  },
+  "keywords": [
+    "bookmarks",
+    "homepage",
+    "markdown",
+    "dashboard"
+  ],
+  "author": "Jan Maarten",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

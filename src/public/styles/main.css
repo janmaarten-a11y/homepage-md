@@ -1,0 +1,251 @@
+@layer config, resets, components, utilities;
+
+/* ---------------------------------------------------------------------------
+ * Config — Design tokens
+ * ------------------------------------------------------------------------- */
+@layer config {
+  :root {
+    /* Colors */
+    --color-bg: oklch(98% 0 0);
+    --color-text: oklch(20% 0 0);
+    --color-primary: oklch(50% 0.15 250);
+    --color-surface: oklch(100% 0 0);
+    --color-border: oklch(85% 0 0);
+    --color-focus: oklch(55% 0.2 250);
+    --color-muted: oklch(55% 0 0);
+
+    /* Spacing */
+    --space-xs: 0.25rem;
+    --space-s: 0.5rem;
+    --space-m: 1rem;
+    --space-l: 2rem;
+    --space-xl: 4rem;
+
+    /* Border radius */
+    --radius-s: 0.25rem;
+    --radius-m: 0.5rem;
+
+    /* Typography */
+    --font-base: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-bg: oklch(20% 0.02 260);
+      --color-text: oklch(90% 0 0);
+      --color-primary: oklch(70% 0.15 250);
+      --color-surface: oklch(25% 0.02 260);
+      --color-border: oklch(35% 0.02 260);
+      --color-focus: oklch(70% 0.2 250);
+      --color-muted: oklch(65% 0 0);
+    }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Resets
+ * ------------------------------------------------------------------------- */
+@layer resets {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-base);
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--color-text);
+    background-color: var(--color-bg);
+  }
+
+  img {
+    display: block;
+    max-inline-size: 100%;
+    block-size: auto;
+  }
+
+  a {
+    color: var(--color-primary);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.15em;
+  }
+
+  a:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  a:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+    border-radius: var(--radius-s);
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  h1, h2, h3 {
+    margin-block: 0;
+    line-height: 1.2;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Components
+ * ------------------------------------------------------------------------- */
+@layer components {
+  /* Header */
+  .c-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-m);
+    padding-block: var(--space-l);
+    padding-inline: var(--space-l);
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .c-header__title {
+    font-size: 1.5rem;
+    margin-inline-end: auto;
+  }
+
+  /* Navigation */
+  .c-nav {
+    display: flex;
+    gap: var(--space-s);
+  }
+
+  .c-nav__link {
+    padding-block: var(--space-xs);
+    padding-inline: var(--space-s);
+    border-radius: var(--radius-s);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .c-nav__link:hover {
+    background-color: var(--color-surface);
+  }
+
+  .c-nav__link[aria-current="page"] {
+    background-color: var(--color-primary);
+    color: var(--color-bg);
+  }
+
+  /* Category sections */
+  .c-category {
+    padding-block: var(--space-l);
+    padding-inline: var(--space-l);
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .c-category > h2 {
+    font-size: 1.25rem;
+    margin-block-end: var(--space-m);
+  }
+
+  /* Subcategory sections */
+  .c-subcategory {
+    margin-block-start: var(--space-m);
+  }
+
+  .c-subcategory > h3 {
+    font-size: 1rem;
+    color: var(--color-muted);
+    margin-block-end: var(--space-s);
+  }
+
+  /* Bookmark list */
+  .c-bookmark-list[role="list"] {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+    gap: var(--space-m);
+  }
+
+  /* Bookmark card */
+  .c-bookmark {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-m);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-m);
+  }
+
+  .c-bookmark__link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-s);
+    text-decoration: none;
+    color: var(--color-text);
+    font-weight: 500;
+  }
+
+  .c-bookmark__link:hover .c-bookmark__title {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    color: var(--color-primary);
+  }
+
+  .c-bookmark__icon {
+    inline-size: 2rem;
+    block-size: 2rem;
+    flex-shrink: 0;
+    border-radius: var(--radius-s);
+  }
+
+  .c-bookmark__title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .c-bookmark__description {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--color-muted);
+    padding-inline-start: calc(2rem + var(--space-s));
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Utilities
+ * ------------------------------------------------------------------------- */
+@layer utilities {
+  .u-visually-hidden {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Motion
+ * ------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  a {
+    transition: color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .c-bookmark {
+    transition: box-shadow 0.15s ease;
+  }
+
+  .c-bookmark:hover {
+    box-shadow: 0 2px 8px oklch(0% 0 0 / 10%);
+  }
+}
