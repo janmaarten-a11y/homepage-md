@@ -382,6 +382,8 @@ document.addEventListener('click', (event) => {
   const editSubcategory = editDialog.querySelector('.js-edit-subcategory');
   if (editCategory) editCategory.value = categoryName;
   if (editSubcategory) editSubcategory.value = subcategoryName;
+  editDialog.dataset.originalCategory = categoryName;
+  editDialog.dataset.originalSubcategory = subcategoryName;
 
   clearError(editError);
   const bookmarkLink = card.querySelector('.c-bookmark__link');
@@ -397,14 +399,16 @@ if (editForm) {
     try {
       const editCategoryVal = editDialog.querySelector('.js-edit-category')?.value || '';
       const editSubcategoryVal = editDialog.querySelector('.js-edit-subcategory')?.value || '';
+      const categoryChanged = editCategoryVal !== (editDialog.dataset.originalCategory || '')
+        || editSubcategoryVal !== (editDialog.dataset.originalSubcategory || '');
       await apiRequest('PUT', slug, {
         url: originalUrl,
         title: editTitle.value,
         newUrl: editUrl.value !== originalUrl ? editUrl.value : undefined,
         description: editDescription.value || null,
         icon: editIcon?.value || null,
-        category: editCategoryVal || undefined,
-        subcategory: editSubcategoryVal || undefined,
+        category: categoryChanged ? editCategoryVal : undefined,
+        subcategory: categoryChanged ? (editSubcategoryVal || undefined) : undefined,
       });
       editDialog.close();
       window.location.reload();
