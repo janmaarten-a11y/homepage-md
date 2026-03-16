@@ -919,7 +919,7 @@ function renderWeather(data) {
     </div>
     <dl class="c-weather-panel__details">
       <div class="c-weather-panel__stat"><dt><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M10 2v9"/><circle cx="10" cy="14.5" r="3.5"/><rect x="8.5" y="6" width="3" height="8" rx="1.5"/></svg> Feels like</dt><dd>${data.current.feelsLike}${data.units.temp}</dd></div>
-      <div class="c-weather-panel__stat"><dt><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6 6l-4 4 4 4"/><path d="M14 6l4 4-4 4"/><path d="M2 10h6M12 10h6"/></svg> High / Low</dt><dd>${data.today.high}\u00B0 / ${data.today.low}\u00B0</dd></div>
+      <div class="c-weather-panel__stat"><dt><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M7 14l-3 4M7 14l3 4M7 14V2"/><path d="M13 6l3-4M13 6l-3-4M13 6v12" opacity=".5"/></svg> High / Low</dt><dd>${data.today.high}\u00B0 / ${data.today.low}\u00B0</dd></div>
       <div class="c-weather-panel__stat"><dt><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M2 7h12a3 3 0 1 0-3-3"/><path d="M2 13h9a2.5 2.5 0 1 1-2.5 2.5"/></svg> Wind</dt><dd>${data.current.wind} ${data.units.wind}</dd></div>
 ${aqiHtml}
     </dl>`;
@@ -950,12 +950,26 @@ ${data.alerts.map((a) => `      <li>${escapeText(a.text)}</li>`).join('\n')}
   }
   weatherAlerts.innerHTML = alertsHtml;
 
-  // Tomorrow's forecast
+  // Tomorrow's forecast + sun/moon
+  const sunTimes = data.today.sunrise && data.today.sunset
+    ? `<div class="c-weather-panel__stat"><dt>\u2600\uFE0F Sunrise</dt><dd>${data.today.sunrise}</dd></div>
+       <div class="c-weather-panel__stat"><dt>\uD83C\uDF05 Sunset</dt><dd>${data.today.sunset}</dd></div>`
+    : '';
+
+  const moonHtml = data.moon
+    ? `<div class="c-weather-panel__stat"><dt>${data.moon.emoji} Moon</dt><dd>${escapeText(data.moon.phase)}, ${data.moon.illumination}% illuminated</dd></div>
+       <div class="c-weather-panel__stat"><dt>\uD83C\uDF15 Next full moon</dt><dd>${data.moon.daysToFullMoon === 0 ? 'Tonight!' : `in ${data.moon.daysToFullMoon} days`}</dd></div>`
+    : '';
+
   weatherForecast.innerHTML = `
     <div class="c-weather-panel__day">
       <strong>Tomorrow</strong> \u2014 ${escapeText(data.tomorrow.condition)},
       ${data.tomorrow.high}\u00B0 / ${data.tomorrow.low}\u00B0${data.tomorrow.precipChance > 0 ? `, ${data.tomorrow.precipChance}% chance of precipitation` : ''}
-    </div>`;
+    </div>
+${(sunTimes || moonHtml) ? `    <dl class="c-weather-panel__details c-weather-panel__astro">
+${sunTimes}
+${moonHtml}
+    </dl>` : ''}`;
 }
 
 function aqiLevel(value) {

@@ -135,7 +135,7 @@ export async function fetchWeather(locationStr, locale) {
     longitude: geo.longitude,
     current: 'temperature_2m,apparent_temperature,weather_code,wind_speed_10m,wind_gusts_10m',
     hourly: 'temperature_2m,weather_code,precipitation_probability',
-    daily: 'temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max',
+    daily: 'temperature_2m_max,temperature_2m_min,weather_code,precipitation_probability_max,sunrise,sunset',
     temperature_unit: tempUnit,
     wind_speed_unit: windUnit,
     timezone: geo.timezone,
@@ -224,6 +224,8 @@ function processWeatherData(raw, geo, useImperial, aqi, nwsAlerts) {
       low: Math.round(daily.temperature_2m_min[0]),
       condition: describeWeatherCode(daily.weather_code[0]).text,
       precipChance: daily.precipitation_probability_max[0],
+      sunrise: formatTime(daily.sunrise?.[0]),
+      sunset: formatTime(daily.sunset?.[0]),
     },
     tomorrow: {
       high: Math.round(daily.temperature_2m_max[1]),
@@ -231,9 +233,69 @@ function processWeatherData(raw, geo, useImperial, aqi, nwsAlerts) {
       condition: describeWeatherCode(daily.weather_code[1]).text,
       precipChance: daily.precipitation_probability_max[1],
     },
+    moon: getMoonData(now),
     alerts,
     nwsAlerts: nwsAlerts || [],
     aqi,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Time formatting
+// ---------------------------------------------------------------------------
+
+function formatTime(isoString) {
+  if (!isoString) return null;
+  const d = new Date(isoString);
+  const h = d.getHours();
+  const m = d.getMinutes().toString().padStart(2, '0');
+  const period = h >= 12 ? 'PM' : 'AM';
+  const hour12 = h % 12 || 12;
+  return `${hour12}:${m} ${period}`;
+}
+
+// ---------------------------------------------------------------------------
+// Moon phase calculation (astronomical approximation)
+// ---------------------------------------------------------------------------
+
+const MOON_PHASES = [
+  { name: 'New Moon', emoji: '\uD83C\uDF11' },
+  { name: 'Waxing Crescent', emoji: '\uD83C\uDF12' },
+  { name: 'First Quarter', emoji: '\uD83C\uDF13' },
+  { name: 'Waxing Gibbous', emoji: '\uD83C\uDF14' },
+  { name: 'Full Moon', emoji: '\uD83C\uDF15' },
+  { name: 'Waning Gibbous', emoji: '\uD83C\uDF16' },
+  { name: 'Last Quarter', emoji: '\uD83C\uDF17' },
+  { name: 'Waning Crescent', emoji: '\uD83C\uDF18' },
+];
+
+/**
+ * Calculate moon phase for a given date.
+ * Uses a simplified algorithm based on known new moon reference date.
+ */
+function getMoonData(date) {
+  const SYNODIC_MONTH = 29.53058770576;
+  // Known new moon: January 6, 2000 18:14 UTC
+  const REFERENCE_NEW_MOON = new Date('2000-01-06T18:14:00Z');
+
+  const daysSinceRef = (date - REFERENCE_NEW_MOON) / (1000 * 60 * 60 * 24);
+  const cycleProgress = ((daysSinceRef % SYNODIC_MONTH) + SYNODIC_MONTH) % SYNODIC_MONTH;
+  const phaseIndex = Math.floor((cycleProgress / SYNODIC_MONTH) * 8) % 8;
+  const illumination = Math.round((1 - Math.cos(2 * Math.PI * cycleProgress / SYNODIC_MONTH)) / 2 * 100);
+
+  // Days until next full moon (phase index 4)
+  const daysIntoFullCycle = cycleProgress;
+  const fullMoonDay = SYNODIC_MONTH / 2; // ~14.77 days into cycle
+  let daysToFull = fullMoonDay - daysIntoFullCycle;
+  if (daysToFull < 0) daysToFull += SYNODIC_MONTH;
+  const nextFullMoon = new Date(date.getTime() + daysToFull * 24 * 60 * 60 * 1000);
+
+  return {
+    phase: MOON_PHASES[phaseIndex].name,
+    emoji: MOON_PHASES[phaseIndex].emoji,
+    illumination,
+    nextFullMoon: nextFullMoon.toISOString().split('T')[0],
+    daysToFullMoon: Math.round(daysToFull),
   };
 }
 
