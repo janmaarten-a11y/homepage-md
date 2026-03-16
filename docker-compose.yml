@@ -5,7 +5,7 @@ services:
     ports:
       - "2525:2525"
     volumes:
-      - ./bookmarks:/app/bookmarks:ro
+      - ./bookmarks:/app/bookmarks
       - ./icons:/app/icons:ro
       - ./custom.css:/app/custom.css:ro
       - ./footer.md:/app/footer.md:ro

@@ -118,7 +118,8 @@ async function resolveFavicons(bookmarks) {
  */
 async function serveStatic(res, baseDir, relativePath) {
   const safePath = resolve(baseDir, relativePath);
-  if (!safePath.startsWith(resolve(baseDir))) {
+  const normBase = resolve(baseDir) + '/';
+  if (!safePath.startsWith(normBase) && safePath !== resolve(baseDir)) {
     res.writeHead(403);
     res.end('Forbidden');
     return;
@@ -213,6 +214,54 @@ function sendJSON(res, status, data) {
   res.end(JSON.stringify(data));
 }
 
+/**
+ * Validate that a URL uses a safe protocol (http or https only).
+ */
+function isSafeUrl(url) {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Check for the CSRF-prevention header on state-changing requests.
+ * Browsers won't send custom headers in cross-origin simple requests.
+ */
+function hasCsrfHeader(req) {
+  return req.headers['x-requested-with'] === 'HomepageMD';
+}
+
+/**
+ * Simple in-memory rate limiter. Returns true if the request is allowed.
+ */
+const rateLimitMap = new Map();
+const RATE_LIMIT_WINDOW = 60_000; // 1 minute
+const RATE_LIMIT_MAX_WRITES = 30;
+const RATE_LIMIT_MAX_FETCHES = 10;
+
+function isRateLimited(req, maxRequests) {
+  const ip = req.socket.remoteAddress || 'unknown';
+  const now = Date.now();
+  let entry = rateLimitMap.get(ip);
+  if (!entry || now - entry.start > RATE_LIMIT_WINDOW) {
+    entry = { start: now, count: 0 };
+    rateLimitMap.set(ip, entry);
+  }
+  entry.count++;
+  return entry.count > maxRequests;
+}
+
+/**
+ * Sanitize a category or subcategory name for safe Markdown use.
+ */
+function sanitizeCategoryName(name) {
+  if (!name) return name;
+  return name.replace(/[\n\r]/g, ' ').replace(/^#+\s*/, '').trim();
+}
+
 // ---------------------------------------------------------------------------
 // API handlers
 // ---------------------------------------------------------------------------
@@ -220,6 +269,16 @@ function sendJSON(res, status, data) {
 async function handleApiBookmark(req, res, slug) {
   if (!isAuthenticated(req)) {
     sendUnauthorized(res);
+    return;
+  }
+
+  if (!hasCsrfHeader(req)) {
+    sendJSON(res, 403, { error: 'Missing CSRF header' });
+    return;
+  }
+
+  if (isRateLimited(req, RATE_LIMIT_MAX_WRITES)) {
+    sendJSON(res, 429, { error: 'Too many requests' });
     return;
   }
 
@@ -232,13 +291,21 @@ async function handleApiBookmark(req, res, slug) {
         sendJSON(res, 400, { error: 'Missing required fields: title, url, category' });
         return;
       }
+      if (!isSafeUrl(body.url)) {
+        sendJSON(res, 400, { error: 'URL must use http or https protocol' });
+        return;
+      }
+      if (body.icon && !isSafeUrl(body.icon)) {
+        sendJSON(res, 400, { error: 'Icon URL must use http or https protocol' });
+        return;
+      }
       await addBookmark(filePath, {
         title: body.title,
         url: body.url,
         description: body.description || null,
         icon: body.icon || null,
-        category: body.category,
-        subcategory: body.subcategory || null,
+        category: sanitizeCategoryName(body.category),
+        subcategory: sanitizeCategoryName(body.subcategory) || null,
       });
       sendJSON(res, 201, { ok: true });
       return;
@@ -248,6 +315,14 @@ async function handleApiBookmark(req, res, slug) {
       const body = JSON.parse(await readBody(req));
       if (!body.url) {
         sendJSON(res, 400, { error: 'Missing required field: url (identifier)' });
+        return;
+      }
+      if (body.newUrl && !isSafeUrl(body.newUrl)) {
+        sendJSON(res, 400, { error: 'URL must use http or https protocol' });
+        return;
+      }
+      if (body.icon && !isSafeUrl(body.icon)) {
+        sendJSON(res, 400, { error: 'Icon URL must use http or https protocol' });
         return;
       }
       // If category is provided, move the bookmark (remove + add)
@@ -276,8 +351,8 @@ async function handleApiBookmark(req, res, slug) {
           url: body.newUrl ?? current.url,
           description: body.description !== undefined ? body.description : current.description,
           icon: body.icon !== undefined ? body.icon : current.icon,
-          category: body.category,
-          subcategory: body.subcategory || null,
+          category: sanitizeCategoryName(body.category),
+          subcategory: sanitizeCategoryName(body.subcategory) || null,
         });
       } else {
         await updateBookmark(filePath, body.url, {
@@ -316,6 +391,16 @@ async function handleApiMetadata(req, res) {
     return;
   }
 
+  if (!hasCsrfHeader(req)) {
+    sendJSON(res, 403, { error: 'Missing CSRF header' });
+    return;
+  }
+
+  if (isRateLimited(req, RATE_LIMIT_MAX_FETCHES)) {
+    sendJSON(res, 429, { error: 'Too many requests' });
+    return;
+  }
+
   if (req.method !== 'POST') {
     res.writeHead(405);
     res.end('Method not allowed');
@@ -326,6 +411,10 @@ async function handleApiMetadata(req, res) {
     const body = JSON.parse(await readBody(req));
     if (!body.url) {
       sendJSON(res, 400, { error: 'Missing required field: url' });
+      return;
+    }
+    if (!isSafeUrl(body.url)) {
+      sendJSON(res, 400, { error: 'URL must use http or https protocol' });
       return;
     }
     const metadata = await fetchMetadata(body.url);
