@@ -598,6 +598,11 @@
   /* Combobox */
   .c-combobox {
     position: relative;
+    inline-size: 100%;
+  }
+
+  .c-combobox__input {
+    inline-size: 100%;
   }
 
   .c-combobox__listbox {

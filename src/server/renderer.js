@@ -21,12 +21,14 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultP
   const jumpLinks = renderJumpLinks(pageData.categories);
   const main = renderMain(pageData, faviconUrls);
   const categories = pageData.categories.map((c) => c.name);
-  const subcategoryNames = pageData.categories.flatMap((c) => c.subcategories.map((s) => s.name));
+  const subcategoryPairs = pageData.categories.flatMap((c) =>
+    c.subcategories.map((s) => ({ category: c.name, subcategory: s.name }))
+  );
 
   const search = renderSearch();
   const addBtn = renderAddButton();
   const toolbar = renderToolbar();
-  const addDialog = renderAddDialog(categories, subcategoryNames, currentSlug);
+  const addDialog = renderAddDialog(categories, currentSlug);
   const deleteDialog = renderDeleteDialog();
   const keyboardHelp = renderKeyboardHelp();
 
@@ -128,7 +130,7 @@ ${addDialog}
   </dialog>
 ${deleteDialog}
 ${keyboardHelp}
-  <script id="js-page-data" type="application/json">${JSON.stringify({ categories: categories, subcategories: [...new Set(subcategoryNames)] })}</script>
+  <script id="js-page-data" type="application/json">${JSON.stringify({ categories, subcategories: subcategoryPairs })}</script>
   <script src="/scripts/app.js" type="module"></script>
 </body>
 </html>`;
@@ -225,14 +227,7 @@ ${links}
   </nav>`;
 }
 
-function renderAddDialog(categories, subcategoryNames, currentSlug) {
-  const categoryOptions = categories
-    .map((name) => `        <option value="${escapeAttr(name)}">${escapeHtml(name)}</option>`)
-    .join('\n');
-  const subcategoryOptions = [...new Set(subcategoryNames)]
-    .map((name) => `        <option value="${escapeAttr(name)}">${escapeHtml(name)}</option>`)
-    .join('\n');
-
+function renderAddDialog(categories, currentSlug) {
   return `  <dialog class="c-dialog js-add-dialog">
     <form method="dialog" class="c-dialog__form js-add-form">
       <div class="c-dialog__header">

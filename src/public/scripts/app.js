@@ -652,8 +652,11 @@ for (const btn of document.querySelectorAll('.js-color-btn')) {
 // ---------------------------------------------------------------------------
 
 const pageData = JSON.parse(document.getElementById('js-page-data')?.textContent || '{}');
-const allCategories = pageData.categories || [];
-const allSubcategories = pageData.subcategories || [];
+const allCategories = (pageData.categories || []).map((c) => ({ label: c, value: c }));
+const allSubcategoryPairs = (pageData.subcategories || []).map((s) => ({
+  label: `${s.category} > ${s.subcategory}`,
+  value: s.subcategory,
+}));
 
 function initCombobox(input, listbox, options) {
   if (!input || !listbox) return;
@@ -662,25 +665,29 @@ function initCombobox(input, listbox, options) {
 
   function renderOptions(filter) {
     const term = filter.toLowerCase().trim();
-    const matches = options.filter((o) => o.toLowerCase().includes(term));
-    const isNew = term && !options.some((o) => o.toLowerCase() === term);
+    const matches = options.filter((o) =>
+      o.label.toLowerCase().includes(term) || o.value.toLowerCase().includes(term)
+    );
+    const isNew = term && !options.some((o) => o.value.toLowerCase() === term);
 
     listbox.innerHTML = '';
     activeIndex = -1;
 
     matches.forEach((opt, i) => {
       const li = document.createElement('li');
-      li.textContent = opt;
+      li.textContent = opt.label;
+      li.dataset.value = opt.value;
       li.className = 'c-combobox__option';
       li.setAttribute('role', 'option');
       li.id = `${listbox.id}-opt-${i}`;
-      li.addEventListener('click', () => selectOption(opt));
+      li.addEventListener('click', () => selectOption(opt.value));
       listbox.appendChild(li);
     });
 
     if (isNew) {
       const li = document.createElement('li');
       li.textContent = `Create "${filter.trim()}"`;
+      li.dataset.value = filter.trim();
       li.className = 'c-combobox__option c-combobox__option--new';
       li.setAttribute('role', 'option');
       li.id = `${listbox.id}-opt-new`;
@@ -731,11 +738,7 @@ function initCombobox(input, listbox, options) {
     } else if (event.key === 'Enter' && activeIndex >= 0) {
       event.preventDefault();
       const selected = items[activeIndex];
-      if (selected) {
-        // Extract the actual value — for "Create ..." options, use the input value
-        const isNew = selected.classList.contains('c-combobox__option--new');
-        selectOption(isNew ? input.value.trim() : selected.textContent);
-      }
+      if (selected) selectOption(selected.dataset.value || selected.textContent);
     } else if (event.key === 'Escape') {
       listbox.hidden = true;
       input.setAttribute('aria-expanded', 'false');
@@ -760,7 +763,7 @@ initCombobox(
 initCombobox(
   document.querySelector('.js-add-subcategory'),
   document.querySelector('.js-add-subcategory-listbox'),
-  allSubcategories
+  allSubcategoryPairs
 );
 initCombobox(
   document.querySelector('.js-edit-category'),
@@ -770,5 +773,5 @@ initCombobox(
 initCombobox(
   document.querySelector('.js-edit-subcategory'),
   document.querySelector('.js-edit-subcategory-listbox'),
-  allSubcategories
+  allSubcategoryPairs
 );
