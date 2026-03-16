@@ -69,10 +69,19 @@ async function safeFetch(url) {
     const timeout = setTimeout(() => controller.abort(), 5000);
     const response = await fetch(url, {
       signal: controller.signal,
-      redirect: 'follow',
+      redirect: 'manual',
       headers: { 'User-Agent': 'HomepageMD Favicon Fetcher' },
     });
     clearTimeout(timeout);
+
+    // Follow redirects manually with SSRF re-validation
+    if ([301, 302, 303, 307, 308].includes(response.status)) {
+      const location = response.headers.get('location');
+      if (!location) return null;
+      const redirectUrl = new URL(location, url).href;
+      return safeFetch(redirectUrl);
+    }
+
     return response;
   } catch {
     return null;
@@ -161,6 +170,10 @@ async function downloadAndCache(iconUrl, domain, cacheDir) {
   const response = await safeFetch(iconUrl);
   if (!response || !response.ok) return null;
 
+  // Reject downloads larger than 1 MB
+  const contentLength = parseInt(response.headers.get('content-length') || '0', 10);
+  if (contentLength > 1_048_576) return null;
+
   const contentType = response.headers.get('content-type') || '';
   let ext = '.ico';
   if (contentType.includes('png')) ext = '.png';
@@ -168,6 +181,8 @@ async function downloadAndCache(iconUrl, domain, cacheDir) {
   else if (contentType.includes('webp')) ext = '.webp';
 
   const buffer = Buffer.from(await response.arrayBuffer());
+  if (buffer.length > 1_048_576) return null;
+
   const fileName = `${domain}${ext}`;
   const filePath = join(cacheDir, fileName);
 

@@ -64,7 +64,7 @@ function closeDialog(dialog) {
 async function apiRequest(method, slug, body) {
   const res = await fetch(`/api/bookmarks/${encodeURIComponent(slug)}`, {
     method,
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'HomepageMD' },
     body: JSON.stringify(body),
   });
   const data = await res.json();
@@ -264,7 +264,7 @@ if (fetchMetaBtn) {
     try {
       const res = await fetch('/api/metadata', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'HomepageMD' },
         body: JSON.stringify({ url }),
       });
       const data = await res.json();
@@ -341,7 +341,7 @@ if (editFetchMetaBtn) {
     try {
       const res = await fetch('/api/metadata', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'HomepageMD' },
         body: JSON.stringify({ url }),
       });
       const data = await res.json();

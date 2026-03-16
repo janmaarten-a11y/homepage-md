@@ -31,16 +31,24 @@ export async function fetchMetadata(url) {
     const timeout = setTimeout(() => controller.abort(), 5000);
     const response = await fetch(url, {
       signal: controller.signal,
-      redirect: 'follow',
+      redirect: 'manual',
       headers: { 'User-Agent': 'HomepageMD Metadata Fetcher' },
     });
     clearTimeout(timeout);
+
+    // Follow redirects manually with SSRF re-validation
+    if ([301, 302, 303, 307, 308].includes(response.status)) {
+      const location = response.headers.get('location');
+      if (!location) return { title: null, description: null };
+      const redirectUrl = new URL(location, url).href;
+      return fetchMetadata(redirectUrl);
+    }
 
     if (!response.ok) {
       return { title: null, description: null };
     }
 
-    const html = await response.text();
+    const html = (await response.text()).substring(0, 200_000);
 
     const titleMatch = html.match(TITLE_RE);
     const title = titleMatch ? titleMatch[1].trim() : null;
