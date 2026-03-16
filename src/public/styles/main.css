@@ -88,6 +88,8 @@
   /* Set core body defaults */
   body {
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
     line-height: 1.5;
     font-family: var(--font-base);
     font-size: 1rem;
@@ -345,7 +347,7 @@
     margin-block-start: calc(-1 * var(--space-s));
     margin-block-end: var(--space-m);
     color: var(--color-muted);
-    max-width: 80ch;
+    margin-inline-end: calc(100% - 80ch);
   }
 
   /* Subcategory sections */
@@ -365,7 +367,7 @@
     margin-block-end: var(--space-s);
     font-size: 0.875rem;
     color: var(--color-muted);
-    max-width: 80ch;
+    margin-inline-end: calc(100% - 80ch);
   }
 
   /* Bookmark list */
@@ -695,6 +697,32 @@
     color: oklch(35% 0.1 80);
     border-block-end: 1px solid oklch(80% 0.06 80);
     margin: 0;
+  }
+
+  /* Main content — fills available vertical space */
+  #main-content {
+    flex: 1;
+  }
+
+  /* Footer */
+  .c-footer {
+    padding-block: var(--space-l);
+    padding-inline: var(--space-l);
+    border-block-start: 1px solid var(--color-border);
+    color: var(--color-muted);
+    font-size: 0.875rem;
+  }
+
+  .c-footer p {
+    margin: 0;
+  }
+
+  .c-footer a {
+    color: var(--color-muted);
+  }
+
+  .c-footer a:hover {
+    color: var(--color-text);
   }
 
   /* Keyboard shortcut help */
