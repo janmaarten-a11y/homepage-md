@@ -402,20 +402,46 @@ const menuToggle = document.querySelector('.js-menu-toggle');
 const menuDrawer = document.querySelector('.js-menu-drawer');
 const viewMenuToggle = document.querySelector('.js-view-menu-toggle');
 const viewDrawer = document.querySelector('.js-view-drawer');
+const mainContent = document.getElementById('main-content');
+const jumpLinks = document.querySelector('.c-jump-links');
+
+function closeDrawer(toggle, drawer) {
+  drawer.hidden = true;
+  toggle?.setAttribute('aria-expanded', 'false');
+}
+
+function updateInert() {
+  const anyOpen = (menuDrawer && !menuDrawer.hidden) || (viewDrawer && !viewDrawer.hidden);
+  document.querySelector('.c-header')?.classList.toggle('is-drawer-open', anyOpen);
+
+  // Make non-drawer content inert when a drawer is open
+  if (mainContent) mainContent.inert = anyOpen;
+  if (jumpLinks) jumpLinks.inert = anyOpen;
+  const fab = document.querySelector('.c-fab');
+  if (fab) fab.inert = anyOpen;
+}
 
 function toggleDrawer(toggle, drawer, otherToggle, otherDrawer) {
   const isOpen = !drawer.hidden;
+
   // Close the other drawer first
   if (otherDrawer && !otherDrawer.hidden) {
-    otherDrawer.hidden = true;
-    otherToggle?.setAttribute('aria-expanded', 'false');
+    closeDrawer(otherToggle, otherDrawer);
   }
+
   drawer.hidden = isOpen;
   toggle.setAttribute('aria-expanded', String(!isOpen));
 
-  // Hide search when any drawer is open
-  const anyOpen = (menuDrawer && !menuDrawer.hidden) || (viewDrawer && !viewDrawer.hidden);
-  document.querySelector('.c-header')?.classList.toggle('is-drawer-open', anyOpen);
+  updateInert();
+
+  if (!isOpen) {
+    // Drawer just opened — focus first focusable element inside
+    const firstFocusable = drawer.querySelector('a, button, input, [tabindex="0"]');
+    firstFocusable?.focus();
+  } else {
+    // Drawer just closed — return focus to the trigger
+    toggle.focus();
+  }
 }
 
 if (menuToggle && menuDrawer) {
@@ -430,14 +456,27 @@ if (viewMenuToggle && viewDrawer) {
   });
 }
 
+// Escape closes any open drawer
+document.addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape') return;
+  if (menuDrawer && !menuDrawer.hidden) {
+    closeDrawer(menuToggle, menuDrawer);
+    updateInert();
+    menuToggle?.focus();
+  } else if (viewDrawer && !viewDrawer.hidden) {
+    closeDrawer(viewMenuToggle, viewDrawer);
+    updateInert();
+    viewMenuToggle?.focus();
+  }
+});
+
 // Close drawers when a category link is clicked
 for (const link of document.querySelectorAll('.js-drawer-category')) {
   link.addEventListener('click', () => {
-    if (menuDrawer) {
-      menuDrawer.hidden = true;
-      menuToggle?.setAttribute('aria-expanded', 'false');
+    if (menuDrawer && !menuDrawer.hidden) {
+      closeDrawer(menuToggle, menuDrawer);
+      updateInert();
     }
-    document.querySelector('.c-header')?.classList.remove('is-drawer-open');
   });
 }
 
