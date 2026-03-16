@@ -802,11 +802,11 @@
   }
 
   .is-columns .c-subcategory > h3 {
-    margin-block-end: var(--space-xs);
+    margin-block-end: var(--space-s);
   }
 
   .is-columns .c-subcategory > .c-subcategory__subtitle {
-    margin-block-end: var(--space-s);
+    display: none;
   }
 
   .is-columns .c-subcategory .c-bookmark-list {
