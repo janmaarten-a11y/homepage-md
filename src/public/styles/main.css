@@ -371,11 +371,18 @@
     display: none;
   }
 
+  .c-weather-panel__heading {
+    display: flex;
+    align-items: center;
+    gap: var(--space-s);
+    margin-block-end: var(--space-xs);
+  }
+
   .c-weather-panel__location {
-    margin: 0 0 var(--space-xs);
-    font-size: 0.875rem;
-    color: var(--color-muted);
-    font-weight: 500;
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
   }
 
   .c-weather-panel__summary {
@@ -409,12 +416,64 @@
   }
 
   .c-weather-panel__details dt {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
     color: var(--color-muted);
   }
 
   .c-weather-panel__details dd {
     margin: 0;
     font-weight: 500;
+  }
+
+  /* AQI color-coded badge */
+  .c-weather-panel__aqi {
+    display: inline-block;
+    padding-inline: var(--space-xs);
+    border-radius: var(--radius-s);
+    font-weight: 700;
+    font-size: 0.875rem;
+    min-inline-size: 2ch;
+    text-align: center;
+  }
+
+  .c-weather-panel__aqi[data-level="good"] {
+    background-color: oklch(88% 0.15 145);
+    color: oklch(25% 0.1 145);
+  }
+
+  .c-weather-panel__aqi[data-level="moderate"] {
+    background-color: oklch(90% 0.15 90);
+    color: oklch(30% 0.1 90);
+  }
+
+  .c-weather-panel__aqi[data-level="sensitive"] {
+    background-color: oklch(82% 0.15 55);
+    color: oklch(30% 0.1 55);
+  }
+
+  .c-weather-panel__aqi[data-level="unhealthy"] {
+    background-color: oklch(75% 0.18 25);
+    color: oklch(98% 0 0);
+  }
+
+  .c-weather-panel__aqi[data-level="very-unhealthy"] {
+    background-color: oklch(50% 0.2 320);
+    color: oklch(98% 0 0);
+  }
+
+  .c-weather-panel__aqi[data-level="hazardous"] {
+    background-color: oklch(35% 0.15 15);
+    color: oklch(98% 0 0);
+  }
+
+  /* External links */
+  .c-weather-panel__links {
+    display: flex;
+    gap: var(--space-m);
+    margin-block-start: var(--space-s);
+    font-size: 0.875rem;
   }
 
   .c-weather-panel__alert-list {

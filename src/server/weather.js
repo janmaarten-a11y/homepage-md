@@ -198,7 +198,7 @@ function processWeatherData(raw, geo, useImperial, aqi) {
   }
 
   // Derive upcoming changes / alerts
-  const alerts = deriveAlerts(current, hourlyForecast, daily, unitSymbol);
+  const alerts = deriveAlerts(current, hourlyForecast, daily, unitSymbol, aqi);
 
   return {
     location: {
@@ -257,7 +257,9 @@ async function fetchAirQuality(geo, useImperial) {
     latitude: geo.latitude,
     longitude: geo.longitude,
     current: `${aqiType},pm2_5`,
+    hourly: aqiType,
     timezone: geo.timezone,
+    forecast_days: '2',
   });
 
   const controller = new AbortController();
@@ -275,11 +277,33 @@ async function fetchAirQuality(geo, useImperial) {
     if (value == null) return null;
 
     const level = describeAqi(value);
+
+    // Find the peak AQI in the next 24 hours for forecast alerts
+    let peakValue = value;
+    let peakHoursAway = 0;
+    const hourlyAqi = data.hourly?.[aqiType] || [];
+    const hourlyTimes = data.hourly?.time || [];
+    const now = new Date(data.current.time);
+    for (let i = 0; i < hourlyTimes.length && i < 48; i++) {
+      const t = new Date(hourlyTimes[i]);
+      if (t > now && hourlyAqi[i] > peakValue) {
+        peakValue = hourlyAqi[i];
+        peakHoursAway = Math.round((t - now) / 3600000);
+      }
+    }
+
+    const peak = peakValue > value ? {
+      value: Math.round(peakValue),
+      label: describeAqi(peakValue).label,
+      hoursAway: peakHoursAway,
+    } : null;
+
     return {
       value: Math.round(value),
       label: level.label,
       concern: level.concern,
       pm25: data.current?.pm2_5 != null ? Math.round(data.current.pm2_5 * 10) / 10 : null,
+      peak,
     };
   } catch {
     clearTimeout(timeout);
@@ -291,7 +315,7 @@ async function fetchAirQuality(geo, useImperial) {
 // Derive "upcoming changes" alerts from forecast data
 // ---------------------------------------------------------------------------
 
-function deriveAlerts(current, hourlyForecast, daily, unitSymbol) {
+function deriveAlerts(current, hourlyForecast, daily, unitSymbol, aqi) {
   const alerts = [];
   const currentCode = current.weather_code;
   const isPrecipNow = currentCode >= 51;
@@ -373,6 +397,14 @@ function deriveAlerts(current, hourlyForecast, daily, unitSymbol) {
       });
       break;
     }
+  }
+
+  // 6. Air quality worsening — peak AQI >100 in next 48 hours
+  if (aqi?.peak && aqi.peak.value > 100 && aqi.peak.value > aqi.value) {
+    alerts.push({
+      type: 'aqi',
+      text: `Air quality worsening to ${aqi.peak.label} (AQI ${aqi.peak.value}) in ~${aqi.peak.hoursAway} hours`,
+    });
   }
 
   return alerts;

@@ -895,25 +895,36 @@ function renderWeather(data) {
   weatherBtn.hidden = false;
   weatherBtn.setAttribute('aria-label', `Weather for ${locationName}: ${data.current.temp}${data.units.temp}, ${data.current.condition}. Activate to show forecast.`);
 
-  // AQI row
+  // AQI with color coding
   const aqiHtml = data.aqi
-    ? `<div><dt>Air quality</dt><dd>${data.aqi.value} — ${escapeText(data.aqi.label)}</dd></div>`
+    ? `<div class="c-weather-panel__stat">
+        <dt><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="2"/></svg> Air quality</dt>
+        <dd><span class="c-weather-panel__aqi" data-level="${aqiLevel(data.aqi.value)}">${data.aqi.value}</span> ${escapeText(data.aqi.label)}</dd>
+      </div>`
     : '';
+
+  // Edit location icon
+  const editIcon = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.5 1.5l3 3L5 14H2v-3z"/></svg>';
 
   // Current conditions
   weatherCurrent.innerHTML = `
-    <p class="c-weather-panel__location">${escapeText(locationName)}</p>
+    <div class="c-weather-panel__heading">
+      <h2 class="c-weather-panel__location">Forecast for ${escapeText(locationName)}</h2>
+    </div>
     <div class="c-weather-panel__summary">
       <span class="c-weather-panel__temp">${data.current.temp}${data.units.temp}</span>
       <span class="c-weather-panel__condition">${escapeText(data.current.condition)}</span>
     </div>
     <dl class="c-weather-panel__details">
-      <div><dt>Feels like</dt><dd>${data.current.feelsLike}${data.units.temp}</dd></div>
-      <div><dt>Wind</dt><dd>${data.current.wind} ${data.units.wind}</dd></div>
+      <div class="c-weather-panel__stat"><dt><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M8 1v10"/><path d="M5 8a3 3 0 1 0 6 0"/></svg> Feels like</dt><dd>${data.current.feelsLike}${data.units.temp}</dd></div>
+      <div class="c-weather-panel__stat"><dt><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 8L6 4M2 8l4 4M2 8h8"/><path d="M14 12l-4 4M14 12l-4-4M14 12H6" opacity=".5"/></svg> High / Low</dt><dd>${data.today.high}° / ${data.today.low}°</dd></div>
+      <div class="c-weather-panel__stat"><dt><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 8h12M10 4l4 4-4 4"/></svg> Wind</dt><dd>${data.current.wind} ${data.units.wind}</dd></div>
 ${aqiHtml}
-      <div><dt>Today</dt><dd>${data.today.high}° / ${data.today.low}°</dd></div>
-      <div><dt>Tomorrow</dt><dd>${data.tomorrow.high}° / ${data.tomorrow.low}°</dd></div>
-    </dl>`;
+    </dl>
+    <div class="c-weather-panel__links">
+      <a href="https://www.weather.gov" rel="noopener">weather.gov</a>
+      <a href="https://www.airnow.gov" rel="noopener">airnow.gov</a>
+    </div>`;
 
   // Alerts
   if (data.alerts.length > 0) {
@@ -927,9 +938,18 @@ ${data.alerts.map((a) => `      <li>${escapeText(a.text)}</li>`).join('\n')}
   // Tomorrow's forecast
   weatherForecast.innerHTML = `
     <div class="c-weather-panel__day">
-      <strong>Tomorrow</strong> — ${escapeText(data.tomorrow.condition)},
-      ${data.tomorrow.high}° / ${data.tomorrow.low}°${data.tomorrow.precipChance > 0 ? `, ${data.tomorrow.precipChance}% chance of precipitation` : ''}
+      <strong>Tomorrow</strong> \u2014 ${escapeText(data.tomorrow.condition)},
+      ${data.tomorrow.high}\u00B0 / ${data.tomorrow.low}\u00B0${data.tomorrow.precipChance > 0 ? `, ${data.tomorrow.precipChance}% chance of precipitation` : ''}
     </div>`;
+}
+
+function aqiLevel(value) {
+  if (value <= 50) return 'good';
+  if (value <= 100) return 'moderate';
+  if (value <= 150) return 'sensitive';
+  if (value <= 200) return 'unhealthy';
+  if (value <= 300) return 'very-unhealthy';
+  return 'hazardous';
 }
 
 function escapeText(str) {
