@@ -903,7 +903,7 @@ function renderWeather(data) {
   // AQI with color coding and link to airnow.gov
   const aqiHtml = data.aqi
     ? `<div class="c-weather-panel__stat">
-        <dt><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="10" cy="10" r="4"/><path d="M10 2a8 8 0 0 1 8 8" opacity=".3"/><path d="M10 4a6 6 0 0 1 6 6" opacity=".5"/></svg> <a href="https://www.airnow.gov" rel="noopener">Air quality</a></dt>
+        <dt>\uD83C\uDF2B\uFE0F <a href="https://www.airnow.gov" rel="noopener">Air quality</a></dt>
         <dd><span class="c-weather-panel__aqi" data-level="${aqiLevel(data.aqi.value)}">${data.aqi.value}</span> ${escapeText(data.aqi.label)}</dd>
       </div>`
     : '';
@@ -918,9 +918,9 @@ function renderWeather(data) {
       <span class="c-weather-panel__condition">${escapeText(data.current.condition)}</span>
     </div>
     <dl class="c-weather-panel__details">
-      <div class="c-weather-panel__stat"><dt><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M10 2v9"/><circle cx="10" cy="14.5" r="3.5"/><rect x="8.5" y="6" width="3" height="8" rx="1.5"/></svg> Feels like</dt><dd>${data.current.feelsLike}${data.units.temp}</dd></div>
-      <div class="c-weather-panel__stat"><dt><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M7 14l-3 4M7 14l3 4M7 14V2"/><path d="M13 6l3-4M13 6l-3-4M13 6v12" opacity=".5"/></svg> High / Low</dt><dd>${data.today.high}\u00B0 / ${data.today.low}\u00B0</dd></div>
-      <div class="c-weather-panel__stat"><dt><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M2 7h12a3 3 0 1 0-3-3"/><path d="M2 13h9a2.5 2.5 0 1 1-2.5 2.5"/></svg> Wind</dt><dd>${data.current.wind} ${data.units.wind}</dd></div>
+      <div class="c-weather-panel__stat"><dt>\uD83C\uDF21\uFE0F Feels like</dt><dd>${data.current.feelsLike}${data.units.temp}</dd></div>
+      <div class="c-weather-panel__stat"><dt>\u2195\uFE0F High / Low</dt><dd>${data.today.high}\u00B0 / ${data.today.low}\u00B0</dd></div>
+      <div class="c-weather-panel__stat"><dt>\uD83D\uDCA8 Wind</dt><dd>${data.current.wind} ${data.units.wind}</dd></div>
 ${aqiHtml}
     </dl>`;
 
