@@ -313,16 +313,24 @@ ${category.bookmarks.map((b) => renderBookmark(b, faviconUrls, category.name, nu
     .map((sub) => renderSubcategory(sub, faviconUrls, category.name))
     .join('\n');
 
+  const subtitle = category.subtitle
+    ? `\n      <p class="c-category__subtitle">${escapeHtml(category.subtitle)}</p>`
+    : '';
+
   return `    <section class="c-category" aria-labelledby="${escapeAttr(category.id)}">
-      <h2 id="${escapeAttr(category.id)}">${escapeHtml(category.name)}</h2>
+      <h2 id="${escapeAttr(category.id)}">${escapeHtml(category.name)}</h2>${subtitle}
 ${directBookmarks}
 ${subcategories}
     </section>`;
 }
 
 function renderSubcategory(subcategory, faviconUrls, categoryName) {
+  const subtitle = subcategory.subtitle
+    ? `\n        <p class="c-subcategory__subtitle">${escapeHtml(subcategory.subtitle)}</p>`
+    : '';
+
   return `      <section class="c-subcategory" aria-labelledby="${escapeAttr(subcategory.id)}">
-        <h3 id="${escapeAttr(subcategory.id)}">${escapeHtml(subcategory.name)}</h3>
+        <h3 id="${escapeAttr(subcategory.id)}">${escapeHtml(subcategory.name)}</h3>${subtitle}
         <ul class="c-bookmark-list" role="list">
 ${subcategory.bookmarks.map((b) => renderBookmark(b, faviconUrls, categoryName, subcategory.name)).join('\n')}
         </ul>

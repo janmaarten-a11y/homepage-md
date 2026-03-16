@@ -127,4 +127,31 @@ describe('parseMarkdown', () => {
     const result = parseMarkdown(source);
     assert.equal(result.title, 'First Title');
   });
+
+  it('extracts subtitle from a category', async () => {
+    const source = await loadFixture('valid.md');
+    const result = parseMarkdown(source);
+    assert.equal(result.categories[0].subtitle, 'Movies, TV, and music');
+  });
+
+  it('sets subtitle to null when not provided', async () => {
+    const source = await loadFixture('valid.md');
+    const result = parseMarkdown(source);
+    // School category has no subtitle
+    assert.equal(result.categories[1].subtitle, null);
+  });
+
+  it('extracts subtitle from a subcategory', () => {
+    const source = '# T\n## Cat\n### Sub\n  - subtitle: Sub description\n- [Link](https://x.com)\n';
+    const result = parseMarkdown(source);
+    assert.equal(result.categories[0].subcategories[0].subtitle, 'Sub description');
+  });
+
+  it('does not assign subtitle to a bookmark', () => {
+    const source = '# T\n## Cat\n- [Link](https://x.com)\n  - subtitle: This is not a bookmark subtitle\n';
+    const result = parseMarkdown(source);
+    // subtitle after a bookmark should not be treated as bookmark metadata
+    // (subtitle only applies to headings, not bookmarks)
+    assert.equal(result.categories[0].bookmarks[0].description, null);
+  });
 });

@@ -10,15 +10,16 @@
  *   categories: [{
  *     name: string,
  *     id: string,
+ *     subtitle: string | null,
  *     bookmarks: [{ title, url, description, icon }],
- *     subcategories: [{ name, id, bookmarks }]
+ *     subcategories: [{ name, id, subtitle, bookmarks }]
  *   }]
  * }
  */
 
 const HEADING_RE = /^(#{1,3})\s+(.+)$/;
 const BOOKMARK_RE = /^-\s+\[([^\]]+)\]\(([^)]+)\)\s*$/;
-const METADATA_RE = /^\s+-\s+(description|icon):\s+(.+)$/;
+const METADATA_RE = /^\s+-\s+(description|icon|subtitle):\s+(.+)$/;
 
 function slugify(text) {
   return text
@@ -49,6 +50,7 @@ export function parseMarkdown(source) {
         currentCategory = {
           name,
           id: slugify(name),
+          subtitle: null,
           bookmarks: [],
           subcategories: [],
         };
@@ -59,6 +61,7 @@ export function parseMarkdown(source) {
         currentSubcategory = {
           name,
           id: `${currentCategory.id}-${slugify(name)}`,
+          subtitle: null,
           bookmarks: [],
         };
         currentCategory.subcategories.push(currentSubcategory);
@@ -82,12 +85,23 @@ export function parseMarkdown(source) {
     }
 
     const metadataMatch = line.match(METADATA_RE);
-    if (metadataMatch && currentBookmark) {
+    if (metadataMatch) {
       const [, key, value] = metadataMatch;
-      if (key === 'description') {
-        currentBookmark.description = value.trim();
-      } else if (key === 'icon') {
-        currentBookmark.icon = value.trim();
+
+      // subtitle: applies to the current section (category or subcategory)
+      if (key === 'subtitle' && !currentBookmark) {
+        const target = currentSubcategory || currentCategory;
+        if (target) target.subtitle = value.trim();
+        continue;
+      }
+
+      // description/icon apply to the current bookmark
+      if (currentBookmark) {
+        if (key === 'description') {
+          currentBookmark.description = value.trim();
+        } else if (key === 'icon') {
+          currentBookmark.icon = value.trim();
+        }
       }
       continue;
     }

@@ -10,6 +10,7 @@
   - description: Family favorites
 
 ## School
+  - subtitle: Kids' school resources and learning tools
 
 - [School Portal](https://school.example.com)
   - description: Grades, attendance, and announcements
@@ -28,6 +29,7 @@
   - description: DNS and ad blocking
 
 ### Home Server
+  - subtitle: Admin panels for self-hosted services
 
 - [Synology DSM](http://synology.local:5000)
   - description: NAS admin panel
@@ -36,6 +38,7 @@
   - description: Media server
 
 ## Streaming
+  - subtitle: Movies, TV shows, and music for the whole family
 
 ### Video
 
@@ -59,6 +62,7 @@
   - description: Indie music and merch
 
 ## Reference
+  - subtitle: Quick lookup and general knowledge
 
 - [Wikipedia](https://www.wikipedia.org)
 - [Google Maps](https://maps.google.com)
