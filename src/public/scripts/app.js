@@ -405,13 +405,36 @@ const viewDrawer = document.querySelector('.js-view-drawer');
 const mainContent = document.getElementById('main-content');
 const jumpLinks = document.querySelector('.c-jump-links');
 
+function isDrawerOpen(drawer) {
+  if (!drawer) return false;
+  // View toolbar uses is-open class; menu drawer uses hidden attribute
+  if (drawer.classList.contains('c-header__toolbar')) return drawer.classList.contains('is-open');
+  return !drawer.hidden;
+}
+
+function openDrawer(drawer) {
+  if (drawer.classList.contains('c-header__toolbar')) {
+    drawer.classList.add('is-open');
+  } else {
+    drawer.hidden = false;
+  }
+}
+
+function closeDrawerEl(drawer) {
+  if (drawer.classList.contains('c-header__toolbar')) {
+    drawer.classList.remove('is-open');
+  } else {
+    drawer.hidden = true;
+  }
+}
+
 function closeDrawer(toggle, drawer) {
-  drawer.hidden = true;
+  closeDrawerEl(drawer);
   toggle?.setAttribute('aria-expanded', 'false');
 }
 
 function updateInert() {
-  const anyOpen = (menuDrawer && !menuDrawer.hidden) || (viewDrawer && !viewDrawer.hidden);
+  const anyOpen = isDrawerOpen(menuDrawer) || isDrawerOpen(viewDrawer);
   document.querySelector('.c-header')?.classList.toggle('is-drawer-open', anyOpen);
 
   // Make non-drawer content inert when a drawer is open
@@ -422,19 +445,23 @@ function updateInert() {
 }
 
 function toggleDrawer(toggle, drawer, otherToggle, otherDrawer) {
-  const isOpen = !drawer.hidden;
+  const wasOpen = isDrawerOpen(drawer);
 
   // Close the other drawer first
-  if (otherDrawer && !otherDrawer.hidden) {
+  if (otherDrawer && isDrawerOpen(otherDrawer)) {
     closeDrawer(otherToggle, otherDrawer);
   }
 
-  drawer.hidden = isOpen;
-  toggle.setAttribute('aria-expanded', String(!isOpen));
+  if (wasOpen) {
+    closeDrawerEl(drawer);
+  } else {
+    openDrawer(drawer);
+  }
+  toggle.setAttribute('aria-expanded', String(!wasOpen));
 
   updateInert();
 
-  if (!isOpen) {
+  if (!wasOpen) {
     // Drawer just opened — focus first focusable element inside
     const firstFocusable = drawer.querySelector('a, button, input, [tabindex="0"]');
     firstFocusable?.focus();
@@ -459,11 +486,11 @@ if (viewMenuToggle && viewDrawer) {
 // Escape closes any open drawer
 document.addEventListener('keydown', (event) => {
   if (event.key !== 'Escape') return;
-  if (menuDrawer && !menuDrawer.hidden) {
+  if (menuDrawer && isDrawerOpen(menuDrawer)) {
     closeDrawer(menuToggle, menuDrawer);
     updateInert();
     menuToggle?.focus();
-  } else if (viewDrawer && !viewDrawer.hidden) {
+  } else if (viewDrawer && isDrawerOpen(viewDrawer)) {
     closeDrawer(viewMenuToggle, viewDrawer);
     updateInert();
     viewMenuToggle?.focus();
@@ -473,7 +500,7 @@ document.addEventListener('keydown', (event) => {
 // Close drawers when a category link is clicked
 for (const link of document.querySelectorAll('.js-drawer-category')) {
   link.addEventListener('click', () => {
-    if (menuDrawer && !menuDrawer.hidden) {
+    if (menuDrawer && isDrawerOpen(menuDrawer)) {
       closeDrawer(menuToggle, menuDrawer);
       updateInert();
     }
