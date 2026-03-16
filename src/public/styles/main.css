@@ -959,6 +959,7 @@
     font-size: 1rem;
     font-weight: 500;
     white-space: nowrap;
+    flex: 1;
   }
 
   .c-toolbar__label {
@@ -1130,6 +1131,11 @@
 
   /* Hide search bar when a drawer is open */
   .c-header.is-drawer-open .c-header__searchbar {
+    display: none;
+  }
+
+  /* Hide search bar when view popover is open on mobile */
+  .c-header:has(.js-view-popover:not([hidden])) .c-header__searchbar {
     display: none;
   }
 
