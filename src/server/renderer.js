@@ -15,7 +15,7 @@
  * @param {object} options.faviconUrls - Map of bookmark URL → resolved favicon path
  * @returns {string} Complete HTML document
  */
-export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultPage }) {
+export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultPage, footerContent }) {
   const title = pageData.title || 'HomepageMD';
   const nav = renderNav(pages, currentSlug, defaultPage);
   const jumpLinks = renderJumpLinks(pageData.categories);
@@ -31,6 +31,7 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultP
   const addDialog = renderAddDialog(categories, currentSlug);
   const deleteDialog = renderDeleteDialog();
   const keyboardHelp = renderKeyboardHelp();
+  const footer = renderFooter(footerContent);
 
   const iconMenu = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/></svg>';
   const iconSettings = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="2.5"/><path d="M10 1.5v2M10 16.5v2M1.5 10h2M16.5 10h2M3.4 3.4l1.4 1.4M15.2 15.2l1.4 1.4M3.4 16.6l1.4-1.4M15.2 4.8l1.4-1.4"/></svg>';
@@ -78,6 +79,7 @@ ${jumpLinks}
   <main id="main-content">
 ${main}
   </main>
+${footer}
   <button type="button" class="c-fab js-add-open">${iconPlus} <span class="c-fab__label">Add link</span></button>
   <p class="c-search-empty js-search-empty" hidden>No bookmarks match your search.</p>
   <div class="u-visually-hidden" aria-live="polite" id="js-search-status"></div>
@@ -363,6 +365,34 @@ function renderBookmark(bookmark, faviconUrls, categoryName, subcategoryName) {
               </div>
             </div>${description}
           </li>`;
+}
+
+function renderFooter(content) {
+  if (!content) return '';
+
+  const lines = content.split('\n').filter((line) => line.trim());
+  const html = lines.map((line) => {
+    // Parse inline markdown links: [text](url)
+    const parts = [];
+    let lastIndex = 0;
+    const pattern = /\[([^\]]+)\]\(([^)]+)\)/g;
+    let match;
+    while ((match = pattern.exec(line)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push(escapeHtml(line.slice(lastIndex, match.index)));
+      }
+      parts.push(`<a href="${escapeAttr(match[2])}">${escapeHtml(match[1])}</a>`);
+      lastIndex = pattern.lastIndex;
+    }
+    if (lastIndex < line.length) {
+      parts.push(escapeHtml(line.slice(lastIndex)));
+    }
+    return `    <p>${parts.join('')}</p>`;
+  });
+
+  return `  <footer class="c-footer" role="contentinfo">
+${html.join('\n')}
+  </footer>`;
 }
 
 function escapeHtml(text) {

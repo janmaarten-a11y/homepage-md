@@ -5,6 +5,7 @@ const config = {
   iconsDir: process.env.ICONS_DIR || './icons',
   faviconCacheDir: process.env.FAVICON_CACHE_DIR || './favicon-cache',
   customCssPath: process.env.CUSTOM_CSS_PATH || './custom.css',
+  footerPath: process.env.FOOTER_PATH || './footer.md',
   authToken: process.env.AUTH_TOKEN || null,
   faviconTtlDays: parseInt(process.env.FAVICON_TTL_DAYS || '7', 10),
 };

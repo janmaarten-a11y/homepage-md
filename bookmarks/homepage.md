@@ -2,40 +2,46 @@
 
 ## Home
 
-- [Family Calendar](https://calendar.google.com)
-  - description: Shared Google Calendar
-- [Grocery List](https://www.example.com/groceries)
-  - description: Shared shopping list
-- [Recipe Collection](https://www.example.com/recipes)
-  - description: Family favorites
 
-## School
-  - subtitle: Kids' school resources and learning tools
-
-- [School Portal](https://school.example.com)
-  - description: Grades, attendance, and announcements
-- [Lunch Menu](https://school.example.com/lunch)
-  - description: Updated weekly on Mondays
-- [Google Classroom](https://classroom.google.com)
-  - description: Assignments and class materials
-- [Khan Academy](https://www.khanacademy.org)
-  - description: Free courses and practice exercises
-
+- [1Password](https://my.1password.com)
+  - description: Family credential manager
+- [Google Calendar](https://calendar.google.com)
+  - description: Shared family calendar
+- [Todoist](https://www.todoist.com/)
+  - description: Shared task lists
+- [Obsidian](https://obsidian.md/auth)
+  - description: Shared notes vault
+- [You Need A Budget](https://app.ynab.com)
+  - description: Family budgeting
+- [Ente Photos](https://web.ente.io)
+  - description: End-to-end encrypted photo storage
+- [Dropbox](https://www.dropbox.com)
+  - description: Shared cloud storage
 ### Smart Home
 
 - [Home Assistant](http://homeassistant.local:8123)
   - description: Smart home dashboard
+  - icon: https://brands.home-assistant.io/homeassistant/icon.png
 - [Pi-hole](http://pihole.local/admin)
   - description: DNS and ad blocking
+  - icon: https://pi-hole.net/wp-content/uploads/2016/12/cropped-Vortex-R-32x32.png
 
 ### Home Server
   - subtitle: Admin panels for self-hosted services
 
-- [Synology DSM](http://synology.local:5000)
-  - description: NAS admin panel
-  - icon: https://www.synology.com/img/company/branding/synology_logo.jpg
 - [Plex](http://synology.local:32400/web)
   - description: Media server
+  - icon: https://app.plex.tv/desktop/favicon.ico
+- [Nextcloud Portal](https://portal.nextcloud.com/login)
+- [Mealie](https://mealie.org/login)
+  - description: Recipe management
+
+### Networking
+- [ASUS Router](https://192.168.1.1)
+  - icon: https://www.asus.com/favicon.ico
+- [Mullvad VPN](https://mullvad.net)
+  - description: Privacy-focused VPN
+
 
 ## Streaming
   - subtitle: Movies, TV shows, and music for the whole family
@@ -46,21 +52,16 @@
   - description: Family media library
 - [Netflix](https://www.netflix.com)
   - description: Family streaming account
-- [Disney+](https://www.disneyplus.com)
-  - description: Kids profiles are set up
-- [YouTube](https://www.youtube.com)
-  - description: Shared family account
 - [Amazon Prime Video](https://www.primevideo.com)
   - description: Included with Prime membership
 
 ### Music
 
-- [Spotify](https://open.spotify.com)
-  - description: Family plan — 6 accounts
-- [Apple Music](https://music.apple.com)
 - [Bandcamp](https://bandcamp.com)
   - description: Indie music and merch
 
+- [Qobuz](https://play.qobuz.com/)
+  - description: Listen to your music in high quality
 ## Reference
   - subtitle: Quick lookup and general knowledge
 

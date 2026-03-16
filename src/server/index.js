@@ -22,6 +22,19 @@ const CONTENT_TYPES = {
 
 const sseClients = new Set();
 
+/**
+ * Load footer content from the footer Markdown file.
+ * Returns null if the file doesn't exist.
+ */
+async function loadFooter() {
+  try {
+    const source = await readFile(config.footerPath, 'utf-8');
+    return source.trim() || null;
+  } catch {
+    return null;
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
@@ -411,7 +424,8 @@ async function handleRequest(req, res) {
       const pages = await getPageList();
       const bookmarks = flattenBookmarks(pageData);
       const faviconUrls = await resolveFavicons(bookmarks);
-      const html = renderPage(pageData, { pages, currentSlug: slug, faviconUrls, defaultPage: config.defaultPage });
+      const footerContent = await loadFooter();
+      const html = renderPage(pageData, { pages, currentSlug: slug, faviconUrls, defaultPage: config.defaultPage, footerContent });
 
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       res.end(html);

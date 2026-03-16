@@ -8,6 +8,7 @@ services:
       - ./bookmarks:/app/bookmarks:ro
       - ./icons:/app/icons:ro
       - ./custom.css:/app/custom.css:ro
+      - ./footer.md:/app/footer.md:ro
       - favicon-cache:/app/favicon-cache
     env_file:
       - .env
