@@ -345,6 +345,7 @@
     margin-block-start: calc(-1 * var(--space-s));
     margin-block-end: var(--space-m);
     color: var(--color-muted);
+    max-width: 80ch;
   }
 
   /* Subcategory sections */
@@ -364,6 +365,7 @@
     margin-block-end: var(--space-s);
     font-size: 0.875rem;
     color: var(--color-muted);
+    max-width: 80ch;
   }
 
   /* Bookmark list */
