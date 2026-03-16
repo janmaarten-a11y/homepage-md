@@ -499,6 +499,61 @@
     font-size: 0.875rem;
   }
 
+  /* NWS severe weather alerts */
+  .c-weather-panel__nws-alerts {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-s);
+    margin-block-start: var(--space-s);
+  }
+
+  .c-weather-panel__nws-alert {
+    padding: var(--space-s) var(--space-m);
+    border-radius: var(--radius-m);
+    border-inline-start: 4px solid;
+    font-size: 0.875rem;
+  }
+
+  .c-weather-panel__nws-alert strong {
+    display: block;
+    font-weight: 700;
+    margin-block-end: var(--space-xs);
+  }
+
+  .c-weather-panel__nws-alert p {
+    margin: 0;
+    line-height: 1.4;
+  }
+
+  .c-weather-panel__nws-alert a {
+    font-weight: 600;
+  }
+
+  .c-weather-panel__nws-alert[data-severity="extreme"] {
+    background-color: oklch(90% 0.08 25);
+    border-color: oklch(55% 0.25 25);
+    color: oklch(30% 0.1 25);
+  }
+
+  .c-weather-panel__nws-alert[data-severity="severe"] {
+    background-color: oklch(92% 0.06 55);
+    border-color: oklch(60% 0.2 55);
+    color: oklch(30% 0.1 55);
+  }
+
+  .c-weather-panel__nws-alert[data-severity="moderate"] {
+    background-color: oklch(95% 0.04 80);
+    border-color: oklch(70% 0.15 80);
+    color: oklch(35% 0.08 80);
+  }
+
+  .c-weather-panel__nws-alert[data-severity="minor"],
+  .c-weather-panel__nws-alert[data-severity="unknown"] {
+    background-color: var(--color-bg);
+    border-color: var(--color-border);
+    color: var(--color-text);
+  }
+
   .c-weather-panel__day {
     margin-block-start: var(--space-s);
     padding-block-start: var(--space-s);

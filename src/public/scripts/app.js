@@ -895,21 +895,18 @@ function renderWeather(data) {
   weatherBtn.hidden = false;
   weatherBtn.setAttribute('aria-label', `Weather for ${locationName}: ${data.current.temp}${data.units.temp}, ${data.current.condition}. Activate to show forecast.`);
 
-  // AQI with color coding
+  // AQI with color coding and link to airnow.gov
   const aqiHtml = data.aqi
     ? `<div class="c-weather-panel__stat">
-        <dt><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="2"/></svg> Air quality</dt>
+        <dt><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="8" cy="8" r="6"/><circle cx="8" cy="8" r="2"/></svg> <a href="https://www.airnow.gov" rel="noopener">Air quality</a></dt>
         <dd><span class="c-weather-panel__aqi" data-level="${aqiLevel(data.aqi.value)}">${data.aqi.value}</span> ${escapeText(data.aqi.label)}</dd>
       </div>`
     : '';
 
-  // Edit location icon
-  const editIcon = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11.5 1.5l3 3L5 14H2v-3z"/></svg>';
-
-  // Current conditions
+  // Current conditions — location links to weather.gov
   weatherCurrent.innerHTML = `
     <div class="c-weather-panel__heading">
-      <h2 class="c-weather-panel__location">Forecast for ${escapeText(locationName)}</h2>
+      <h2 class="c-weather-panel__location">Forecast for <a href="https://www.weather.gov" rel="noopener">${escapeText(locationName)}</a></h2>
     </div>
     <div class="c-weather-panel__summary">
       <span class="c-weather-panel__temp">${data.current.temp}${data.units.temp}</span>
@@ -920,20 +917,33 @@ function renderWeather(data) {
       <div class="c-weather-panel__stat"><dt><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 8L6 4M2 8l4 4M2 8h8"/><path d="M14 12l-4 4M14 12l-4-4M14 12H6" opacity=".5"/></svg> High / Low</dt><dd>${data.today.high}° / ${data.today.low}°</dd></div>
       <div class="c-weather-panel__stat"><dt><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M2 8h12M10 4l4 4-4 4"/></svg> Wind</dt><dd>${data.current.wind} ${data.units.wind}</dd></div>
 ${aqiHtml}
-    </dl>
-    <div class="c-weather-panel__links">
-      <a href="https://www.weather.gov" rel="noopener">weather.gov</a>
-      <a href="https://www.airnow.gov" rel="noopener">airnow.gov</a>
-    </div>`;
+    </dl>`;
 
-  // Alerts
+  // NWS severe weather alerts (bold, prominent)
+  let alertsHtml = '';
+  if (data.nwsAlerts && data.nwsAlerts.length > 0) {
+    alertsHtml += `<div class="c-weather-panel__nws-alerts">
+${data.nwsAlerts.map((a) => {
+  const link = a.url ? ` <a href="${escapeText(a.url)}" rel="noopener">Details \u2192</a>` : '';
+  return `      <div class="c-weather-panel__nws-alert" data-severity="${escapeText(a.severity)}">
+        <strong>${escapeText(a.event)}</strong>
+        <p>${escapeText(a.headline)}${link}</p>
+      </div>`;
+}).join('\n')}
+    </div>`;
+  }
+
+  // Derived forecast alerts
   if (data.alerts.length > 0) {
-    weatherAlerts.innerHTML = `<ul class="c-weather-panel__alert-list">
+    alertsHtml += `<ul class="c-weather-panel__alert-list">
 ${data.alerts.map((a) => `      <li>${escapeText(a.text)}</li>`).join('\n')}
     </ul>`;
-  } else {
-    weatherAlerts.innerHTML = `<p class="c-weather-panel__no-alerts">No notable weather changes expected.</p>`;
   }
+
+  if (!alertsHtml) {
+    alertsHtml = `<p class="c-weather-panel__no-alerts">No notable weather changes expected.</p>`;
+  }
+  weatherAlerts.innerHTML = alertsHtml;
 
   // Tomorrow's forecast
   weatherForecast.innerHTML = `
@@ -959,12 +969,14 @@ function escapeText(str) {
 }
 
 if (weatherBtn && weatherPanel) {
+  const weatherStorageKey = `homepage-md-weather-${getPageSlug()}`;
+
   // Toggle panel
   weatherBtn.addEventListener('click', () => {
     const isOpen = !weatherPanel.hidden;
-    weatherPanel.hidden = !isOpen ? false : true;
     weatherPanel.hidden = isOpen;
     weatherBtn.setAttribute('aria-expanded', String(!isOpen));
+    localStorage.setItem(weatherStorageKey, String(!isOpen));
   });
 
   // Close on focusin outside
@@ -973,6 +985,7 @@ if (weatherBtn && weatherPanel) {
       if (!weatherPanel.contains(event.target) && !weatherBtn.contains(event.target)) {
         weatherPanel.hidden = true;
         weatherBtn.setAttribute('aria-expanded', 'false');
+        localStorage.setItem(weatherStorageKey, 'false');
       }
     }
   });
@@ -981,6 +994,13 @@ if (weatherBtn && weatherPanel) {
   const slug = getPageSlug();
   fetch(`/api/weather/${encodeURIComponent(slug)}`)
     .then((res) => res.json())
-    .then((data) => renderWeather(data))
+    .then((data) => {
+      renderWeather(data);
+      // Restore panel open state from localStorage
+      if (data && localStorage.getItem(weatherStorageKey) === 'true') {
+        weatherPanel.hidden = false;
+        weatherBtn.setAttribute('aria-expanded', 'true');
+      }
+    })
     .catch(() => {});
 }

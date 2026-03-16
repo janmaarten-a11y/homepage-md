@@ -154,10 +154,13 @@ export async function fetchWeather(locationStr, locale) {
 
     const raw = await res.json();
 
-    // Fetch air quality in parallel (separate API, best-effort)
-    const aqi = await fetchAirQuality(geo, useImperial);
+    // Fetch air quality and NWS alerts in parallel (best-effort)
+    const [aqi, nwsAlerts] = await Promise.all([
+      fetchAirQuality(geo, useImperial),
+      fetchNwsAlerts(geo),
+    ]);
 
-    const result = processWeatherData(raw, geo, useImperial, aqi);
+    const result = processWeatherData(raw, geo, useImperial, aqi, nwsAlerts);
 
     forecastCache.set(cacheKey, { data: result, timestamp: Date.now() });
     return result;
@@ -171,7 +174,7 @@ export async function fetchWeather(locationStr, locale) {
 // Process raw API data into our output shape
 // ---------------------------------------------------------------------------
 
-function processWeatherData(raw, geo, useImperial, aqi) {
+function processWeatherData(raw, geo, useImperial, aqi, nwsAlerts) {
   const current = raw.current;
   const hourly = raw.hourly;
   const daily = raw.daily;
@@ -227,6 +230,7 @@ function processWeatherData(raw, geo, useImperial, aqi) {
       precipChance: daily.precipitation_probability_max[1],
     },
     alerts,
+    nwsAlerts: nwsAlerts || [],
     aqi,
   };
 }
@@ -408,6 +412,46 @@ function deriveAlerts(current, hourlyForecast, daily, unitSymbol, aqi) {
   }
 
   return alerts;
+}
+
+// ---------------------------------------------------------------------------
+// NWS Severe Weather Alerts (api.weather.gov — US only, free, no key)
+// ---------------------------------------------------------------------------
+
+const NWS_SEVERITY_ORDER = { extreme: 0, severe: 1, moderate: 2, minor: 3, unknown: 4 };
+
+async function fetchNwsAlerts(geo) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+
+  try {
+    const url = `https://api.weather.gov/alerts/active?point=${geo.latitude},${geo.longitude}&status=actual`;
+    const res = await fetch(url, {
+      signal: controller.signal,
+      headers: { 'User-Agent': 'HomepageMD Weather Widget', Accept: 'application/geo+json' },
+    });
+    clearTimeout(timeout);
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    const features = data.features || [];
+    if (features.length === 0) return null;
+
+    return features.map((f) => {
+      const p = f.properties;
+      return {
+        event: p.event || 'Weather Alert',
+        severity: (p.severity || 'unknown').toLowerCase(),
+        headline: p.headline || p.event || 'Weather alert in effect',
+        description: p.description?.substring(0, 300) || '',
+        url: p.web || null,
+        expires: p.expires || null,
+      };
+    }).sort((a, b) => (NWS_SEVERITY_ORDER[a.severity] ?? 4) - (NWS_SEVERITY_ORDER[b.severity] ?? 4));
+  } catch {
+    clearTimeout(timeout);
+    return null;
+  }
 }
 
 // ---------------------------------------------------------------------------
