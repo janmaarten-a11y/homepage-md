@@ -62,33 +62,43 @@ async function geocode(locationStr) {
   const cached = geocodeCache.get(locationStr);
   if (cached) return cached;
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 5000);
-  const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(locationStr)}&count=1&language=en&format=json`;
-
-  try {
-    const res = await fetch(url, { signal: controller.signal });
-    clearTimeout(timeout);
-    if (!res.ok) return null;
-
-    const data = await res.json();
-    if (!data.results || data.results.length === 0) return null;
-
-    const result = {
-      latitude: data.results[0].latitude,
-      longitude: data.results[0].longitude,
-      name: data.results[0].name,
-      admin1: data.results[0].admin1 || null,
-      country: data.results[0].country || null,
-      timezone: data.results[0].timezone || 'auto',
-    };
-
-    geocodeCache.set(locationStr, result);
-    return result;
-  } catch {
-    clearTimeout(timeout);
-    return null;
+  // Open-Meteo geocoding works best with just the city name
+  // Strip comma-separated qualifiers (state, country) and try the full string first
+  const queries = [locationStr];
+  if (locationStr.includes(',')) {
+    queries.push(locationStr.split(',')[0].trim());
   }
+
+  for (const query of queries) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=en&format=json`;
+
+    try {
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeout);
+      if (!res.ok) continue;
+
+      const data = await res.json();
+      if (!data.results || data.results.length === 0) continue;
+
+      const result = {
+        latitude: data.results[0].latitude,
+        longitude: data.results[0].longitude,
+        name: data.results[0].name,
+        admin1: data.results[0].admin1 || null,
+        country: data.results[0].country || null,
+        timezone: data.results[0].timezone || 'auto',
+      };
+
+      geocodeCache.set(locationStr, result);
+      return result;
+    } catch {
+      clearTimeout(timeout);
+    }
+  }
+
+  return null;
 }
 
 // ---------------------------------------------------------------------------
@@ -133,7 +143,7 @@ export async function fetchWeather(locationStr, locale) {
   });
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 5000);
+  const timeout = setTimeout(() => controller.abort(), 10000);
 
   try {
     const res = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`, {
