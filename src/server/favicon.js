@@ -10,7 +10,7 @@
  * 6. Generic placeholder — bundled default icon
  */
 
-import { readdir, stat, readFile, writeFile, mkdir } from 'node:fs/promises';
+import { readdir, stat, readFile, writeFile, mkdir, unlink } from 'node:fs/promises';
 import { join, extname } from 'node:path';
 import { lookup } from 'node:dns/promises';
 
@@ -251,4 +251,38 @@ export async function refreshFavicons(bookmarks, config) {
   }
 
   await Promise.allSettled(tasks);
+}
+
+/**
+ * Remove stale entries from the favicon cache.
+ * Deletes files older than the configured TTL.
+ *
+ * @param {object} config - App configuration
+ */
+export async function cleanFaviconCache(config) {
+  try {
+    const files = await readdir(config.faviconCacheDir);
+    const ttlMs = config.faviconTtlDays * 24 * 60 * 60 * 1000;
+    const now = Date.now();
+    let removed = 0;
+
+    for (const file of files) {
+      const filePath = join(config.faviconCacheDir, file);
+      try {
+        const info = await stat(filePath);
+        if (now - info.mtimeMs > ttlMs) {
+          await unlink(filePath);
+          removed++;
+        }
+      } catch {
+        // Skip files that can't be stat'd
+      }
+    }
+
+    if (removed > 0) {
+      console.log(`Favicon cache: removed ${removed} stale file${removed === 1 ? '' : 's'}`);
+    }
+  } catch {
+    // Cache directory may not exist yet
+  }
 }

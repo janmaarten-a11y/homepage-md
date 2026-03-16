@@ -33,7 +33,7 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultP
   const footer = renderFooter(footerContent);
 
   const iconMenu = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/></svg>';
-  const iconSettings = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="2.5"/><path d="M10 1.5v2M10 16.5v2M1.5 10h2M16.5 10h2M3.4 3.4l1.4 1.4M15.2 15.2l1.4 1.4M3.4 16.6l1.4-1.4M15.2 4.8l1.4-1.4"/></svg>';
+  const iconSettings = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.3 2h3.4l.5 2.3a6 6 0 0 1 1.5.9l2.2-.7 1.7 3-1.7 1.6a6 6 0 0 1 0 1.8l1.7 1.6-1.7 3-2.2-.7a6 6 0 0 1-1.5.9L11.7 18H8.3l-.5-2.3a6 6 0 0 1-1.5-.9l-2.2.7-1.7-3 1.7-1.6a6 6 0 0 1 0-1.8L2.4 7.5l1.7-3 2.2.7a6 6 0 0 1 1.5-.9L8.3 2z"/><circle cx="10" cy="10" r="2.5"/></svg>';
   const iconPlus = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
   const iconToc = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="7" y1="4" x2="17" y2="4"/><line x1="7" y1="10" x2="17" y2="10"/><line x1="7" y1="16" x2="17" y2="16"/><circle cx="3.5" cy="4" r="1" fill="currentColor" stroke="none"/><circle cx="3.5" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="3.5" cy="16" r="1" fill="currentColor" stroke="none"/></svg>';
   const iconPlusSmall = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>';
@@ -59,15 +59,15 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultP
 ${nav}
       <div class="c-header__actions">
         <button type="button" class="c-header__action-btn js-view-toggle" aria-expanded="false" aria-controls="js-view-popover" aria-label="View options">${iconSettings}</button>
+        <div class="c-popover js-view-popover" id="js-view-popover" hidden>
+${toolbar}
+        </div>
       </div>
     </div>
     <div class="c-header__searchbar">
 ${tocPopover}
 ${search}
       <button type="button" class="c-header__add-btn c-btn c-btn--primary js-add-open">${iconPlusSmall} <span>Add link</span></button>
-    </div>
-    <div class="c-popover js-view-popover" id="js-view-popover" hidden>
-${toolbar}
     </div>
   </header>
   <aside class="c-drawer js-menu-drawer" id="js-menu-drawer" hidden>

@@ -202,6 +202,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-xs);
+    position: relative;
   }
 
   .c-header__action-btn {
@@ -275,8 +276,9 @@
   /* Popover — dropdown panel for view options and TOC */
   .c-popover {
     position: absolute;
-    inset-inline-end: var(--space-l);
+    inset-inline-end: 0;
     inset-block-start: 100%;
+    margin-block-start: var(--space-xs);
     z-index: 20;
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
@@ -1139,14 +1141,22 @@
     display: none;
   }
 
-  /* View popover becomes a drawer on mobile */
+  /* On mobile, flatten actions so the popover can span full width
+     within the wrapping c-header__top flex container */
+  .c-header__actions {
+    display: contents;
+  }
+
+  /* View popover: full-width panel below the top row on mobile */
   .c-popover.js-view-popover {
     position: static;
+    margin-block-start: 0;
     border: none;
     border-radius: 0;
     box-shadow: none;
     border-block-start: 1px solid var(--color-border);
     inline-size: 100%;
+    order: 99;
   }
 
   .c-popover.js-view-popover:not([hidden]) {
