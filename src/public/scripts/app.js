@@ -856,3 +856,100 @@ initCombobox(
     },
   }
 );
+
+// ---------------------------------------------------------------------------
+// Weather widget
+// ---------------------------------------------------------------------------
+
+const weatherBtn = document.querySelector('.js-weather-toggle');
+const weatherPanel = document.querySelector('.js-weather-panel');
+const weatherIcon = document.querySelector('.js-weather-icon');
+const weatherLabel = document.querySelector('.js-weather-label');
+const weatherCurrent = document.querySelector('.js-weather-current');
+const weatherAlerts = document.querySelector('.js-weather-alerts');
+const weatherForecast = document.querySelector('.js-weather-forecast');
+
+const WEATHER_ICONS = {
+  'clear': '\u2600\uFE0F',
+  'partly-cloudy': '\u26C5',
+  'cloudy': '\u2601\uFE0F',
+  'fog': '\uD83C\uDF2B\uFE0F',
+  'drizzle': '\uD83C\uDF26\uFE0F',
+  'rain': '\uD83C\uDF27\uFE0F',
+  'freezing': '\uD83E\uDDCA',
+  'snow': '\u2744\uFE0F',
+  'thunderstorm': '\u26C8\uFE0F',
+};
+
+function renderWeather(data) {
+  if (!data || !weatherBtn) return;
+
+  // Show the button with current temp and icon
+  const icon = WEATHER_ICONS[data.current.icon] || '\uD83C\uDF24\uFE0F';
+  weatherIcon.textContent = icon;
+  weatherLabel.textContent = `${data.current.temp}${data.units.temp}`;
+  weatherBtn.hidden = false;
+  weatherBtn.setAttribute('aria-label', `Weather: ${data.current.temp}${data.units.temp}, ${data.current.condition}. Activate to show forecast.`);
+
+  // Current conditions
+  weatherCurrent.innerHTML = `
+    <div class="c-weather-panel__summary">
+      <span class="c-weather-panel__temp">${data.current.temp}${data.units.temp}</span>
+      <span class="c-weather-panel__condition">${escapeText(data.current.condition)}</span>
+    </div>
+    <dl class="c-weather-panel__details">
+      <div><dt>Feels like</dt><dd>${data.current.feelsLike}${data.units.temp}</dd></div>
+      <div><dt>Wind</dt><dd>${data.current.wind} ${data.units.wind}</dd></div>
+      <div><dt>Today</dt><dd>${data.today.high}° / ${data.today.low}°</dd></div>
+      <div><dt>Tomorrow</dt><dd>${data.tomorrow.high}° / ${data.tomorrow.low}°</dd></div>
+    </dl>`;
+
+  // Alerts
+  if (data.alerts.length > 0) {
+    weatherAlerts.innerHTML = `<ul class="c-weather-panel__alert-list">
+${data.alerts.map((a) => `      <li>${escapeText(a.text)}</li>`).join('\n')}
+    </ul>`;
+  } else {
+    weatherAlerts.innerHTML = `<p class="c-weather-panel__no-alerts">No notable weather changes expected.</p>`;
+  }
+
+  // Tomorrow's forecast
+  weatherForecast.innerHTML = `
+    <div class="c-weather-panel__day">
+      <strong>Tomorrow</strong> — ${escapeText(data.tomorrow.condition)},
+      ${data.tomorrow.high}° / ${data.tomorrow.low}°${data.tomorrow.precipChance > 0 ? `, ${data.tomorrow.precipChance}% chance of precipitation` : ''}
+    </div>`;
+}
+
+function escapeText(str) {
+  const el = document.createElement('span');
+  el.textContent = str;
+  return el.innerHTML;
+}
+
+if (weatherBtn && weatherPanel) {
+  // Toggle panel
+  weatherBtn.addEventListener('click', () => {
+    const isOpen = !weatherPanel.hidden;
+    weatherPanel.hidden = !isOpen ? false : true;
+    weatherPanel.hidden = isOpen;
+    weatherBtn.setAttribute('aria-expanded', String(!isOpen));
+  });
+
+  // Close on focusin outside
+  document.addEventListener('focusin', (event) => {
+    if (!weatherPanel.hidden) {
+      if (!weatherPanel.contains(event.target) && !weatherBtn.contains(event.target)) {
+        weatherPanel.hidden = true;
+        weatherBtn.setAttribute('aria-expanded', 'false');
+      }
+    }
+  });
+
+  // Fetch weather data
+  const slug = getPageSlug();
+  fetch(`/api/weather/${encodeURIComponent(slug)}`)
+    .then((res) => res.json())
+    .then((data) => renderWeather(data))
+    .catch(() => {});
+}
