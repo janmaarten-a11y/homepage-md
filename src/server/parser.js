@@ -19,7 +19,7 @@
 
 const HEADING_RE = /^(#{1,3})\s+(.+)$/;
 const BOOKMARK_RE = /^-\s+\[([^\]]+)\]\(([^)]+)\)\s*$/;
-const METADATA_RE = /^\s+-\s+(description|icon|subtitle):\s+(.+)$/;
+const METADATA_RE = /^\s+-\s+(description|icon|subtitle|location):\s+(.+)$/;
 
 function slugify(text) {
   return text
@@ -30,7 +30,7 @@ function slugify(text) {
 
 export function parseMarkdown(source) {
   const lines = source.split('\n');
-  const result = { title: null, categories: [] };
+  const result = { title: null, location: null, categories: [] };
 
   let currentCategory = null;
   let currentSubcategory = null;
@@ -92,6 +92,12 @@ export function parseMarkdown(source) {
       if (key === 'subtitle' && !currentBookmark) {
         const target = currentSubcategory || currentCategory;
         if (target) target.subtitle = value.trim();
+        continue;
+      }
+
+      // location: applies to the page (before any category, or at top level)
+      if (key === 'location' && !currentBookmark) {
+        if (!currentCategory) result.location = value.trim();
         continue;
       }
 

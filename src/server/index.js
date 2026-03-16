@@ -8,6 +8,7 @@ import { getFaviconUrl, refreshFavicons, extractDomain, cleanFaviconCache } from
 import { addBookmark, removeBookmark, updateBookmark } from './writer.js';
 import { isAuthenticated, sendUnauthorized } from './auth.js';
 import { fetchMetadata } from './metadata.js';
+import { fetchWeather, clearWeatherCache } from './weather.js';
 
 const CONTENT_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -441,6 +442,31 @@ async function handleRequest(req, res) {
   // API: fetch metadata from URL
   if (pathname === '/api/metadata') {
     await handleApiMetadata(req, res);
+    return;
+  }
+
+  // API: weather data for a page's location
+  const weatherMatch = pathname.match(/^\/api\/weather\/([a-zA-Z0-9_-]+)$/);
+  if (weatherMatch && req.method === 'GET') {
+    const slug = weatherMatch[1];
+    const locale = req.headers['accept-language']?.split(',')[0] || '';
+    const refresh = url.searchParams.has('refresh');
+    if (refresh) clearWeatherCache();
+    try {
+      const pageData = await loadPage(slug);
+      if (!pageData.location) {
+        sendJSON(res, 200, null);
+        return;
+      }
+      const weather = await fetchWeather(pageData.location, locale);
+      res.writeHead(200, {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Cache-Control': 'public, max-age=300',
+      });
+      res.end(JSON.stringify(weather));
+    } catch {
+      sendJSON(res, 200, null);
+    }
     return;
   }
 

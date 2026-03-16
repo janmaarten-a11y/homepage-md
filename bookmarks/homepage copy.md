@@ -1,5 +1,4 @@
-# Dashboard
-  - location: Seattle, WA
+# Second page 
 
 ## Today
   - subtitle: Seize the thing!

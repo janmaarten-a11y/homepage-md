@@ -17,6 +17,7 @@
  */
 export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultPage, footerContent }) {
   const title = pageData.title || 'HomepageMD';
+  const hasLocation = !!pageData.location;
   const nav = renderNav(pages, currentSlug, defaultPage);
   const tocPopover = renderTocPopover(pageData.categories);
   const main = renderMain(pageData, faviconUrls);
@@ -58,6 +59,10 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultP
       <h1 class="c-header__title">${escapeHtml(title)}</h1>
 ${nav}
       <div class="c-header__actions">
+${hasLocation ? `        <button type="button" class="c-weather-btn js-weather-toggle" aria-expanded="false" aria-label="Weather" hidden>
+          <span class="c-weather-btn__icon js-weather-icon" aria-hidden="true"></span>
+          <span class="c-weather-btn__label js-weather-label"></span>
+        </button>` : ''}
         <button type="button" class="c-header__action-btn js-view-toggle" aria-expanded="false" aria-controls="js-view-popover" aria-label="View options">${iconSettings}</button>
         <div class="c-popover js-view-popover" id="js-view-popover" hidden>
 ${toolbar}
@@ -70,6 +75,11 @@ ${search}
       <button type="button" class="c-header__add-btn c-btn c-btn--primary js-add-open">${iconPlusSmall} <span>Add link</span></button>
     </div>
   </header>
+${hasLocation ? `  <section class="c-weather-panel js-weather-panel" hidden aria-label="Weather forecast">
+    <div class="c-weather-panel__current js-weather-current"></div>
+    <div class="c-weather-panel__alerts js-weather-alerts"></div>
+    <div class="c-weather-panel__forecast js-weather-forecast"></div>
+  </section>` : ''}
   <aside class="c-drawer js-menu-drawer" id="js-menu-drawer" hidden>
     <nav class="c-drawer__nav" aria-label="Pages">
 ${pages.length > 1 ? pages.map((p) => {

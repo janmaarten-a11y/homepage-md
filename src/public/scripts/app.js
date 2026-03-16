@@ -856,3 +856,185 @@ initCombobox(
     },
   }
 );
+
+// ---------------------------------------------------------------------------
+// Weather widget
+// ---------------------------------------------------------------------------
+
+const weatherBtn = document.querySelector('.js-weather-toggle');
+const weatherPanel = document.querySelector('.js-weather-panel');
+const weatherIcon = document.querySelector('.js-weather-icon');
+const weatherLabel = document.querySelector('.js-weather-label');
+const weatherCurrent = document.querySelector('.js-weather-current');
+const weatherAlerts = document.querySelector('.js-weather-alerts');
+const weatherForecast = document.querySelector('.js-weather-forecast');
+
+const WEATHER_ICONS = {
+  'clear': '\u2600\uFE0F',
+  'partly-cloudy': '\u26C5',
+  'cloudy': '\u2601\uFE0F',
+  'fog': '\uD83C\uDF2B\uFE0F',
+  'drizzle': '\uD83C\uDF26\uFE0F',
+  'rain': '\uD83C\uDF27\uFE0F',
+  'freezing': '\uD83E\uDDCA',
+  'snow': '\u2744\uFE0F',
+  'thunderstorm': '\u26C8\uFE0F',
+};
+
+function renderWeather(data) {
+  if (!data || !weatherBtn) return;
+
+  const locationName = data.location.region
+    ? `${data.location.name}, ${data.location.region}`
+    : data.location.name;
+
+  // Show the button with current temp and icon
+  const icon = WEATHER_ICONS[data.current.icon] || '\uD83C\uDF24\uFE0F';
+  weatherIcon.textContent = icon;
+  weatherLabel.textContent = `${data.current.temp}${data.units.temp}`;
+  weatherBtn.hidden = false;
+  weatherBtn.setAttribute('aria-label', `Weather for ${locationName}: ${data.current.temp}${data.units.temp}, ${data.current.condition}. Activate to show forecast.`);
+
+  // Location-specific weather.gov link
+  const weatherGovUrl = data.location.latitude
+    ? `https://forecast.weather.gov/MapClick.php?lat=${data.location.latitude}&lon=${data.location.longitude}`
+    : 'https://www.weather.gov';
+
+  // AQI stat
+  const aqiHtml = data.aqi
+    ? `<div class="c-weather-panel__stat">
+        <dt>\uD83C\uDF2B\uFE0F <a href="https://www.airnow.gov" rel="noopener">Air quality</a></dt>
+        <dd><span class="c-weather-panel__aqi" data-level="${aqiLevel(data.aqi.value)}">${data.aqi.value}</span> ${escapeText(data.aqi.label)}</dd>
+      </div>`
+    : '';
+
+  // NWS alerts
+  let nwsHtml = '';
+  if (data.nwsAlerts && data.nwsAlerts.length > 0) {
+    nwsHtml = `<div class="c-weather-panel__nws-alerts">
+${data.nwsAlerts.map((a) => {
+  const link = a.url ? ` <a href="${escapeText(a.url)}" rel="noopener">Details \u2192</a>` : '';
+  return `      <p class="c-weather-panel__nws-alert" data-severity="${escapeText(a.severity)}">${escapeText(a.headline)}${link}</p>`;
+}).join('\n')}
+    </div>`;
+  }
+
+  // Derived alerts
+  let derivedHtml = '';
+  if (data.alerts.length > 0) {
+    derivedHtml = `<ul class="c-weather-panel__alert-list">
+${data.alerts.map((a) => `      <li>${escapeText(a.text)}</li>`).join('\n')}
+    </ul>`;
+  }
+
+  const alertsHtml = nwsHtml || derivedHtml
+    ? nwsHtml + derivedHtml
+    : `<p class="c-weather-panel__no-alerts">No notable weather changes expected.</p>`;
+
+  // Full moon hero
+  const fullMoonText = data.moon.daysToFullMoon === 0
+    ? 'Tonight!'
+    : `${escapeText(data.moon.nextFullMoon)}`;
+  const daysLabel = data.moon.daysToFullMoon === 0
+    ? ''
+    : `<span class="c-weather-panel__astro-sub">in ${data.moon.daysToFullMoon} days</span>`;
+
+  const moonHero = data.moon
+    ? `<div class="c-weather-panel__moon-hero">
+        <p class="c-weather-panel__moon-label">Next full moon \u2014 ${escapeText(data.moon.fullMoonName || 'Full Moon')}</p>
+        <p class="c-weather-panel__moon-date">\uD83C\uDF15 ${fullMoonText} ${daysLabel}</p>
+        <p class="c-weather-panel__astro-line">${data.moon.emoji} ${escapeText(data.moon.phase)}, ${data.moon.illumination}% illuminated</p>
+      </div>`
+    : '';
+
+  // Sun times
+  const sunLine = data.today.sunrise && data.today.sunset
+    ? `<p class="c-weather-panel__astro-line">\u2600\uFE0F Sunrise ${data.today.sunrise} \u00B7 \uD83C\uDF05 Sunset ${data.today.sunset}</p>`
+    : '';
+
+  // Tomorrow
+  const tomorrowHtml = `<div class="c-weather-panel__tomorrow">
+    <strong>Tomorrow</strong> \u2014 ${escapeText(data.tomorrow.condition)},
+    ${data.tomorrow.high}\u00B0 / ${data.tomorrow.low}\u00B0${data.tomorrow.precipChance > 0 ? `, ${data.tomorrow.precipChance}% precip` : ''}
+  </div>`;
+
+  // Left column: heading + conditions + alerts
+  weatherCurrent.innerHTML = `
+    <div class="c-weather-panel__heading">
+      <h2 class="c-weather-panel__location">Forecast for <a href="${weatherGovUrl}" rel="noopener">${escapeText(locationName)}</a></h2>
+    </div>
+    <div class="c-weather-panel__summary">
+      <span class="c-weather-panel__temp">${data.current.temp}${data.units.temp}</span>
+      <span class="c-weather-panel__condition">${escapeText(data.current.condition)}</span>
+    </div>
+    <dl class="c-weather-panel__details">
+      <div class="c-weather-panel__stat"><dt>\uD83C\uDF21\uFE0F Feels like</dt><dd>${data.current.feelsLike}${data.units.temp}</dd></div>
+      <div class="c-weather-panel__stat"><dt>\u2195\uFE0F High / Low</dt><dd>${data.today.high}\u00B0 / ${data.today.low}\u00B0</dd></div>
+      <div class="c-weather-panel__stat"><dt>\uD83D\uDCA8 Wind</dt><dd>${data.current.wind} ${data.units.wind}</dd></div>
+${aqiHtml}
+    </dl>
+${alertsHtml}`;
+
+  // Right column: moon hero → sun → tomorrow
+  weatherAlerts.innerHTML = '';
+  weatherForecast.innerHTML = `
+    <div class="c-weather-panel__sidebar">
+      <div class="c-weather-panel__astro-section">
+${moonHero}
+${sunLine}
+      </div>
+${tomorrowHtml}
+    </div>`;
+}
+
+function aqiLevel(value) {
+  if (value <= 50) return 'good';
+  if (value <= 100) return 'moderate';
+  if (value <= 150) return 'sensitive';
+  if (value <= 200) return 'unhealthy';
+  if (value <= 300) return 'very-unhealthy';
+  return 'hazardous';
+}
+
+function escapeText(str) {
+  const el = document.createElement('span');
+  el.textContent = str;
+  return el.innerHTML;
+}
+
+if (weatherBtn && weatherPanel) {
+  const weatherStorageKey = `homepage-md-weather-${getPageSlug()}`;
+
+  // Toggle panel
+  weatherBtn.addEventListener('click', () => {
+    const isOpen = !weatherPanel.hidden;
+    weatherPanel.hidden = isOpen;
+    weatherBtn.setAttribute('aria-expanded', String(!isOpen));
+    localStorage.setItem(weatherStorageKey, String(!isOpen));
+  });
+
+  // Close on focusin outside
+  document.addEventListener('focusin', (event) => {
+    if (!weatherPanel.hidden) {
+      if (!weatherPanel.contains(event.target) && !weatherBtn.contains(event.target)) {
+        weatherPanel.hidden = true;
+        weatherBtn.setAttribute('aria-expanded', 'false');
+        localStorage.setItem(weatherStorageKey, 'false');
+      }
+    }
+  });
+
+  // Fetch weather data
+  const slug = getPageSlug();
+  fetch(`/api/weather/${encodeURIComponent(slug)}`)
+    .then((res) => res.json())
+    .then((data) => {
+      renderWeather(data);
+      // Restore panel open state from localStorage
+      if (data && localStorage.getItem(weatherStorageKey) === 'true') {
+        weatherPanel.hidden = false;
+        weatherBtn.setAttribute('aria-expanded', 'true');
+      }
+    })
+    .catch(() => {});
+}
