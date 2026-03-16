@@ -237,12 +237,43 @@ async function handleApiBookmark(req, res, slug) {
         sendJSON(res, 400, { error: 'Missing required field: url (identifier)' });
         return;
       }
-      await updateBookmark(filePath, body.url, {
-        title: body.title,
-        url: body.newUrl,
-        description: body.description,
-        icon: body.icon,
-      });
+      // If category is provided, move the bookmark (remove + add)
+      if (body.category) {
+        const { parseMarkdown } = await import('./parser.js');
+        const source = await readFile(filePath, 'utf-8');
+        const pageData = parseMarkdown(source);
+        // Find the current bookmark data
+        let current = null;
+        for (const cat of pageData.categories) {
+          current = cat.bookmarks.find((b) => b.url === body.url);
+          if (current) break;
+          for (const sub of cat.subcategories) {
+            current = sub.bookmarks.find((b) => b.url === body.url);
+            if (current) break;
+          }
+          if (current) break;
+        }
+        if (!current) {
+          sendJSON(res, 404, { error: 'Bookmark not found' });
+          return;
+        }
+        await removeBookmark(filePath, body.url);
+        await addBookmark(filePath, {
+          title: body.title ?? current.title,
+          url: body.newUrl ?? current.url,
+          description: body.description !== undefined ? body.description : current.description,
+          icon: body.icon !== undefined ? body.icon : current.icon,
+          category: body.category,
+          subcategory: body.subcategory || null,
+        });
+      } else {
+        await updateBookmark(filePath, body.url, {
+          title: body.title,
+          url: body.newUrl,
+          description: body.description,
+          icon: body.icon,
+        });
+      }
       sendJSON(res, 200, { ok: true });
       return;
     }
