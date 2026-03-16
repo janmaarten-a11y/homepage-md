@@ -246,7 +246,7 @@ function renderAddDialog(categories, currentSlug) {
       <div class="c-dialog__error js-add-error" role="alert" hidden></div>
       <label class="c-dialog__label">
         URL
-        <input type="url" name="url" class="c-dialog__input js-add-url" required placeholder="https://…">
+        <input type="url" name="url" class="c-dialog__input js-add-url" required>
       </label>
       <button type="button" class="c-btn c-btn--small js-fetch-meta">Fetch title &amp; description</button>
       <label class="c-dialog__label">

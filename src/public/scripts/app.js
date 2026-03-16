@@ -243,6 +243,7 @@ if (addDialog) {
   for (const btn of addOpenBtns) {
     btn.addEventListener('click', () => {
       clearError(addError);
+      if (addUrlInput && !addUrlInput.value) addUrlInput.value = 'https://';
       openDialog(addDialog, btn);
     });
   }
@@ -703,7 +704,7 @@ const allSubcategoryPairs = (pageData.subcategories || []).map((s) => ({
   value: s.subcategory,
 }));
 
-function initCombobox(input, listbox, options) {
+function initCombobox(input, listbox, options, { onSelect } = {}) {
   if (!input || !listbox) return;
 
   let activeIndex = -1;
@@ -750,6 +751,7 @@ function initCombobox(input, listbox, options) {
     listbox.hidden = true;
     input.setAttribute('aria-expanded', 'false');
     input.removeAttribute('aria-activedescendant');
+    if (onSelect) onSelect(value);
     input.focus();
   }
 
@@ -799,6 +801,12 @@ function initCombobox(input, listbox, options) {
   });
 }
 
+// Helper: find the parent category for a subcategory
+function findCategoryForSubcategory(subcategoryName) {
+  const pair = (pageData.subcategories || []).find((s) => s.subcategory === subcategoryName);
+  return pair ? pair.category : null;
+}
+
 // Initialize all comboboxes
 initCombobox(
   document.querySelector('.js-add-category'),
@@ -808,7 +816,14 @@ initCombobox(
 initCombobox(
   document.querySelector('.js-add-subcategory'),
   document.querySelector('.js-add-subcategory-listbox'),
-  allSubcategoryPairs
+  allSubcategoryPairs,
+  {
+    onSelect(value) {
+      const cat = findCategoryForSubcategory(value);
+      const catInput = document.querySelector('.js-add-category');
+      if (cat && catInput) catInput.value = cat;
+    },
+  }
 );
 initCombobox(
   document.querySelector('.js-edit-category'),
@@ -818,5 +833,12 @@ initCombobox(
 initCombobox(
   document.querySelector('.js-edit-subcategory'),
   document.querySelector('.js-edit-subcategory-listbox'),
-  allSubcategoryPairs
+  allSubcategoryPairs,
+  {
+    onSelect(value) {
+      const cat = findCategoryForSubcategory(value);
+      const catInput = document.querySelector('.js-edit-category');
+      if (cat && catInput) catInput.value = cat;
+    },
+  }
 );
