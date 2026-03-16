@@ -263,7 +263,7 @@ describe('renderPage', () => {
       ],
     };
     const html = renderPage(multiCatPage, DEFAULT_OPTIONS);
-    assert.ok(html.includes('c-jump-links'));
+    assert.ok(html.includes('js-toc-popover'));
     assert.ok(html.includes('aria-label="Categories"'));
     assert.ok(html.includes('href="#cat-a"'));
     assert.ok(html.includes('href="#cat-b"'));
@@ -271,12 +271,12 @@ describe('renderPage', () => {
 
   it('does not render jump links for a single category', () => {
     const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
-    assert.ok(!html.includes('c-jump-links'));
+    assert.ok(!html.includes('js-toc-popover'));
   });
 
   it('does not render jump links for an empty page', () => {
     const html = renderPage(EMPTY_PAGE, DEFAULT_OPTIONS);
-    assert.ok(!html.includes('c-jump-links'));
+    assert.ok(!html.includes('js-toc-popover'));
   });
 
   it('includes a toolbar with toggle buttons', () => {

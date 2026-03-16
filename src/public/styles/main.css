@@ -171,13 +171,14 @@
  * Components
  * ------------------------------------------------------------------------- */
 @layer components {
-  /* Header — two rows: title/nav + toolbar */
+  /* Header — two rows: title/nav/actions + search bar */
   .c-header {
     display: flex;
     flex-direction: column;
     gap: 0;
     border-block-end: 1px solid var(--color-border);
     background-color: var(--color-surface);
+    position: relative;
   }
 
   .c-header__top {
@@ -196,14 +197,123 @@
     margin-inline-end: auto;
   }
 
-  .c-header__toolbar {
+  /* Header action buttons (view options, etc.) */
+  .c-header__actions {
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
-    gap: var(--space-m);
+    gap: var(--space-xs);
+  }
+
+  .c-header__action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xs);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+    color: var(--color-muted);
+    cursor: pointer;
+    min-block-size: 2.75rem;
+    min-inline-size: 2.75rem;
+    border-radius: var(--radius-m);
+  }
+
+  .c-header__action-btn:hover {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+  }
+
+  .c-header__action-btn:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  .c-header__action-btn[aria-expanded="true"] {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+  }
+
+  /* Search bar row */
+  .c-header__searchbar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-s);
     padding-block: var(--space-s);
     padding-inline: var(--space-l);
     border-block-start: 1px solid var(--color-border);
+    background-color: var(--color-bg);
+  }
+
+  .c-header__searchbar .c-search {
+    flex: 1;
+    min-inline-size: 0;
+  }
+
+  .c-header__searchbar .c-search__input {
+    inline-size: 100%;
+  }
+
+  .c-header__searchbar .c-search__wrap {
+    inline-size: 100%;
+  }
+
+  /* Add button in search bar */
+  .c-header__add-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* TOC button wrapper */
+  .c-header__toc {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  /* Popover — dropdown panel for view options and TOC */
+  .c-popover {
+    position: absolute;
+    inset-inline-end: var(--space-l);
+    inset-block-start: 100%;
+    z-index: 20;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-l);
+    box-shadow: var(--shadow-m);
+    padding: var(--space-m);
+  }
+
+  .c-popover[hidden] {
+    display: none;
+  }
+
+  /* TOC popover — positioned relative to its wrapper */
+  .c-popover--toc {
+    position: absolute;
+    inset-inline-start: 0;
+    inset-inline-end: auto;
+    inset-block-start: 100%;
+    margin-block-start: var(--space-xs);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    padding: var(--space-s);
+    min-inline-size: 10rem;
+  }
+
+  .c-popover__link {
+    display: block;
+    padding: var(--space-xs) var(--space-s);
+    border-radius: var(--radius-s);
+    text-decoration: none;
+    color: var(--color-text);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .c-popover__link:hover {
     background-color: var(--color-bg);
   }
 
@@ -757,37 +867,6 @@
     background-color: var(--color-surface);
   }
 
-  /* Jump links */
-  .c-jump-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-s);
-    padding-block: var(--space-s);
-    padding-inline: var(--space-l);
-    border-block-end: 1px solid var(--color-border);
-    background-color: var(--color-surface);
-    position: sticky;
-    inset-block-start: 0;
-    z-index: 10;
-  }
-
-  .c-jump-links__link {
-    font-size: 1rem;
-    padding-block: var(--space-s);
-    padding-inline: var(--space-s);
-    border-radius: var(--radius-s);
-    text-decoration: none;
-    color: var(--color-text);
-    font-weight: 500;
-    min-block-size: 2.75rem;
-    display: inline-flex;
-    align-items: center;
-  }
-
-  .c-jump-links__link:hover {
-    background-color: var(--color-border);
-  }
-
   /* Condensed view */
   .is-condensed .c-bookmark__description {
     display: none;
@@ -850,12 +929,11 @@
     display: none;
   }
 
-  /* Toolbar — toggle button groups */
+  /* Toolbar — toggle button groups (inside view popover) */
   .c-toolbar {
     display: flex;
-    align-items: center;
+    flex-direction: column;
     gap: var(--space-s);
-    margin-inline-start: auto;
   }
 
   .c-toolbar__group {
@@ -912,8 +990,8 @@
   }
 
   .c-toolbar__separator {
-    inline-size: 1px;
-    block-size: 1.25rem;
+    inline-size: 100%;
+    block-size: 1px;
     background-color: var(--color-border);
   }
 
@@ -993,35 +1071,8 @@
  * Responsive
  * ------------------------------------------------------------------------- */
 
-/* Narrow desktop: tighten toolbar, hide separators */
-@media (max-width: 55rem) {
-  .c-toolbar__separator {
-    display: none;
-  }
-
-  .c-toolbar {
-    gap: var(--space-xs);
-  }
-}
-
-/* Narrower: hide Layout labels (Grid/Columns), keep icons */
-@media (max-width: 53rem) {
-  .c-toolbar__group[aria-label="Layout"] .c-toolbar__label {
-    position: absolute;
-    inline-size: 1px;
-    block-size: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
-  }
-}
-
-/* Mobile: hamburger/view buttons visible, desktop nav/toolbar hidden */
-.c-header__menu-btn,
-.c-header__view-btn {
+/* Mobile: hamburger visible, desktop nav/searchbar/actions hidden */
+.c-header__menu-btn {
   display: none;
 }
 
@@ -1034,9 +1085,8 @@
 }
 
 @media (max-width: 48rem) {
-  /* Show mobile controls */
-  .c-header__menu-btn,
-  .c-header__view-btn {
+  /* Show mobile hamburger */
+  .c-header__menu-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1050,75 +1100,67 @@
     border-radius: var(--radius-s);
   }
 
-  .c-header__menu-btn:focus-visible,
-  .c-header__view-btn:focus-visible {
+  .c-header__menu-btn:focus-visible {
     outline: 2px solid var(--color-focus);
     outline-offset: 2px;
   }
 
-  /* Toolbar hidden on mobile, show when toggled */
+  /* Hide desktop nav */
   .c-header__top .c-nav {
     display: none;
   }
 
-  .c-header__toolbar {
+  /* Hide desktop actions row buttons, keep view-options gear on mobile */
+  .c-header__actions {
+    margin-inline-start: auto;
+  }
+
+  /* Search bar: hide TOC and Add, only show search */
+  .c-header__searchbar .c-header__toc {
     display: none;
   }
 
-  .c-header__toolbar.is-open {
-    display: flex;
-    flex-wrap: wrap;
-    padding: var(--space-m);
-    background-color: var(--color-surface);
+  .c-header__searchbar .c-header__add-btn {
+    display: none;
+  }
+
+  .c-header__searchbar {
+    padding-inline: var(--space-s);
+  }
+
+  /* Hide search bar when a drawer is open */
+  .c-header.is-drawer-open .c-header__searchbar {
+    display: none;
+  }
+
+  /* View popover becomes a drawer on mobile */
+  .c-popover.js-view-popover {
+    position: static;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
     border-block-start: 1px solid var(--color-border);
-  }
-
-  /* Search stays visible in top row, expands full width */
-  .c-header__top .c-search {
-    order: 10;
-    inline-size: 100%;
-  }
-  .c-search__wrap {
-    width: 100%;
-  }
-  .c-header__top .c-search__input {
     inline-size: 100%;
   }
 
-  /* Hide search when a drawer is open */
-  .c-header.is-drawer-open .c-search {
-    display: none;
-  }
-
-  /* Mobile toolbar layout — vertical, no layout group */
-  .c-header__toolbar .c-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-    margin-inline-start: 0;
-    gap: var(--space-s);
-    inline-size: 100%;
-  }
-
-  .c-header__toolbar .c-toolbar__separator {
-    inline-size: 100%;
-    block-size: 1px;
-  }
-
-  .c-header__toolbar .c-toolbar__group[aria-label="Layout"] {
-    display: none;
-  }
-
-  .c-header__toolbar .c-toolbar__group {
+  .c-popover.js-view-popover:not([hidden]) {
     display: flex;
   }
 
-  .c-header__toolbar .c-toolbar__btn {
-    flex: 1;
+  .c-popover.js-view-popover .c-toolbar {
+    inline-size: 100%;
   }
 
-  /* Hide Add button in toolbar on mobile (FAB replaces it) */
-  .c-header__toolbar .js-add-open {
+  .c-popover.js-view-popover .c-toolbar__group[aria-label="Layout"] {
     display: none;
+  }
+
+  .c-popover.js-view-popover .c-toolbar__group {
+    display: flex;
+  }
+
+  .c-popover.js-view-popover .c-toolbar__btn {
+    flex: 1;
   }
 
   /* Compact header */
@@ -1167,11 +1209,6 @@
   .c-drawer__categories {
     border-block-start: 1px solid var(--color-border);
     padding-block-start: var(--space-s);
-  }
-
-  /* Hide jump links on mobile — they're in the hamburger */
-  .c-jump-links {
-    display: none;
   }
 
   /* FAB — floating action button */

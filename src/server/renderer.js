@@ -18,7 +18,7 @@
 export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultPage, footerContent }) {
   const title = pageData.title || 'HomepageMD';
   const nav = renderNav(pages, currentSlug, defaultPage);
-  const jumpLinks = renderJumpLinks(pageData.categories);
+  const tocPopover = renderTocPopover(pageData.categories);
   const main = renderMain(pageData, faviconUrls);
   const categories = pageData.categories.map((c) => c.name);
   const subcategoryPairs = pageData.categories.flatMap((c) =>
@@ -26,7 +26,6 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultP
   );
 
   const search = renderSearch();
-  const addBtn = renderAddButton();
   const toolbar = renderToolbar();
   const addDialog = renderAddDialog(categories, currentSlug);
   const deleteDialog = renderDeleteDialog();
@@ -36,6 +35,8 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultP
   const iconMenu = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/></svg>';
   const iconSettings = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="2.5"/><path d="M10 1.5v2M10 16.5v2M1.5 10h2M16.5 10h2M3.4 3.4l1.4 1.4M15.2 15.2l1.4 1.4M3.4 16.6l1.4-1.4M15.2 4.8l1.4-1.4"/></svg>';
   const iconPlus = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
+  const iconToc = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="7" y1="4" x2="17" y2="4"/><line x1="7" y1="10" x2="17" y2="10"/><line x1="7" y1="16" x2="17" y2="16"/><circle cx="3.5" cy="4" r="1" fill="currentColor" stroke="none"/><circle cx="3.5" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="3.5" cy="16" r="1" fill="currentColor" stroke="none"/></svg>';
+  const iconPlusSmall = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>';
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -55,12 +56,17 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultP
     <div class="c-header__top">
       <button type="button" class="c-header__menu-btn js-menu-toggle" aria-expanded="false" aria-controls="js-menu-drawer" aria-label="Menu">${iconMenu}</button>
       <h1 class="c-header__title">${escapeHtml(title)}</h1>
-      <button type="button" class="c-header__view-btn js-view-menu-toggle" aria-expanded="false" aria-controls="js-view-drawer" aria-label="View options">${iconSettings}</button>
 ${nav}
-${search}
+      <div class="c-header__actions">
+        <button type="button" class="c-header__action-btn js-view-toggle" aria-expanded="false" aria-controls="js-view-popover" aria-label="View options">${iconSettings}</button>
+      </div>
     </div>
-    <div class="c-header__toolbar js-view-drawer" id="js-view-drawer">
-${addBtn}
+    <div class="c-header__searchbar">
+${tocPopover}
+${search}
+      <button type="button" class="c-header__add-btn c-btn c-btn--primary js-add-open">${iconPlusSmall} <span>Add link</span></button>
+    </div>
+    <div class="c-popover js-view-popover" id="js-view-popover" hidden>
 ${toolbar}
     </div>
   </header>
@@ -75,7 +81,6 @@ ${pageData.categories.length > 1 ? `    <nav class="c-drawer__categories" aria-l
 ${pageData.categories.map((cat) => `      <a href="#${escapeAttr(cat.id)}" class="c-drawer__link js-drawer-category">${escapeHtml(cat.name)}</a>`).join('\n')}
     </nav>` : ''}
   </aside>
-${jumpLinks}
   <main id="main-content">
 ${main}
   </main>
@@ -148,10 +153,6 @@ function renderSearch() {
     </search>`;
 }
 
-function renderAddButton() {
-  return `    <button type="button" class="c-btn c-btn--primary js-add-open" aria-label="Add link">+ Add link</button>`;
-}
-
 function renderToolbar() {
   // Inline SVG icons (16×16, currentColor)
   const iconGrid = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>';
@@ -217,16 +218,21 @@ function renderKeyboardHelp() {
   </dialog>`;
 }
 
-function renderJumpLinks(categories) {
+function renderTocPopover(categories) {
   if (categories.length <= 1) return '';
 
+  const iconToc = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="7" y1="4" x2="17" y2="4"/><line x1="7" y1="10" x2="17" y2="10"/><line x1="7" y1="16" x2="17" y2="16"/><circle cx="3.5" cy="4" r="1" fill="currentColor" stroke="none"/><circle cx="3.5" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="3.5" cy="16" r="1" fill="currentColor" stroke="none"/></svg>';
+
   const links = categories
-    .map((cat) => `    <a href="#${escapeAttr(cat.id)}" class="c-jump-links__link">${escapeHtml(cat.name)}</a>`)
+    .map((cat) => `        <a href="#${escapeAttr(cat.id)}" class="c-popover__link js-toc-link">${escapeHtml(cat.name)}</a>`)
     .join('\n');
 
-  return `  <nav class="c-jump-links" aria-label="Categories">
+  return `      <div class="c-header__toc">
+        <button type="button" class="c-header__action-btn js-toc-toggle" aria-expanded="false" aria-controls="js-toc-popover" aria-label="Categories">${iconToc}</button>
+        <nav class="c-popover c-popover--toc js-toc-popover" id="js-toc-popover" aria-label="Categories" hidden>
 ${links}
-  </nav>`;
+        </nav>
+      </div>`;
 }
 
 function renderAddDialog(categories, currentSlug) {
