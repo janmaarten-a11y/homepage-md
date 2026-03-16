@@ -29,10 +29,12 @@ function clearError(errorEl) {
 
 // Track which element opened each dialog so we can return focus
 const dialogOpeners = new WeakMap();
+const dialogTargetBtns = new WeakMap();
 
-function openDialog(dialog, opener) {
+function openDialog(dialog, opener, targetBtn) {
   if (!dialog) return;
   dialogOpeners.set(dialog, opener || document.activeElement);
+  if (targetBtn) dialogTargetBtns.set(dialog, targetBtn);
   dialog.showModal();
   const closeBtn = dialog.querySelector('.c-dialog__close');
   if (closeBtn) closeBtn.focus();
@@ -40,10 +42,17 @@ function openDialog(dialog, opener) {
 
 function returnFocus(dialog) {
   const opener = dialogOpeners.get(dialog);
+  const targetBtn = dialogTargetBtns.get(dialog);
   if (opener && typeof opener.focus === 'function') {
+    // Focus the link first to trigger :focus-within (makes action buttons visible)
     opener.focus();
+    if (targetBtn) {
+      // Then shift focus to the specific button once it's visible
+      requestAnimationFrame(() => targetBtn.focus());
+    }
   }
   dialogOpeners.delete(dialog);
+  dialogTargetBtns.delete(dialog);
 }
 
 function closeDialog(dialog) {
@@ -370,7 +379,7 @@ document.addEventListener('click', (event) => {
 
   clearError(editError);
   const bookmarkLink = card.querySelector('.c-bookmark__link');
-  openDialog(editDialog, bookmarkLink);
+  openDialog(editDialog, bookmarkLink, editBtn);
 });
 
 if (editForm) {
@@ -425,7 +434,7 @@ document.addEventListener('click', (event) => {
   deleteUrlInput.value = url;
   clearError(deleteError);
   const bookmarkLink = card.querySelector('.c-bookmark__link');
-  openDialog(deleteDialog, bookmarkLink);
+  openDialog(deleteDialog, bookmarkLink, deleteBtn);
 });
 
 if (deleteConfirmBtn) {
