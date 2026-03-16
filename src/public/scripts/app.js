@@ -28,24 +28,28 @@ function clearError(errorEl) {
 }
 
 // Track which element opened each dialog so we can return focus
-let dialogOpener = null;
+const dialogOpeners = new WeakMap();
 
 function openDialog(dialog, opener) {
   if (!dialog) return;
-  dialogOpener = opener || document.activeElement;
+  dialogOpeners.set(dialog, opener || document.activeElement);
   dialog.showModal();
-  // Focus the close button (first focusable in the dialog header)
   const closeBtn = dialog.querySelector('.c-dialog__close');
   if (closeBtn) closeBtn.focus();
+}
+
+function returnFocus(dialog) {
+  const opener = dialogOpeners.get(dialog);
+  if (opener && typeof opener.focus === 'function') {
+    opener.focus();
+  }
+  dialogOpeners.delete(dialog);
 }
 
 function closeDialog(dialog) {
   if (!dialog) return;
   dialog.close();
-  if (dialogOpener) {
-    dialogOpener.focus();
-    dialogOpener = null;
-  }
+  // focus return handled by the 'close' event listener below
 }
 
 async function apiRequest(method, slug, body) {
@@ -167,14 +171,9 @@ if (keyboardHelpClose && keyboardHelpDialog) {
   keyboardHelpClose.addEventListener('click', () => closeDialog(keyboardHelpDialog));
 }
 
-// Return focus when native dialog close (Escape) fires
+// Return focus when any dialog closes (Escape, close button, or form submit)
 for (const dialog of document.querySelectorAll('dialog')) {
-  dialog.addEventListener('close', () => {
-    if (dialogOpener) {
-      dialogOpener.focus();
-      dialogOpener = null;
-    }
-  });
+  dialog.addEventListener('close', () => returnFocus(dialog));
 }
 
 function isEditing(element) {

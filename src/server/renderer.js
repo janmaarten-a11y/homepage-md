@@ -107,7 +107,6 @@ ${addDialog}
       </label>
       <div class="c-dialog__actions">
         <button type="submit" class="c-btn c-btn--primary">Save</button>
-        <button type="button" class="c-btn js-edit-cancel">Cancel</button>
       </div>
     </form>
   </dialog>
@@ -173,7 +172,6 @@ function renderDeleteDialog() {
       <input type="hidden" class="js-delete-url">
       <div class="c-dialog__actions">
         <button type="button" class="c-btn c-btn--danger js-delete-confirm">Delete</button>
-        <button type="button" class="c-btn js-delete-cancel">Cancel</button>
       </div>
     </form>
   </dialog>`;
@@ -258,7 +256,6 @@ ${subcategoryOptions}
       </label>
       <div class="c-dialog__actions">
         <button type="submit" class="c-btn c-btn--primary">Add Link</button>
-        <button type="button" class="c-btn js-add-cancel">Cancel</button>
       </div>
     </form>
   </dialog>`;
