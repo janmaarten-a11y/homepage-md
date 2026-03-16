@@ -1141,16 +1141,21 @@
     display: none;
   }
 
-  /* View popover becomes a full-width drawer on mobile */
+  /* On mobile, actions wrapper doesn't constrain the popover */
+  .c-header__actions {
+    position: static;
+  }
+
+  /* View popover becomes a full-width panel below the top row on mobile */
   .c-popover.js-view-popover {
-    position: fixed;
+    position: absolute;
     inset-inline: 0;
     inset-block-start: auto;
     margin-block-start: 0;
     border: none;
     border-radius: 0;
     box-shadow: none;
-    border-block-end: 1px solid var(--color-border);
+    border-block-start: 1px solid var(--color-border);
     inline-size: 100%;
   }
 
