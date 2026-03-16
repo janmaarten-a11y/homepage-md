@@ -302,13 +302,38 @@ function getMoonData(date) {
     weekday: 'short', month: 'short', day: 'numeric',
   });
 
+  // Full moon name based on month
+  const fullMoonName = getFullMoonName(nextFullMoon.getMonth());
+
   return {
     phase: MOON_PHASES[phaseIndex].name,
     emoji: MOON_PHASES[phaseIndex].emoji,
     illumination,
     nextFullMoon: fullMoonFormatted,
+    fullMoonName,
     daysToFullMoon: Math.round(daysToFull),
   };
+}
+
+/**
+ * Traditional full moon names by month (Northern Hemisphere).
+ */
+function getFullMoonName(month) {
+  const names = [
+    'Wolf Moon',        // January
+    'Snow Moon',        // February
+    'Worm Moon',        // March
+    'Pink Moon',        // April
+    'Flower Moon',      // May
+    'Strawberry Moon',  // June
+    'Buck Moon',        // July
+    'Sturgeon Moon',    // August
+    'Harvest Moon',     // September
+    'Hunter\u2019s Moon', // October
+    'Beaver Moon',      // November
+    'Cold Moon',        // December
+  ];
+  return names[month] || 'Full Moon';
 }
 
 // ---------------------------------------------------------------------------

@@ -373,7 +373,7 @@
 
   @media (min-width: 48rem) {
     .c-weather-panel {
-      grid-template-columns: 1fr auto;
+      grid-template-columns: auto 1fr;
     }
 
     .c-weather-panel > .js-weather-current {
@@ -598,6 +598,29 @@
     font-size: 1rem;
     color: var(--color-muted);
     white-space: nowrap;
+  }
+
+  .c-weather-panel__moon-hero {
+    margin-block-end: var(--space-s);
+  }
+
+  .c-weather-panel__moon-label {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--color-muted);
+  }
+
+  .c-weather-panel__moon-date {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .c-weather-panel__astro-sub {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--color-muted);
   }
 
   .c-weather-panel__tomorrow {

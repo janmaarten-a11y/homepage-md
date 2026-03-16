@@ -931,17 +931,25 @@ ${data.alerts.map((a) => `      <li>${escapeText(a.text)}</li>`).join('\n')}
     ? nwsHtml + derivedHtml
     : `<p class="c-weather-panel__no-alerts">No notable weather changes expected.</p>`;
 
-  // Sun line
-  const sunLine = data.today.sunrise && data.today.sunset
-    ? `<p class="c-weather-panel__astro-line">\u2600\uFE0F Sunrise ${data.today.sunrise} \u00B7 \uD83C\uDF05 Sunset ${data.today.sunset}</p>`
-    : '';
-
-  // Moon line
+  // Full moon hero
   const fullMoonText = data.moon.daysToFullMoon === 0
     ? 'Tonight!'
-    : `${escapeText(data.moon.nextFullMoon)} (in ${data.moon.daysToFullMoon} days)`;
-  const moonLine = data.moon
-    ? `<p class="c-weather-panel__astro-line">${data.moon.emoji} ${escapeText(data.moon.phase)}, ${data.moon.illumination}% illuminated \u00B7 \uD83C\uDF15 Full moon ${fullMoonText}</p>`
+    : `${escapeText(data.moon.nextFullMoon)}`;
+  const daysLabel = data.moon.daysToFullMoon === 0
+    ? ''
+    : `<span class="c-weather-panel__astro-sub">in ${data.moon.daysToFullMoon} days</span>`;
+
+  const moonHero = data.moon
+    ? `<div class="c-weather-panel__moon-hero">
+        <p class="c-weather-panel__moon-label">Next full moon \u2014 ${escapeText(data.moon.fullMoonName || 'Full Moon')}</p>
+        <p class="c-weather-panel__moon-date">\uD83C\uDF15 ${fullMoonText} ${daysLabel}</p>
+        <p class="c-weather-panel__astro-line">${data.moon.emoji} ${escapeText(data.moon.phase)}, ${data.moon.illumination}% illuminated</p>
+      </div>`
+    : '';
+
+  // Sun times
+  const sunLine = data.today.sunrise && data.today.sunset
+    ? `<p class="c-weather-panel__astro-line">\u2600\uFE0F Sunrise ${data.today.sunrise} \u00B7 \uD83C\uDF05 Sunset ${data.today.sunset}</p>`
     : '';
 
   // Tomorrow
@@ -967,13 +975,13 @@ ${aqiHtml}
     </dl>
 ${alertsHtml}`;
 
-  // Right column: sun/moon + tomorrow
+  // Right column: moon hero → sun → tomorrow
   weatherAlerts.innerHTML = '';
   weatherForecast.innerHTML = `
     <div class="c-weather-panel__sidebar">
       <div class="c-weather-panel__astro-section">
+${moonHero}
 ${sunLine}
-${moonLine}
       </div>
 ${tomorrowHtml}
     </div>`;
