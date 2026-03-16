@@ -44,6 +44,7 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultP
   <link rel="stylesheet" href="/custom.css">
 </head>
 <body data-slug="${escapeAttr(currentSlug)}">
+  <noscript><p class="c-noscript">This dashboard requires JavaScript for search, editing, and view options. Bookmarks are still visible below.</p></noscript>
   <a href="#main-content" class="c-skip-link">Skip to content</a>
   <header class="c-header">
     <div class="c-header__top">
@@ -76,13 +77,14 @@ ${jumpLinks}
   <main id="main-content">
 ${main}
   </main>
-  <button type="button" class="c-fab js-add-open" aria-label="Add link">${iconPlus}</button>
+  <button type="button" class="c-fab js-add-open">${iconPlus} <span class="c-fab__label">Add link</span></button>
   <p class="c-search-empty js-search-empty" hidden>No bookmarks match your search.</p>
   <div class="u-visually-hidden" aria-live="polite" id="js-search-status"></div>
 ${addDialog}
   <dialog class="c-dialog js-edit-dialog">
     <form method="dialog" class="c-dialog__form js-edit-form">
       <h2 class="c-dialog__title">Edit Bookmark</h2>
+      <div class="c-dialog__error js-edit-error" role="alert" hidden></div>
       <input type="hidden" name="originalUrl" class="js-edit-original-url">
       <label class="c-dialog__label">
         URL
@@ -138,17 +140,17 @@ function renderToolbar() {
   const iconSystem = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="9" rx="1.5"/><line x1="5" y1="14" x2="11" y2="14"/><line x1="8" y1="11" x2="8" y2="14"/></svg>';
 
   return `      <div class="c-toolbar" role="toolbar" aria-label="View options">
-        <div class="c-toolbar__group" role="radiogroup" aria-label="Layout">
+        <div class="c-toolbar__group" role="group" aria-label="Layout">
           <button type="button" class="c-toolbar__btn js-layout-btn" data-value="grid" aria-pressed="true" title="Grid layout">${iconGrid} <span class="c-toolbar__label">Grid</span></button>
           <button type="button" class="c-toolbar__btn js-layout-btn" data-value="columns" aria-pressed="false" title="Columns layout">${iconColumns} <span class="c-toolbar__label">Columns</span></button>
         </div>
         <div class="c-toolbar__separator" aria-hidden="true"></div>
-        <div class="c-toolbar__group" role="radiogroup" aria-label="Density">
+        <div class="c-toolbar__group" role="group" aria-label="Density">
           <button type="button" class="c-toolbar__btn js-density-btn" data-value="detailed" aria-pressed="true" title="Detailed view">${iconDetailed} <span class="c-toolbar__label">Detailed</span></button>
           <button type="button" class="c-toolbar__btn js-density-btn" data-value="condensed" aria-pressed="false" title="Condensed view">${iconCondensed} <span class="c-toolbar__label">Condensed</span></button>
         </div>
         <div class="c-toolbar__separator" aria-hidden="true"></div>
-        <div class="c-toolbar__group" role="radiogroup" aria-label="Color mode">
+        <div class="c-toolbar__group" role="group" aria-label="Color mode">
           <button type="button" class="c-toolbar__btn js-color-btn" data-value="system" aria-pressed="true" title="System theme">${iconSystem} <span class="c-toolbar__label">System</span></button>
           <button type="button" class="c-toolbar__btn js-color-btn" data-value="light" aria-pressed="false" title="Light theme">${iconSun} <span class="c-toolbar__label">Light</span></button>
           <button type="button" class="c-toolbar__btn js-color-btn" data-value="dark" aria-pressed="false" title="Dark theme">${iconMoon} <span class="c-toolbar__label">Dark</span></button>
@@ -160,6 +162,7 @@ function renderDeleteDialog() {
   return `  <dialog class="c-dialog c-dialog--small js-delete-dialog">
     <form method="dialog" class="c-dialog__form">
       <h2 class="c-dialog__title">Delete Bookmark</h2>
+      <div class="c-dialog__error js-delete-error" role="alert" hidden></div>
       <p class="c-dialog__message js-delete-message">Are you sure?</p>
       <input type="hidden" class="js-delete-url">
       <div class="c-dialog__actions">
@@ -191,6 +194,7 @@ function renderAddDialog(categories, currentSlug) {
     <form method="dialog" class="c-dialog__form js-add-form">
       <h2 class="c-dialog__title">Add Link</h2>
       <input type="hidden" name="page" value="${escapeAttr(currentSlug)}">
+      <div class="c-dialog__error js-add-error" role="alert" hidden></div>
       <label class="c-dialog__label">
         URL
         <input type="url" name="url" class="c-dialog__input js-add-url" required placeholder="https://…">

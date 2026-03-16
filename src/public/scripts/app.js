@@ -15,6 +15,18 @@ function getPageSlug() {
   return path || document.querySelector('input[name="page"]')?.value || 'homepage';
 }
 
+function showError(errorEl, message) {
+  if (!errorEl) return;
+  errorEl.textContent = message;
+  errorEl.hidden = false;
+}
+
+function clearError(errorEl) {
+  if (!errorEl) return;
+  errorEl.textContent = '';
+  errorEl.hidden = true;
+}
+
 async function apiRequest(method, slug, body) {
   const res = await fetch(`/api/bookmarks/${encodeURIComponent(slug)}`, {
     method,
@@ -171,10 +183,14 @@ const fetchMetaBtn = document.querySelector('.js-fetch-meta');
 const addUrlInput = document.querySelector('.js-add-url');
 const addTitleInput = document.querySelector('.js-add-title');
 const addDescInput = document.querySelector('.js-add-description');
+const addError = document.querySelector('.js-add-error');
 
 if (addDialog) {
   for (const btn of addOpenBtns) {
-    btn.addEventListener('click', () => addDialog.showModal());
+    btn.addEventListener('click', () => {
+      clearError(addError);
+      addDialog.showModal();
+    });
   }
 }
 
@@ -232,7 +248,7 @@ if (addForm) {
       // SSE will trigger reload, but reload immediately for responsiveness
       window.location.reload();
     } catch (err) {
-      alert(`Failed to add bookmark: ${err.message}`);
+      showError(addError, `Failed to add bookmark: ${err.message}`);
     }
   });
 }
@@ -250,6 +266,7 @@ const editUrl = document.querySelector('.js-edit-url');
 const editDescription = document.querySelector('.js-edit-description');
 const editIcon = document.querySelector('.js-edit-icon');
 const editFetchMetaBtn = document.querySelector('.js-edit-fetch-meta');
+const editError = document.querySelector('.js-edit-error');
 
 if (editCancelBtn && editDialog) {
   editCancelBtn.addEventListener('click', () => editDialog.close());
@@ -304,6 +321,7 @@ document.addEventListener('click', (event) => {
   editDescription.value = descEl?.textContent || '';
   if (editIcon) editIcon.value = iconUrl;
 
+  clearError(editError);
   editDialog.showModal();
 });
 
@@ -324,7 +342,7 @@ if (editForm) {
       editDialog.close();
       window.location.reload();
     } catch (err) {
-      alert(`Failed to update bookmark: ${err.message}`);
+      showError(editError, `Failed to update bookmark: ${err.message}`);
     }
   });
 }
@@ -338,6 +356,7 @@ const deleteMessage = document.querySelector('.js-delete-message');
 const deleteUrlInput = document.querySelector('.js-delete-url');
 const deleteConfirmBtn = document.querySelector('.js-delete-confirm');
 const deleteCancelBtn = document.querySelector('.js-delete-cancel');
+const deleteError = document.querySelector('.js-delete-error');
 
 if (deleteCancelBtn && deleteDialog) {
   deleteCancelBtn.addEventListener('click', () => deleteDialog.close());
@@ -356,6 +375,7 @@ document.addEventListener('click', (event) => {
 
   deleteMessage.textContent = `Are you sure you want to delete "${title}"?`;
   deleteUrlInput.value = url;
+  clearError(deleteError);
   deleteDialog.showModal();
 });
 
@@ -369,7 +389,7 @@ if (deleteConfirmBtn) {
       deleteDialog.close();
       window.location.reload();
     } catch (err) {
-      alert(`Failed to delete bookmark: ${err.message}`);
+      showError(deleteError, `Failed to delete bookmark: ${err.message}`);
     }
   });
 }
