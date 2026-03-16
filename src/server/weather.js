@@ -153,7 +153,11 @@ export async function fetchWeather(locationStr, locale) {
     if (!res.ok) return null;
 
     const raw = await res.json();
-    const result = processWeatherData(raw, geo, useImperial);
+
+    // Fetch air quality in parallel (separate API, best-effort)
+    const aqi = await fetchAirQuality(geo, useImperial);
+
+    const result = processWeatherData(raw, geo, useImperial, aqi);
 
     forecastCache.set(cacheKey, { data: result, timestamp: Date.now() });
     return result;
@@ -167,7 +171,7 @@ export async function fetchWeather(locationStr, locale) {
 // Process raw API data into our output shape
 // ---------------------------------------------------------------------------
 
-function processWeatherData(raw, geo, useImperial) {
+function processWeatherData(raw, geo, useImperial, aqi) {
   const current = raw.current;
   const hourly = raw.hourly;
   const daily = raw.daily;
@@ -223,7 +227,64 @@ function processWeatherData(raw, geo, useImperial) {
       precipChance: daily.precipitation_probability_max[1],
     },
     alerts,
+    aqi,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Air Quality Index
+// ---------------------------------------------------------------------------
+
+const AQI_LEVELS = [
+  { max: 50, label: 'Good', concern: null },
+  { max: 100, label: 'Moderate', concern: 'Sensitive groups may be affected' },
+  { max: 150, label: 'Unhealthy for sensitive groups', concern: 'Limit prolonged outdoor exertion' },
+  { max: 200, label: 'Unhealthy', concern: 'Everyone may begin to experience health effects' },
+  { max: 300, label: 'Very unhealthy', concern: 'Health alert: everyone may experience serious effects' },
+  { max: Infinity, label: 'Hazardous', concern: 'Emergency conditions' },
+];
+
+function describeAqi(value) {
+  for (const level of AQI_LEVELS) {
+    if (value <= level.max) return level;
+  }
+  return AQI_LEVELS[AQI_LEVELS.length - 1];
+}
+
+async function fetchAirQuality(geo, useImperial) {
+  const aqiType = useImperial ? 'us_aqi' : 'european_aqi';
+  const params = new URLSearchParams({
+    latitude: geo.latitude,
+    longitude: geo.longitude,
+    current: `${aqiType},pm2_5`,
+    timezone: geo.timezone,
+  });
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+
+  try {
+    const res = await fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?${params}`, {
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    const value = data.current?.[aqiType];
+    if (value == null) return null;
+
+    const level = describeAqi(value);
+    return {
+      value: Math.round(value),
+      label: level.label,
+      concern: level.concern,
+      pm25: data.current?.pm2_5 != null ? Math.round(data.current.pm2_5 * 10) / 10 : null,
+    };
+  } catch {
+    clearTimeout(timeout);
+    return null;
+  }
 }
 
 // ---------------------------------------------------------------------------

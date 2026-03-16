@@ -884,15 +884,25 @@ const WEATHER_ICONS = {
 function renderWeather(data) {
   if (!data || !weatherBtn) return;
 
+  const locationName = data.location.region
+    ? `${data.location.name}, ${data.location.region}`
+    : data.location.name;
+
   // Show the button with current temp and icon
   const icon = WEATHER_ICONS[data.current.icon] || '\uD83C\uDF24\uFE0F';
   weatherIcon.textContent = icon;
   weatherLabel.textContent = `${data.current.temp}${data.units.temp}`;
   weatherBtn.hidden = false;
-  weatherBtn.setAttribute('aria-label', `Weather: ${data.current.temp}${data.units.temp}, ${data.current.condition}. Activate to show forecast.`);
+  weatherBtn.setAttribute('aria-label', `Weather for ${locationName}: ${data.current.temp}${data.units.temp}, ${data.current.condition}. Activate to show forecast.`);
+
+  // AQI row
+  const aqiHtml = data.aqi
+    ? `<div><dt>Air quality</dt><dd>${data.aqi.value} — ${escapeText(data.aqi.label)}</dd></div>`
+    : '';
 
   // Current conditions
   weatherCurrent.innerHTML = `
+    <p class="c-weather-panel__location">${escapeText(locationName)}</p>
     <div class="c-weather-panel__summary">
       <span class="c-weather-panel__temp">${data.current.temp}${data.units.temp}</span>
       <span class="c-weather-panel__condition">${escapeText(data.current.condition)}</span>
@@ -900,6 +910,7 @@ function renderWeather(data) {
     <dl class="c-weather-panel__details">
       <div><dt>Feels like</dt><dd>${data.current.feelsLike}${data.units.temp}</dd></div>
       <div><dt>Wind</dt><dd>${data.current.wind} ${data.units.wind}</dd></div>
+${aqiHtml}
       <div><dt>Today</dt><dd>${data.today.high}° / ${data.today.low}°</dd></div>
       <div><dt>Tomorrow</dt><dd>${data.tomorrow.high}° / ${data.tomorrow.low}°</dd></div>
     </dl>`;

@@ -371,6 +371,13 @@
     display: none;
   }
 
+  .c-weather-panel__location {
+    margin: 0 0 var(--space-xs);
+    font-size: 0.875rem;
+    color: var(--color-muted);
+    font-weight: 500;
+  }
+
   .c-weather-panel__summary {
     display: flex;
     align-items: baseline;
