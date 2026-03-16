@@ -54,7 +54,7 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultP
 ${nav}
 ${search}
     </div>
-    <div class="c-header__toolbar">
+    <div class="c-header__toolbar js-view-drawer" id="js-view-drawer">
 ${addBtn}
 ${toolbar}
     </div>
@@ -69,9 +69,6 @@ ${pages.length > 1 ? pages.map((p) => {
 ${pageData.categories.length > 1 ? `    <nav class="c-drawer__categories" aria-label="Categories">
 ${pageData.categories.map((cat) => `      <a href="#${escapeAttr(cat.id)}" class="c-drawer__link js-drawer-category">${escapeHtml(cat.name)}</a>`).join('\n')}
     </nav>` : ''}
-  </aside>
-  <aside class="c-drawer c-drawer--end js-view-drawer" id="js-view-drawer" hidden>
-${toolbar}
   </aside>
 ${jumpLinks}
   <main id="main-content">

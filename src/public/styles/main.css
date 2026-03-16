@@ -44,7 +44,7 @@
       --color-surface: oklch(22% 0.015 260);
       --color-border: oklch(30% 0.015 260);
       --color-focus: oklch(72% 0.18 260);
-      --color-muted: oklch(62% 0.01 260);
+      --color-muted: oklch(68% 0.01 260);
 
       --shadow-s: 0 1px 3px oklch(0% 0 0 / 20%);
       --shadow-m: 0 4px 12px oklch(0% 0 0 / 25%);
@@ -771,7 +771,7 @@
     --color-surface: oklch(100% 0 0);
     --color-border: oklch(88% 0.005 260);
     --color-focus: oklch(48% 0.2 260);
-    --color-muted: oklch(52% 0.01 260);
+    --color-muted: oklch(44% 0.01 260);
     --shadow-s: 0 1px 3px oklch(20% 0.01 260 / 8%);
     --shadow-m: 0 4px 12px oklch(20% 0.01 260 / 10%);
     --shadow-l: 0 8px 24px oklch(20% 0.01 260 / 12%);
@@ -784,7 +784,7 @@
     --color-surface: oklch(22% 0.015 260);
     --color-border: oklch(30% 0.015 260);
     --color-focus: oklch(72% 0.18 260);
-    --color-muted: oklch(62% 0.01 260);
+    --color-muted: oklch(68% 0.01 260);
     --shadow-s: 0 1px 3px oklch(0% 0 0 / 20%);
     --shadow-m: 0 4px 12px oklch(0% 0 0 / 25%);
     --shadow-l: 0 8px 24px oklch(0% 0 0 / 30%);
@@ -892,13 +892,21 @@
     outline-offset: 2px;
   }
 
-  /* Hide desktop nav and toolbar on mobile */
+  /* Toolbar hidden on mobile, show when toggled */
   .c-header__top .c-nav {
     display: none;
   }
 
   .c-header__toolbar {
     display: none;
+  }
+
+  .c-header__toolbar.is-open {
+    display: flex;
+    flex-wrap: wrap;
+    padding: var(--space-m);
+    background-color: var(--color-surface);
+    border-block-start: 1px solid var(--color-border);
   }
 
   /* Search stays visible in top row, expands full width */
@@ -918,36 +926,34 @@
     display: none;
   }
 
-  /* View drawer — toolbar vertically, no layout group */
-  .c-drawer--end .c-toolbar {
+  /* Mobile toolbar layout — vertical, no layout group */
+  .c-header__toolbar .c-toolbar {
     flex-direction: column;
     align-items: stretch;
     margin-inline-start: 0;
     gap: var(--space-s);
+    inline-size: 100%;
   }
 
-  .c-drawer--end .c-toolbar__separator {
+  .c-header__toolbar .c-toolbar__separator {
     inline-size: 100%;
     block-size: 1px;
   }
 
-  .c-drawer--end .c-toolbar__group[aria-label="Layout"] {
+  .c-header__toolbar .c-toolbar__group[aria-label="Layout"] {
     display: none;
   }
 
-  .c-drawer--end .c-toolbar__group {
+  .c-header__toolbar .c-toolbar__group {
     display: flex;
   }
 
-  .c-drawer--end .c-toolbar__btn {
+  .c-header__toolbar .c-toolbar__btn {
     flex: 1;
   }
 
-  .c-toolbar__btn {
-    flex: 1;
-  }
-
-  .c-toolbar__separator {
+  /* Hide Add button in toolbar on mobile (FAB replaces it) */
+  .c-header__toolbar .js-add-open {
     display: none;
   }
 
