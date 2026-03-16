@@ -1,22 +1,32 @@
 # Dashboard 
 
+## Today
+  - subtitle: Seize the thing!
+
+- [Weather](https://www.weather.gov)
+  - description: National Weather Service forecasts
+- [Google Calendar](https://calendar.google.com)
+  - description: Shared family calendar
+- [Todoist](https://www.todoist.com/)
+  - description: Shared task lists
+
+
 ## Home
 
 
 - [1Password](https://my.1password.com)
   - description: Family credential manager
-- [Google Calendar](https://calendar.google.com)
-  - description: Shared family calendar
-- [Todoist](https://www.todoist.com/)
-  - description: Shared task lists
-- [Obsidian](https://obsidian.md/auth)
-  - description: Shared notes vault
 - [You Need A Budget](https://app.ynab.com)
   - description: Family budgeting
+
+### Storage
+- [Obsidian](https://obsidian.md/auth)
+  - description: Shared notes vault
 - [Ente Photos](https://web.ente.io)
   - description: End-to-end encrypted photo storage
 - [Dropbox](https://www.dropbox.com)
   - description: Shared cloud storage
+
 ### Smart Home
 
 - [Home Assistant](http://homeassistant.local:8123)
@@ -41,34 +51,40 @@
   - icon: https://www.asus.com/favicon.ico
 - [Mullvad VPN](https://mullvad.net)
   - description: Privacy-focused VPN
+- [NextDNS](https://my.nextdns.io/)
 
+### House Subscriptions
+- [Blue Apron](https://blueapron.com)
+  - description: Discover chef-designed meal kits...
+- [Ridwell](https://ridwell.com)
+- [Instacart](https://instacart.com)
 
-## Streaming
-  - subtitle: Movies, TV shows, and music for the whole family
-
+## Media
+  - subtitle: Steaming and reading for the whole family
+  
 ### Video
 
 - [Plex](https://plex.tv)
   - description: Family media library
+- [Apple TV](https://tv.apple.com/)
+  - description: Browse all movies, TV shows, and more from Apple TV.
 - [Netflix](https://www.netflix.com)
   - description: Family streaming account
-- [Amazon Prime Video](https://www.primevideo.com)
-  - description: Included with Prime membership
 
 ### Music
 
+- [Qobuz](https://play.qobuz.com/)
+  - description: Listen to your music in high quality
 - [Bandcamp](https://bandcamp.com)
   - description: Indie music and merch
 
-- [Qobuz](https://play.qobuz.com/)
-  - description: Listen to your music in high quality
-## Reference
-  - subtitle: Quick lookup and general knowledge
+### Audiobooks
+- [Libro.fm](https://libro.fm)
+- [Audiobookshelf](https://www.audiobookshelf.org/)
 
-- [Wikipedia](https://www.wikipedia.org)
-- [Google Maps](https://maps.google.com)
-  - description: Directions and local search
-- [Weather](https://www.weather.gov)
-  - description: National Weather Service forecasts
-- [Wolfram Alpha](https://www.wolframalpha.com)
-  - description: Computational knowledge engine
+### Games
+- [Steam](https://store.steampowered.com/)
+
+## Travel
+
+- [HERE WeGo](https://wego.here.com)

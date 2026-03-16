@@ -243,6 +243,7 @@ if (addDialog) {
   for (const btn of addOpenBtns) {
     btn.addEventListener('click', () => {
       clearError(addError);
+      if (addUrlInput && !addUrlInput.value) addUrlInput.value = 'https://';
       openDialog(addDialog, btn);
     });
   }
@@ -467,37 +468,90 @@ if (deleteConfirmBtn) {
 }
 
 // ---------------------------------------------------------------------------
-// Mobile drawers — hamburger menu + view options
+// Popovers — view options + TOC (desktop), drawers (mobile)
 // ---------------------------------------------------------------------------
 
 const menuToggle = document.querySelector('.js-menu-toggle');
 const menuDrawer = document.querySelector('.js-menu-drawer');
-const viewMenuToggle = document.querySelector('.js-view-menu-toggle');
-const viewDrawer = document.querySelector('.js-view-drawer');
+const viewToggle = document.querySelector('.js-view-toggle');
+const viewPopover = document.querySelector('.js-view-popover');
+const tocToggle = document.querySelector('.js-toc-toggle');
+const tocPopover = document.querySelector('.js-toc-popover');
 const mainContent = document.getElementById('main-content');
-const jumpLinks = document.querySelector('.c-jump-links');
+
+// --- Popover helpers (desktop) ---
+
+function closePopover(toggle, popover) {
+  if (!popover) return;
+  popover.hidden = true;
+  toggle?.setAttribute('aria-expanded', 'false');
+}
+
+function openPopover(toggle, popover) {
+  if (!popover) return;
+  popover.hidden = false;
+  toggle?.setAttribute('aria-expanded', 'true');
+  const firstFocusable = popover.querySelector('a, button, input, [tabindex="0"]');
+  firstFocusable?.focus();
+}
+
+function isPopoverOpen(popover) {
+  return popover && !popover.hidden;
+}
+
+function togglePopover(toggle, popover) {
+  if (isPopoverOpen(popover)) {
+    closePopover(toggle, popover);
+    toggle?.focus();
+  } else {
+    // Close other popovers first
+    if (isPopoverOpen(viewPopover) && popover !== viewPopover) closePopover(viewToggle, viewPopover);
+    if (isPopoverOpen(tocPopover) && popover !== tocPopover) closePopover(tocToggle, tocPopover);
+    openPopover(toggle, popover);
+  }
+}
+
+if (viewToggle && viewPopover) {
+  viewToggle.addEventListener('click', () => togglePopover(viewToggle, viewPopover));
+}
+
+if (tocToggle && tocPopover) {
+  tocToggle.addEventListener('click', () => togglePopover(tocToggle, tocPopover));
+}
+
+// Close TOC popover when a link is clicked
+for (const link of document.querySelectorAll('.js-toc-link')) {
+  link.addEventListener('click', () => {
+    closePopover(tocToggle, tocPopover);
+  });
+}
+
+// Close popovers on click outside
+document.addEventListener('click', (event) => {
+  if (viewPopover && isPopoverOpen(viewPopover)) {
+    if (!viewPopover.contains(event.target) && !viewToggle.contains(event.target)) {
+      closePopover(viewToggle, viewPopover);
+    }
+  }
+  if (tocPopover && isPopoverOpen(tocPopover)) {
+    if (!tocPopover.contains(event.target) && !tocToggle.contains(event.target)) {
+      closePopover(tocToggle, tocPopover);
+    }
+  }
+});
+
+// --- Mobile drawer helpers ---
 
 function isDrawerOpen(drawer) {
-  if (!drawer) return false;
-  // View toolbar uses is-open class; menu drawer uses hidden attribute
-  if (drawer.classList.contains('c-header__toolbar')) return drawer.classList.contains('is-open');
-  return !drawer.hidden;
+  return drawer && !drawer.hidden;
 }
 
 function openDrawer(drawer) {
-  if (drawer.classList.contains('c-header__toolbar')) {
-    drawer.classList.add('is-open');
-  } else {
-    drawer.hidden = false;
-  }
+  drawer.hidden = false;
 }
 
 function closeDrawerEl(drawer) {
-  if (drawer.classList.contains('c-header__toolbar')) {
-    drawer.classList.remove('is-open');
-  } else {
-    drawer.hidden = true;
-  }
+  drawer.hidden = true;
 }
 
 function closeDrawer(toggle, drawer) {
@@ -506,23 +560,15 @@ function closeDrawer(toggle, drawer) {
 }
 
 function updateInert() {
-  const anyOpen = isDrawerOpen(menuDrawer) || isDrawerOpen(viewDrawer);
+  const anyOpen = isDrawerOpen(menuDrawer);
   document.querySelector('.c-header')?.classList.toggle('is-drawer-open', anyOpen);
-
-  // Make non-drawer content inert when a drawer is open
   if (mainContent) mainContent.inert = anyOpen;
-  if (jumpLinks) jumpLinks.inert = anyOpen;
   const fab = document.querySelector('.c-fab');
   if (fab) fab.inert = anyOpen;
 }
 
-function toggleDrawer(toggle, drawer, otherToggle, otherDrawer) {
+function toggleMobileDrawer(toggle, drawer) {
   const wasOpen = isDrawerOpen(drawer);
-
-  // Close the other drawer first
-  if (otherDrawer && isDrawerOpen(otherDrawer)) {
-    closeDrawer(otherToggle, otherDrawer);
-  }
 
   if (wasOpen) {
     closeDrawerEl(drawer);
@@ -530,42 +576,38 @@ function toggleDrawer(toggle, drawer, otherToggle, otherDrawer) {
     openDrawer(drawer);
   }
   toggle.setAttribute('aria-expanded', String(!wasOpen));
-
   updateInert();
 
   if (!wasOpen) {
-    // Drawer just opened — focus first focusable element inside
     const firstFocusable = drawer.querySelector('a, button, input, [tabindex="0"]');
     firstFocusable?.focus();
   } else {
-    // Drawer just closed — return focus to the trigger
     toggle.focus();
   }
 }
 
 if (menuToggle && menuDrawer) {
-  menuToggle.addEventListener('click', () => {
-    toggleDrawer(menuToggle, menuDrawer, viewMenuToggle, viewDrawer);
-  });
+  menuToggle.addEventListener('click', () => toggleMobileDrawer(menuToggle, menuDrawer));
 }
 
-if (viewMenuToggle && viewDrawer) {
-  viewMenuToggle.addEventListener('click', () => {
-    toggleDrawer(viewMenuToggle, viewDrawer, menuToggle, menuDrawer);
-  });
-}
-
-// Escape closes any open drawer
+// Escape closes any open popover or drawer
 document.addEventListener('keydown', (event) => {
   if (event.key !== 'Escape') return;
+
+  if (isPopoverOpen(viewPopover)) {
+    closePopover(viewToggle, viewPopover);
+    viewToggle?.focus();
+    return;
+  }
+  if (isPopoverOpen(tocPopover)) {
+    closePopover(tocToggle, tocPopover);
+    tocToggle?.focus();
+    return;
+  }
   if (menuDrawer && isDrawerOpen(menuDrawer)) {
     closeDrawer(menuToggle, menuDrawer);
     updateInert();
     menuToggle?.focus();
-  } else if (viewDrawer && isDrawerOpen(viewDrawer)) {
-    closeDrawer(viewMenuToggle, viewDrawer);
-    updateInert();
-    viewMenuToggle?.focus();
   }
 });
 
@@ -662,7 +704,7 @@ const allSubcategoryPairs = (pageData.subcategories || []).map((s) => ({
   value: s.subcategory,
 }));
 
-function initCombobox(input, listbox, options) {
+function initCombobox(input, listbox, options, { onSelect } = {}) {
   if (!input || !listbox) return;
 
   let activeIndex = -1;
@@ -709,6 +751,7 @@ function initCombobox(input, listbox, options) {
     listbox.hidden = true;
     input.setAttribute('aria-expanded', 'false');
     input.removeAttribute('aria-activedescendant');
+    if (onSelect) onSelect(value);
     input.focus();
   }
 
@@ -758,6 +801,12 @@ function initCombobox(input, listbox, options) {
   });
 }
 
+// Helper: find the parent category for a subcategory
+function findCategoryForSubcategory(subcategoryName) {
+  const pair = (pageData.subcategories || []).find((s) => s.subcategory === subcategoryName);
+  return pair ? pair.category : null;
+}
+
 // Initialize all comboboxes
 initCombobox(
   document.querySelector('.js-add-category'),
@@ -767,7 +816,14 @@ initCombobox(
 initCombobox(
   document.querySelector('.js-add-subcategory'),
   document.querySelector('.js-add-subcategory-listbox'),
-  allSubcategoryPairs
+  allSubcategoryPairs,
+  {
+    onSelect(value) {
+      const cat = findCategoryForSubcategory(value);
+      const catInput = document.querySelector('.js-add-category');
+      if (cat && catInput) catInput.value = cat;
+    },
+  }
 );
 initCombobox(
   document.querySelector('.js-edit-category'),
@@ -777,5 +833,12 @@ initCombobox(
 initCombobox(
   document.querySelector('.js-edit-subcategory'),
   document.querySelector('.js-edit-subcategory-listbox'),
-  allSubcategoryPairs
+  allSubcategoryPairs,
+  {
+    onSelect(value) {
+      const cat = findCategoryForSubcategory(value);
+      const catInput = document.querySelector('.js-edit-category');
+      if (cat && catInput) catInput.value = cat;
+    },
+  }
 );
