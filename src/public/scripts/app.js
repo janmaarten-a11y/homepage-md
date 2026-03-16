@@ -27,6 +27,27 @@ function clearError(errorEl) {
   errorEl.hidden = true;
 }
 
+// Track which element opened each dialog so we can return focus
+let dialogOpener = null;
+
+function openDialog(dialog, opener) {
+  if (!dialog) return;
+  dialogOpener = opener || document.activeElement;
+  dialog.showModal();
+  // Focus the close button (first focusable in the dialog header)
+  const closeBtn = dialog.querySelector('.c-dialog__close');
+  if (closeBtn) closeBtn.focus();
+}
+
+function closeDialog(dialog) {
+  if (!dialog) return;
+  dialog.close();
+  if (dialogOpener) {
+    dialogOpener.focus();
+    dialogOpener = null;
+  }
+}
+
 async function apiRequest(method, slug, body) {
   const res = await fetch(`/api/bookmarks/${encodeURIComponent(slug)}`, {
     method,
@@ -123,6 +144,14 @@ document.addEventListener('keydown', (event) => {
     return;
   }
 
+  // "?" opens keyboard help (unless in an input)
+  if (event.key === '?' && !isEditing(event.target)) {
+    event.preventDefault();
+    const helpDialog = document.querySelector('.js-keyboard-help');
+    if (helpDialog) openDialog(helpDialog);
+    return;
+  }
+
   // Escape clears and blurs the search input
   if (event.key === 'Escape' && document.activeElement === searchInput) {
     searchInput.value = '';
@@ -130,6 +159,23 @@ document.addEventListener('keydown', (event) => {
     searchInput.blur();
   }
 });
+
+// Keyboard help close button
+const keyboardHelpClose = document.querySelector('.js-keyboard-help-close');
+const keyboardHelpDialog = document.querySelector('.js-keyboard-help');
+if (keyboardHelpClose && keyboardHelpDialog) {
+  keyboardHelpClose.addEventListener('click', () => closeDialog(keyboardHelpDialog));
+}
+
+// Return focus when native dialog close (Escape) fires
+for (const dialog of document.querySelectorAll('dialog')) {
+  dialog.addEventListener('close', () => {
+    if (dialogOpener) {
+      dialogOpener.focus();
+      dialogOpener = null;
+    }
+  });
+}
 
 function isEditing(element) {
   const tag = element.tagName;
@@ -189,13 +235,13 @@ if (addDialog) {
   for (const btn of addOpenBtns) {
     btn.addEventListener('click', () => {
       clearError(addError);
-      addDialog.showModal();
+      openDialog(addDialog, btn);
     });
   }
 }
 
 if (addCancelBtn && addDialog) {
-  addCancelBtn.addEventListener('click', () => addDialog.close());
+  addCancelBtn.addEventListener('click', () => closeDialog(addDialog));
 }
 
 if (fetchMetaBtn) {
@@ -269,14 +315,16 @@ const editFetchMetaBtn = document.querySelector('.js-edit-fetch-meta');
 const editError = document.querySelector('.js-edit-error');
 
 if (editCancelBtn && editDialog) {
-  editCancelBtn.addEventListener('click', () => editDialog.close());
+  editCancelBtn.addEventListener('click', () => closeDialog(editDialog));
 }
 
-// Fetch metadata in edit dialog
+// Fetch metadata in edit dialog — overwrites if URL changed, fills empty if same
 if (editFetchMetaBtn) {
   editFetchMetaBtn.addEventListener('click', async () => {
     const url = editUrl?.value?.trim();
     if (!url) return;
+
+    const urlChanged = url !== editOriginalUrl.value;
 
     editFetchMetaBtn.disabled = true;
     editFetchMetaBtn.textContent = 'Fetching…';
@@ -288,11 +336,11 @@ if (editFetchMetaBtn) {
         body: JSON.stringify({ url }),
       });
       const data = await res.json();
-      if (data.title && editTitle && !editTitle.value) {
-        editTitle.value = data.title;
+      if (data.title && editTitle) {
+        if (urlChanged || !editTitle.value) editTitle.value = data.title;
       }
-      if (data.description && editDescription && !editDescription.value) {
-        editDescription.value = data.description;
+      if (data.description && editDescription) {
+        if (urlChanged || !editDescription.value) editDescription.value = data.description;
       }
     } catch {
       // Silently fail
@@ -322,7 +370,7 @@ document.addEventListener('click', (event) => {
   if (editIcon) editIcon.value = iconUrl;
 
   clearError(editError);
-  editDialog.showModal();
+  openDialog(editDialog, editBtn);
 });
 
 if (editForm) {
@@ -359,7 +407,7 @@ const deleteCancelBtn = document.querySelector('.js-delete-cancel');
 const deleteError = document.querySelector('.js-delete-error');
 
 if (deleteCancelBtn && deleteDialog) {
-  deleteCancelBtn.addEventListener('click', () => deleteDialog.close());
+  deleteCancelBtn.addEventListener('click', () => closeDialog(deleteDialog));
 }
 
 document.addEventListener('click', (event) => {
@@ -376,7 +424,7 @@ document.addEventListener('click', (event) => {
   deleteMessage.textContent = `Are you sure you want to delete "${title}"?`;
   deleteUrlInput.value = url;
   clearError(deleteError);
-  deleteDialog.showModal();
+  openDialog(deleteDialog, deleteBtn);
 });
 
 if (deleteConfirmBtn) {
@@ -386,7 +434,7 @@ if (deleteConfirmBtn) {
 
     try {
       await apiRequest('DELETE', slug, { url });
-      deleteDialog.close();
+      closeDialog(deleteDialog);
       window.location.reload();
     } catch (err) {
       showError(deleteError, `Failed to delete bookmark: ${err.message}`);

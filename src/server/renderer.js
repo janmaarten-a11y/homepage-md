@@ -21,12 +21,14 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultP
   const jumpLinks = renderJumpLinks(pageData.categories);
   const main = renderMain(pageData, faviconUrls);
   const categories = pageData.categories.map((c) => c.name);
+  const subcategoryNames = pageData.categories.flatMap((c) => c.subcategories.map((s) => s.name));
 
   const search = renderSearch();
   const addBtn = renderAddButton();
   const toolbar = renderToolbar();
-  const addDialog = renderAddDialog(categories, currentSlug);
+  const addDialog = renderAddDialog(categories, subcategoryNames, currentSlug);
   const deleteDialog = renderDeleteDialog();
+  const keyboardHelp = renderKeyboardHelp();
 
   const iconMenu = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/></svg>';
   const iconSettings = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="10" cy="10" r="2.5"/><path d="M10 1.5v2M10 16.5v2M1.5 10h2M16.5 10h2M3.4 3.4l1.4 1.4M15.2 15.2l1.4 1.4M3.4 16.6l1.4-1.4M15.2 4.8l1.4-1.4"/></svg>';
@@ -80,7 +82,10 @@ ${main}
 ${addDialog}
   <dialog class="c-dialog js-edit-dialog">
     <form method="dialog" class="c-dialog__form js-edit-form">
-      <h2 class="c-dialog__title">Edit Bookmark</h2>
+      <div class="c-dialog__header">
+        <h2 class="c-dialog__title">Edit Bookmark</h2>
+        <button type="button" class="c-btn c-btn--icon c-dialog__close js-edit-cancel" aria-label="Close">&times;</button>
+      </div>
       <div class="c-dialog__error js-edit-error" role="alert" hidden></div>
       <input type="hidden" name="originalUrl" class="js-edit-original-url">
       <label class="c-dialog__label">
@@ -107,6 +112,7 @@ ${addDialog}
     </form>
   </dialog>
 ${deleteDialog}
+${keyboardHelp}
   <script src="/scripts/app.js" type="module"></script>
 </body>
 </html>`;
@@ -158,7 +164,10 @@ function renderToolbar() {
 function renderDeleteDialog() {
   return `  <dialog class="c-dialog c-dialog--small js-delete-dialog">
     <form method="dialog" class="c-dialog__form">
-      <h2 class="c-dialog__title">Delete Bookmark</h2>
+      <div class="c-dialog__header">
+        <h2 class="c-dialog__title">Delete Bookmark</h2>
+        <button type="button" class="c-btn c-btn--icon c-dialog__close js-delete-cancel" aria-label="Close">&times;</button>
+      </div>
       <div class="c-dialog__error js-delete-error" role="alert" hidden></div>
       <p class="c-dialog__message js-delete-message">Are you sure?</p>
       <input type="hidden" class="js-delete-url">
@@ -167,6 +176,24 @@ function renderDeleteDialog() {
         <button type="button" class="c-btn js-delete-cancel">Cancel</button>
       </div>
     </form>
+  </dialog>`;
+}
+
+function renderKeyboardHelp() {
+  return `  <dialog class="c-dialog c-dialog--small js-keyboard-help">
+    <div class="c-dialog__form">
+      <div class="c-dialog__header">
+        <h2 class="c-dialog__title">Keyboard Shortcuts</h2>
+        <button type="button" class="c-btn c-btn--icon c-dialog__close js-keyboard-help-close" aria-label="Close">&times;</button>
+      </div>
+      <dl class="c-shortcut-list">
+        <div class="c-shortcut-list__item"><dt><kbd>/</kbd></dt><dd>Focus search</dd></div>
+        <div class="c-shortcut-list__item"><dt><kbd>Esc</kbd></dt><dd>Clear search / close dialog</dd></div>
+        <div class="c-shortcut-list__item"><dt><kbd>→</kbd> <kbd>↓</kbd></dt><dd>Edit / Delete actions</dd></div>
+        <div class="c-shortcut-list__item"><dt><kbd>←</kbd> <kbd>↑</kbd></dt><dd>Return to bookmark</dd></div>
+        <div class="c-shortcut-list__item"><dt><kbd>?</kbd></dt><dd>This help</dd></div>
+      </dl>
+    </div>
   </dialog>`;
 }
 
@@ -182,14 +209,20 @@ ${links}
   </nav>`;
 }
 
-function renderAddDialog(categories, currentSlug) {
+function renderAddDialog(categories, subcategoryNames, currentSlug) {
   const categoryOptions = categories
+    .map((name) => `        <option value="${escapeAttr(name)}">${escapeHtml(name)}</option>`)
+    .join('\n');
+  const subcategoryOptions = [...new Set(subcategoryNames)]
     .map((name) => `        <option value="${escapeAttr(name)}">${escapeHtml(name)}</option>`)
     .join('\n');
 
   return `  <dialog class="c-dialog js-add-dialog">
     <form method="dialog" class="c-dialog__form js-add-form">
-      <h2 class="c-dialog__title">Add Link</h2>
+      <div class="c-dialog__header">
+        <h2 class="c-dialog__title">Add Link</h2>
+        <button type="button" class="c-btn c-btn--icon c-dialog__close js-add-cancel" aria-label="Close">&times;</button>
+      </div>
       <input type="hidden" name="page" value="${escapeAttr(currentSlug)}">
       <div class="c-dialog__error js-add-error" role="alert" hidden></div>
       <label class="c-dialog__label">
@@ -214,7 +247,10 @@ ${categoryOptions}
       </label>
       <label class="c-dialog__label">
         Subcategory <span class="c-dialog__hint">(optional)</span>
-        <input type="text" name="subcategory" class="c-dialog__input js-add-subcategory">
+        <input type="text" name="subcategory" list="js-subcategory-list" class="c-dialog__input js-add-subcategory">
+        <datalist id="js-subcategory-list">
+${subcategoryOptions}
+        </datalist>
       </label>
       <label class="c-dialog__label">
         Icon URL <span class="c-dialog__hint">(optional)</span>
@@ -293,7 +329,7 @@ function renderBookmark(bookmark, faviconUrls) {
   const ICON_EDIT = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 1.5l3 3L5 14H2v-3z"/></svg>';
   const ICON_DELETE = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="4" x2="13" y2="4"/><path d="M5 4V2.5A.5.5 0 0 1 5.5 2h5a.5.5 0 0 1 .5.5V4"/><path d="M4 4l.7 9.1a1 1 0 0 0 1 .9h4.6a1 1 0 0 0 1-.9L12 4"/></svg>';
 
-  return `          <li class="c-bookmark" data-search="${escapeAttr(searchText.toLowerCase())}" data-url="${escapeAttr(bookmark.url)}"${iconData}>
+  return `          <li class="c-bookmark" data-search="${escapeAttr(searchText.toLowerCase())}" data-url="${escapeAttr(bookmark.url)}"${iconData} aria-roledescription="bookmark, use arrow keys for actions">
             <div class="c-bookmark__header">
               <a href="${escapeAttr(bookmark.url)}" class="c-bookmark__link">
                 <img src="${escapeAttr(faviconUrl)}" alt="" class="c-bookmark__icon" loading="lazy" width="32" height="32">
