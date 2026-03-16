@@ -340,6 +340,13 @@
     margin-block-end: var(--space-m);
   }
 
+  .c-category__subtitle {
+    margin: 0;
+    margin-block-start: calc(-1 * var(--space-s));
+    margin-block-end: var(--space-m);
+    color: var(--color-muted);
+  }
+
   /* Subcategory sections */
   .c-subcategory {
     margin-block-start: var(--space-m);
@@ -349,6 +356,14 @@
     font-size: 1rem;
     color: var(--color-muted);
     margin-block-end: var(--space-s);
+  }
+
+  .c-subcategory__subtitle {
+    margin: 0;
+    margin-block-start: calc(-1 * var(--space-xs));
+    margin-block-end: var(--space-s);
+    font-size: 0.875rem;
+    color: var(--color-muted);
   }
 
   /* Bookmark list */
