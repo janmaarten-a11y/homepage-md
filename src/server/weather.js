@@ -297,11 +297,16 @@ function getMoonData(date) {
   if (daysToFull < 0) daysToFull += SYNODIC_MONTH;
   const nextFullMoon = new Date(date.getTime() + daysToFull * 24 * 60 * 60 * 1000);
 
+  // Format the full moon date nicely
+  const fullMoonFormatted = nextFullMoon.toLocaleDateString('en-US', {
+    weekday: 'short', month: 'short', day: 'numeric',
+  });
+
   return {
     phase: MOON_PHASES[phaseIndex].name,
     emoji: MOON_PHASES[phaseIndex].emoji,
     illumination,
-    nextFullMoon: nextFullMoon.toISOString().split('T')[0],
+    nextFullMoon: fullMoonFormatted,
     daysToFullMoon: Math.round(daysToFull),
   };
 }

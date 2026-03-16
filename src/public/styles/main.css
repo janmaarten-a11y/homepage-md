@@ -360,11 +360,38 @@
   }
 
   /* Weather panel */
+  /* Weather panel — two-column layout on desktop */
   .c-weather-panel {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0 var(--space-xl);
     padding-block: var(--space-m);
     padding-inline: var(--space-l);
     border-block-end: 1px solid var(--color-border);
     background-color: var(--color-surface);
+  }
+
+  @media (min-width: 48rem) {
+    .c-weather-panel {
+      grid-template-columns: 1fr auto;
+    }
+
+    .c-weather-panel > .js-weather-current {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .c-weather-panel > .js-weather-alerts {
+      grid-column: 1;
+      grid-row: 2;
+    }
+
+    .c-weather-panel > .js-weather-forecast {
+      grid-column: 2;
+      grid-row: 1 / -1;
+      display: flex;
+      align-items: stretch;
+    }
   }
 
   .c-weather-panel[hidden] {
@@ -552,27 +579,37 @@
     font-size: 1rem;
   }
 
-  /* Astro section — right-aligned on wider viewports */
-  .c-weather-panel__astro {
-    justify-content: flex-end;
-  }
-
-  /* Two-column layout for forecast section on desktop */
-  .c-weather-panel__forecast {
+  /* Sidebar: sun/moon + tomorrow */
+  .c-weather-panel__sidebar {
     display: flex;
-    flex-wrap: wrap;
-    align-items: start;
-    gap: var(--space-s) var(--space-l);
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-m);
   }
 
-  .c-weather-panel__forecast > .c-weather-panel__day {
-    flex: 1;
-    min-inline-size: 15rem;
+  .c-weather-panel__astro-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
   }
 
-  .c-weather-panel__forecast > .c-weather-panel__details {
-    flex: 1;
-    min-inline-size: 15rem;
+  .c-weather-panel__astro-line {
+    margin: 0;
+    font-size: 1rem;
+    color: var(--color-muted);
+    white-space: nowrap;
+  }
+
+  .c-weather-panel__tomorrow {
+    padding: var(--space-s) var(--space-m);
+    background-color: var(--color-bg);
+    border-radius: var(--radius-m);
+    font-size: 1rem;
+  }
+
+  /* Remove old astro justify */
+  .c-weather-panel__astro {
+    justify-content: flex-start;
   }
 
   /* Skip link */

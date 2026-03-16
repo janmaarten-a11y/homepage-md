@@ -900,7 +900,7 @@ function renderWeather(data) {
     ? `https://forecast.weather.gov/MapClick.php?lat=${data.location.latitude}&lon=${data.location.longitude}`
     : 'https://www.weather.gov';
 
-  // AQI with color coding and link to airnow.gov
+  // AQI stat
   const aqiHtml = data.aqi
     ? `<div class="c-weather-panel__stat">
         <dt>\uD83C\uDF2B\uFE0F <a href="https://www.airnow.gov" rel="noopener">Air quality</a></dt>
@@ -908,7 +908,49 @@ function renderWeather(data) {
       </div>`
     : '';
 
-  // Current conditions — location links to local weather.gov forecast
+  // NWS alerts
+  let nwsHtml = '';
+  if (data.nwsAlerts && data.nwsAlerts.length > 0) {
+    nwsHtml = `<div class="c-weather-panel__nws-alerts">
+${data.nwsAlerts.map((a) => {
+  const link = a.url ? ` <a href="${escapeText(a.url)}" rel="noopener">Details \u2192</a>` : '';
+  return `      <p class="c-weather-panel__nws-alert" data-severity="${escapeText(a.severity)}">${escapeText(a.headline)}${link}</p>`;
+}).join('\n')}
+    </div>`;
+  }
+
+  // Derived alerts
+  let derivedHtml = '';
+  if (data.alerts.length > 0) {
+    derivedHtml = `<ul class="c-weather-panel__alert-list">
+${data.alerts.map((a) => `      <li>${escapeText(a.text)}</li>`).join('\n')}
+    </ul>`;
+  }
+
+  const alertsHtml = nwsHtml || derivedHtml
+    ? nwsHtml + derivedHtml
+    : `<p class="c-weather-panel__no-alerts">No notable weather changes expected.</p>`;
+
+  // Sun line
+  const sunLine = data.today.sunrise && data.today.sunset
+    ? `<p class="c-weather-panel__astro-line">\u2600\uFE0F Sunrise ${data.today.sunrise} \u00B7 \uD83C\uDF05 Sunset ${data.today.sunset}</p>`
+    : '';
+
+  // Moon line
+  const fullMoonText = data.moon.daysToFullMoon === 0
+    ? 'Tonight!'
+    : `${escapeText(data.moon.nextFullMoon)} (in ${data.moon.daysToFullMoon} days)`;
+  const moonLine = data.moon
+    ? `<p class="c-weather-panel__astro-line">${data.moon.emoji} ${escapeText(data.moon.phase)}, ${data.moon.illumination}% illuminated \u00B7 \uD83C\uDF15 Full moon ${fullMoonText}</p>`
+    : '';
+
+  // Tomorrow
+  const tomorrowHtml = `<div class="c-weather-panel__tomorrow">
+    <strong>Tomorrow</strong> \u2014 ${escapeText(data.tomorrow.condition)},
+    ${data.tomorrow.high}\u00B0 / ${data.tomorrow.low}\u00B0${data.tomorrow.precipChance > 0 ? `, ${data.tomorrow.precipChance}% precip` : ''}
+  </div>`;
+
+  // Left column: heading + conditions + alerts
   weatherCurrent.innerHTML = `
     <div class="c-weather-panel__heading">
       <h2 class="c-weather-panel__location">Forecast for <a href="${weatherGovUrl}" rel="noopener">${escapeText(locationName)}</a></h2>
@@ -922,51 +964,19 @@ function renderWeather(data) {
       <div class="c-weather-panel__stat"><dt>\u2195\uFE0F High / Low</dt><dd>${data.today.high}\u00B0 / ${data.today.low}\u00B0</dd></div>
       <div class="c-weather-panel__stat"><dt>\uD83D\uDCA8 Wind</dt><dd>${data.current.wind} ${data.units.wind}</dd></div>
 ${aqiHtml}
-    </dl>`;
+    </dl>
+${alertsHtml}`;
 
-  // NWS severe weather alerts — single line each
-  let alertsHtml = '';
-  if (data.nwsAlerts && data.nwsAlerts.length > 0) {
-    alertsHtml += `<div class="c-weather-panel__nws-alerts">
-${data.nwsAlerts.map((a) => {
-  const link = a.url ? ` <a href="${escapeText(a.url)}" rel="noopener">Details \u2192</a>` : '';
-  return `      <p class="c-weather-panel__nws-alert" data-severity="${escapeText(a.severity)}">${escapeText(a.headline)}${link}</p>`;
-}).join('\n')}
-    </div>`;
-  }
-
-  // Derived forecast alerts
-  if (data.alerts.length > 0) {
-    alertsHtml += `<ul class="c-weather-panel__alert-list">
-${data.alerts.map((a) => `      <li>${escapeText(a.text)}</li>`).join('\n')}
-    </ul>`;
-  }
-
-  if (!alertsHtml) {
-    alertsHtml = `<p class="c-weather-panel__no-alerts">No notable weather changes expected.</p>`;
-  }
-  weatherAlerts.innerHTML = alertsHtml;
-
-  // Tomorrow's forecast + sun/moon
-  const sunTimes = data.today.sunrise && data.today.sunset
-    ? `<div class="c-weather-panel__stat"><dt>\u2600\uFE0F Sunrise</dt><dd>${data.today.sunrise}</dd></div>
-       <div class="c-weather-panel__stat"><dt>\uD83C\uDF05 Sunset</dt><dd>${data.today.sunset}</dd></div>`
-    : '';
-
-  const moonHtml = data.moon
-    ? `<div class="c-weather-panel__stat"><dt>${data.moon.emoji} Moon</dt><dd>${escapeText(data.moon.phase)}, ${data.moon.illumination}% illuminated</dd></div>
-       <div class="c-weather-panel__stat"><dt>\uD83C\uDF15 Next full moon</dt><dd>${data.moon.daysToFullMoon === 0 ? 'Tonight!' : `in ${data.moon.daysToFullMoon} days`}</dd></div>`
-    : '';
-
+  // Right column: sun/moon + tomorrow
+  weatherAlerts.innerHTML = '';
   weatherForecast.innerHTML = `
-    <div class="c-weather-panel__day">
-      <strong>Tomorrow</strong> \u2014 ${escapeText(data.tomorrow.condition)},
-      ${data.tomorrow.high}\u00B0 / ${data.tomorrow.low}\u00B0${data.tomorrow.precipChance > 0 ? `, ${data.tomorrow.precipChance}% chance of precipitation` : ''}
-    </div>
-${(sunTimes || moonHtml) ? `    <dl class="c-weather-panel__details c-weather-panel__astro">
-${sunTimes}
-${moonHtml}
-    </dl>` : ''}`;
+    <div class="c-weather-panel__sidebar">
+      <div class="c-weather-panel__astro-section">
+${sunLine}
+${moonLine}
+      </div>
+${tomorrowHtml}
+    </div>`;
 }
 
 function aqiLevel(value) {
