@@ -369,7 +369,8 @@ document.addEventListener('click', (event) => {
   if (editIcon) editIcon.value = iconUrl;
 
   clearError(editError);
-  openDialog(editDialog, editBtn);
+  const bookmarkLink = card.querySelector('.c-bookmark__link');
+  openDialog(editDialog, bookmarkLink);
 });
 
 if (editForm) {
@@ -402,11 +403,11 @@ const deleteDialog = document.querySelector('.js-delete-dialog');
 const deleteMessage = document.querySelector('.js-delete-message');
 const deleteUrlInput = document.querySelector('.js-delete-url');
 const deleteConfirmBtn = document.querySelector('.js-delete-confirm');
-const deleteCancelBtn = document.querySelector('.js-delete-cancel');
+const deleteCancelBtn = document.querySelectorAll('.js-delete-cancel');
 const deleteError = document.querySelector('.js-delete-error');
 
-if (deleteCancelBtn && deleteDialog) {
-  deleteCancelBtn.addEventListener('click', () => closeDialog(deleteDialog));
+for (const btn of deleteCancelBtn) {
+  btn.addEventListener('click', () => closeDialog(deleteDialog));
 }
 
 document.addEventListener('click', (event) => {
@@ -423,7 +424,8 @@ document.addEventListener('click', (event) => {
   deleteMessage.textContent = `Are you sure you want to delete "${title}"?`;
   deleteUrlInput.value = url;
   clearError(deleteError);
-  openDialog(deleteDialog, deleteBtn);
+  const bookmarkLink = card.querySelector('.c-bookmark__link');
+  openDialog(deleteDialog, bookmarkLink);
 });
 
 if (deleteConfirmBtn) {
