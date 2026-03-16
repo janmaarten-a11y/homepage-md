@@ -59,15 +59,15 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultP
 ${nav}
       <div class="c-header__actions">
         <button type="button" class="c-header__action-btn js-view-toggle" aria-expanded="false" aria-controls="js-view-popover" aria-label="View options">${iconSettings}</button>
+        <div class="c-popover js-view-popover" id="js-view-popover" hidden>
+${toolbar}
+        </div>
       </div>
     </div>
     <div class="c-header__searchbar">
 ${tocPopover}
 ${search}
       <button type="button" class="c-header__add-btn c-btn c-btn--primary js-add-open">${iconPlusSmall} <span>Add link</span></button>
-    </div>
-    <div class="c-popover js-view-popover" id="js-view-popover" hidden>
-${toolbar}
     </div>
   </header>
   <aside class="c-drawer js-menu-drawer" id="js-menu-drawer" hidden>

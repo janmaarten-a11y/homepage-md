@@ -540,6 +540,20 @@ document.addEventListener('click', (event) => {
   }
 });
 
+// Close popovers when tabbing out
+document.addEventListener('focusin', (event) => {
+  if (viewPopover && isPopoverOpen(viewPopover)) {
+    if (!viewPopover.contains(event.target) && !viewToggle.contains(event.target)) {
+      closePopover(viewToggle, viewPopover);
+    }
+  }
+  if (tocPopover && isPopoverOpen(tocPopover)) {
+    if (!tocPopover.contains(event.target) && !tocToggle.contains(event.target)) {
+      closePopover(tocToggle, tocPopover);
+    }
+  }
+});
+
 // --- Mobile drawer helpers ---
 
 function isDrawerOpen(drawer) {
