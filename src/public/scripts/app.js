@@ -368,6 +368,8 @@ document.addEventListener('click', (event) => {
 
   const url = card.dataset.url || '';
   const iconUrl = card.dataset.icon || '';
+  const categoryName = card.dataset.category || '';
+  const subcategoryName = card.dataset.subcategory || '';
   const titleEl = card.querySelector('.c-bookmark__title');
   const descEl = card.querySelector('.c-bookmark__description');
 
@@ -376,6 +378,10 @@ document.addEventListener('click', (event) => {
   editTitle.value = titleEl?.textContent || '';
   editDescription.value = descEl?.textContent || '';
   if (editIcon) editIcon.value = iconUrl;
+  const editCategory = editDialog.querySelector('.js-edit-category');
+  const editSubcategory = editDialog.querySelector('.js-edit-subcategory');
+  if (editCategory) editCategory.value = categoryName;
+  if (editSubcategory) editSubcategory.value = subcategoryName;
 
   clearError(editError);
   const bookmarkLink = card.querySelector('.c-bookmark__link');
@@ -389,12 +395,16 @@ if (editForm) {
     const originalUrl = editOriginalUrl.value;
 
     try {
+      const editCategoryVal = editDialog.querySelector('.js-edit-category')?.value || '';
+      const editSubcategoryVal = editDialog.querySelector('.js-edit-subcategory')?.value || '';
       await apiRequest('PUT', slug, {
         url: originalUrl,
         title: editTitle.value,
         newUrl: editUrl.value !== originalUrl ? editUrl.value : undefined,
         description: editDescription.value || null,
         icon: editIcon?.value || null,
+        category: editCategoryVal || undefined,
+        subcategory: editSubcategoryVal || undefined,
       });
       editDialog.close();
       window.location.reload();
@@ -636,3 +646,129 @@ for (const btn of document.querySelectorAll('.js-color-btn')) {
     applyView(viewPrefs);
   });
 }
+
+// ---------------------------------------------------------------------------
+// ARIA Combobox — filtered autocomplete for category/subcategory fields
+// ---------------------------------------------------------------------------
+
+const pageData = JSON.parse(document.getElementById('js-page-data')?.textContent || '{}');
+const allCategories = pageData.categories || [];
+const allSubcategories = pageData.subcategories || [];
+
+function initCombobox(input, listbox, options) {
+  if (!input || !listbox) return;
+
+  let activeIndex = -1;
+
+  function renderOptions(filter) {
+    const term = filter.toLowerCase().trim();
+    const matches = options.filter((o) => o.toLowerCase().includes(term));
+    const isNew = term && !options.some((o) => o.toLowerCase() === term);
+
+    listbox.innerHTML = '';
+    activeIndex = -1;
+
+    matches.forEach((opt, i) => {
+      const li = document.createElement('li');
+      li.textContent = opt;
+      li.className = 'c-combobox__option';
+      li.setAttribute('role', 'option');
+      li.id = `${listbox.id}-opt-${i}`;
+      li.addEventListener('click', () => selectOption(opt));
+      listbox.appendChild(li);
+    });
+
+    if (isNew) {
+      const li = document.createElement('li');
+      li.textContent = `Create "${filter.trim()}"`;
+      li.className = 'c-combobox__option c-combobox__option--new';
+      li.setAttribute('role', 'option');
+      li.id = `${listbox.id}-opt-new`;
+      li.addEventListener('click', () => selectOption(filter.trim()));
+      listbox.appendChild(li);
+    }
+
+    const hasItems = listbox.children.length > 0;
+    listbox.hidden = !hasItems || !term;
+    input.setAttribute('aria-expanded', String(!listbox.hidden));
+  }
+
+  function selectOption(value) {
+    input.value = value;
+    listbox.hidden = true;
+    input.setAttribute('aria-expanded', 'false');
+    input.removeAttribute('aria-activedescendant');
+    input.focus();
+  }
+
+  function setActive(index) {
+    const items = listbox.querySelectorAll('[role="option"]');
+    items.forEach((item) => item.removeAttribute('aria-selected'));
+    if (index >= 0 && index < items.length) {
+      activeIndex = index;
+      items[index].setAttribute('aria-selected', 'true');
+      input.setAttribute('aria-activedescendant', items[index].id);
+      items[index].scrollIntoView({ block: 'nearest' });
+    } else {
+      activeIndex = -1;
+      input.removeAttribute('aria-activedescendant');
+    }
+  }
+
+  input.addEventListener('input', () => renderOptions(input.value));
+  input.addEventListener('focus', () => { if (input.value) renderOptions(input.value); });
+
+  input.addEventListener('keydown', (event) => {
+    const items = listbox.querySelectorAll('[role="option"]');
+    if (!items.length || listbox.hidden) return;
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      setActive(Math.min(activeIndex + 1, items.length - 1));
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setActive(Math.max(activeIndex - 1, 0));
+    } else if (event.key === 'Enter' && activeIndex >= 0) {
+      event.preventDefault();
+      const selected = items[activeIndex];
+      if (selected) {
+        // Extract the actual value — for "Create ..." options, use the input value
+        const isNew = selected.classList.contains('c-combobox__option--new');
+        selectOption(isNew ? input.value.trim() : selected.textContent);
+      }
+    } else if (event.key === 'Escape') {
+      listbox.hidden = true;
+      input.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  // Close listbox when clicking outside
+  document.addEventListener('click', (event) => {
+    if (!event.target.closest('.c-combobox') || !input.contains(event.target)) {
+      listbox.hidden = true;
+      input.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
+
+// Initialize all comboboxes
+initCombobox(
+  document.querySelector('.js-add-category'),
+  document.querySelector('.js-add-category-listbox'),
+  allCategories
+);
+initCombobox(
+  document.querySelector('.js-add-subcategory'),
+  document.querySelector('.js-add-subcategory-listbox'),
+  allSubcategories
+);
+initCombobox(
+  document.querySelector('.js-edit-category'),
+  document.querySelector('.js-edit-category-listbox'),
+  allCategories
+);
+initCombobox(
+  document.querySelector('.js-edit-subcategory'),
+  document.querySelector('.js-edit-subcategory-listbox'),
+  allSubcategories
+);

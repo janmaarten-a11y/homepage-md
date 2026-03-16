@@ -193,10 +193,28 @@ describe('renderPage', () => {
     assert.ok(html.includes('name="category"'));
   });
 
-  it('includes category options in the add dialog datalist', () => {
+  it('includes category combobox in the add dialog', () => {
     const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
+    assert.ok(html.includes('js-add-category'));
+    assert.ok(html.includes('role="combobox"'));
+    assert.ok(html.includes('js-add-category-listbox'));
+  });
+
+  it('includes category data for combobox autocomplete', () => {
+    const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
+    assert.ok(html.includes('js-page-data'));
     assert.ok(html.includes('Category One'));
-    assert.ok(html.includes('js-category-list'));
+  });
+
+  it('includes category and subcategory fields in edit dialog', () => {
+    const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
+    assert.ok(html.includes('js-edit-category'));
+    assert.ok(html.includes('js-edit-subcategory'));
+  });
+
+  it('includes data-category on bookmark cards', () => {
+    const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
+    assert.ok(html.includes('data-category="Category One"'));
   });
 
   it('includes edit and delete buttons on each bookmark', () => {

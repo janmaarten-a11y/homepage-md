@@ -101,6 +101,22 @@ ${addDialog}
         Description <span class="c-dialog__hint">(max 160 characters)</span>
         <input type="text" name="description" class="c-dialog__input js-edit-description" maxlength="160">
       </label>
+      <label class="c-dialog__label" id="edit-category-label">
+        Category
+        <div class="c-combobox">
+          <input type="text" name="category" class="c-dialog__input c-combobox__input js-edit-category" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="js-edit-category-listbox" aria-labelledby="edit-category-label" autocomplete="off" required>
+          <ul class="c-combobox__listbox js-edit-category-listbox" id="js-edit-category-listbox" role="listbox" hidden></ul>
+          <span class="c-combobox__hint js-combobox-hint" hidden></span>
+        </div>
+      </label>
+      <label class="c-dialog__label" id="edit-subcategory-label">
+        Subcategory <span class="c-dialog__hint">(optional)</span>
+        <div class="c-combobox">
+          <input type="text" name="subcategory" class="c-dialog__input c-combobox__input js-edit-subcategory" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="js-edit-subcategory-listbox" aria-labelledby="edit-subcategory-label" autocomplete="off">
+          <ul class="c-combobox__listbox js-edit-subcategory-listbox" id="js-edit-subcategory-listbox" role="listbox" hidden></ul>
+          <span class="c-combobox__hint js-combobox-hint" hidden></span>
+        </div>
+      </label>
       <label class="c-dialog__label">
         Icon URL <span class="c-dialog__hint">(optional)</span>
         <input type="url" name="icon" class="c-dialog__input js-edit-icon" placeholder="https://…">
@@ -112,6 +128,7 @@ ${addDialog}
   </dialog>
 ${deleteDialog}
 ${keyboardHelp}
+  <script id="js-page-data" type="application/json">${JSON.stringify({ categories: categories, subcategories: [...new Set(subcategoryNames)] })}</script>
   <script src="/scripts/app.js" type="module"></script>
 </body>
 </html>`;
@@ -237,19 +254,21 @@ function renderAddDialog(categories, subcategoryNames, currentSlug) {
         Description <span class="c-dialog__hint">(max 160 characters)</span>
         <input type="text" name="description" class="c-dialog__input js-add-description" maxlength="160">
       </label>
-      <label class="c-dialog__label">
+      <label class="c-dialog__label" id="add-category-label">
         Category
-        <input type="text" name="category" list="js-category-list" class="c-dialog__input js-add-category" required>
-        <datalist id="js-category-list">
-${categoryOptions}
-        </datalist>
+        <div class="c-combobox">
+          <input type="text" name="category" class="c-dialog__input c-combobox__input js-add-category" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="js-add-category-listbox" aria-labelledby="add-category-label" autocomplete="off" required>
+          <ul class="c-combobox__listbox js-add-category-listbox" id="js-add-category-listbox" role="listbox" hidden></ul>
+          <span class="c-combobox__hint js-combobox-hint" hidden></span>
+        </div>
       </label>
-      <label class="c-dialog__label">
+      <label class="c-dialog__label" id="add-subcategory-label">
         Subcategory <span class="c-dialog__hint">(optional)</span>
-        <input type="text" name="subcategory" list="js-subcategory-list" class="c-dialog__input js-add-subcategory">
-        <datalist id="js-subcategory-list">
-${subcategoryOptions}
-        </datalist>
+        <div class="c-combobox">
+          <input type="text" name="subcategory" class="c-dialog__input c-combobox__input js-add-subcategory" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="js-add-subcategory-listbox" aria-labelledby="add-subcategory-label" autocomplete="off">
+          <ul class="c-combobox__listbox js-add-subcategory-listbox" id="js-add-subcategory-listbox" role="listbox" hidden></ul>
+          <span class="c-combobox__hint js-combobox-hint" hidden></span>
+        </div>
       </label>
       <label class="c-dialog__label">
         Icon URL <span class="c-dialog__hint">(optional)</span>
@@ -291,12 +310,12 @@ function renderMain(pageData, faviconUrls) {
 function renderCategory(category, faviconUrls) {
   const directBookmarks = category.bookmarks.length
     ? `      <ul class="c-bookmark-list" role="list">
-${category.bookmarks.map((b) => renderBookmark(b, faviconUrls)).join('\n')}
+${category.bookmarks.map((b) => renderBookmark(b, faviconUrls, category.name, null)).join('\n')}
       </ul>`
     : '';
 
   const subcategories = category.subcategories
-    .map((sub) => renderSubcategory(sub, faviconUrls))
+    .map((sub) => renderSubcategory(sub, faviconUrls, category.name))
     .join('\n');
 
   return `    <section class="c-category" aria-labelledby="${escapeAttr(category.id)}">
@@ -306,16 +325,16 @@ ${subcategories}
     </section>`;
 }
 
-function renderSubcategory(subcategory, faviconUrls) {
+function renderSubcategory(subcategory, faviconUrls, categoryName) {
   return `      <section class="c-subcategory" aria-labelledby="${escapeAttr(subcategory.id)}">
         <h3 id="${escapeAttr(subcategory.id)}">${escapeHtml(subcategory.name)}</h3>
         <ul class="c-bookmark-list" role="list">
-${subcategory.bookmarks.map((b) => renderBookmark(b, faviconUrls)).join('\n')}
+${subcategory.bookmarks.map((b) => renderBookmark(b, faviconUrls, categoryName, subcategory.name)).join('\n')}
         </ul>
       </section>`;
 }
 
-function renderBookmark(bookmark, faviconUrls) {
+function renderBookmark(bookmark, faviconUrls, categoryName, subcategoryName) {
   const faviconUrl = faviconUrls[bookmark.url] || '/icons/default.svg';
   const description = bookmark.description
     ? `\n            <p class="c-bookmark__description">${escapeHtml(bookmark.description)}</p>`
@@ -323,11 +342,13 @@ function renderBookmark(bookmark, faviconUrls) {
 
   const searchText = [bookmark.title, bookmark.description || '', bookmark.url].join(' ');
   const iconData = bookmark.icon ? ` data-icon="${escapeAttr(bookmark.icon)}"` : '';
+  const catData = categoryName ? ` data-category="${escapeAttr(categoryName)}"` : '';
+  const subData = subcategoryName ? ` data-subcategory="${escapeAttr(subcategoryName)}"` : '';
 
   const ICON_EDIT = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 1.5l3 3L5 14H2v-3z"/></svg>';
   const ICON_DELETE = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="4" x2="13" y2="4"/><path d="M5 4V2.5A.5.5 0 0 1 5.5 2h5a.5.5 0 0 1 .5.5V4"/><path d="M4 4l.7 9.1a1 1 0 0 0 1 .9h4.6a1 1 0 0 0 1-.9L12 4"/></svg>';
 
-  return `          <li class="c-bookmark" data-search="${escapeAttr(searchText.toLowerCase())}" data-url="${escapeAttr(bookmark.url)}"${iconData} aria-roledescription="bookmark, use arrow keys for actions">
+  return `          <li class="c-bookmark" data-search="${escapeAttr(searchText.toLowerCase())}" data-url="${escapeAttr(bookmark.url)}"${iconData}${catData}${subData} aria-roledescription="bookmark, use arrow keys for actions">
             <div class="c-bookmark__header">
               <a href="${escapeAttr(bookmark.url)}" class="c-bookmark__link">
                 <img src="${escapeAttr(faviconUrl)}" alt="" class="c-bookmark__icon" loading="lazy" width="32" height="32">
