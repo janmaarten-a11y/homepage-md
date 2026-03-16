@@ -391,6 +391,7 @@
       grid-row: 1 / -1;
       display: flex;
       align-items: stretch;
+      justify-self: end;
     }
   }
 
@@ -607,7 +608,8 @@
   .c-weather-panel__moon-label {
     margin: 0;
     font-size: 1rem;
-    color: var(--color-muted);
+    font-weight: 600;
+    color: var(--color-text);
   }
 
   .c-weather-panel__moon-date {
