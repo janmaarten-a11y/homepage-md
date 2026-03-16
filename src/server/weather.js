@@ -207,6 +207,8 @@ function processWeatherData(raw, geo, useImperial, aqi, nwsAlerts) {
     location: {
       name: geo.name,
       region: geo.admin1,
+      latitude: geo.latitude,
+      longitude: geo.longitude,
     },
     units: { temp: unitSymbol, wind: windUnitLabel },
     current: {
