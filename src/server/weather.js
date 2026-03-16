@@ -14,6 +14,13 @@ const geocodeCache = new Map();
 const forecastCache = new Map();
 const FORECAST_TTL = 30 * 60 * 1000; // 30 minutes
 
+/**
+ * Clear the forecast cache (geocode cache is kept since locations don't change).
+ */
+export function clearWeatherCache() {
+  forecastCache.clear();
+}
+
 // ---------------------------------------------------------------------------
 // WMO Weather Codes → human-readable descriptions and icon names
 // https://www.noaa.gov/weather/codes

@@ -508,21 +508,12 @@
   }
 
   .c-weather-panel__nws-alert {
-    padding: var(--space-s) var(--space-m);
-    border-radius: var(--radius-m);
+    padding: var(--space-xs) var(--space-s);
+    border-radius: var(--radius-s);
     border-inline-start: 4px solid;
     font-size: 1rem;
-  }
-
-  .c-weather-panel__nws-alert strong {
-    display: block;
-    font-weight: 700;
-    margin-block-end: var(--space-xs);
-  }
-
-  .c-weather-panel__nws-alert p {
+    font-weight: 500;
     margin: 0;
-    line-height: 1.4;
   }
 
   .c-weather-panel__nws-alert a {
@@ -559,6 +550,29 @@
     padding-block-start: var(--space-s);
     border-block-start: 1px solid var(--color-border);
     font-size: 1rem;
+  }
+
+  /* Astro section — right-aligned on wider viewports */
+  .c-weather-panel__astro {
+    justify-content: flex-end;
+  }
+
+  /* Two-column layout for forecast section on desktop */
+  .c-weather-panel__forecast {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: start;
+    gap: var(--space-s) var(--space-l);
+  }
+
+  .c-weather-panel__forecast > .c-weather-panel__day {
+    flex: 1;
+    min-inline-size: 15rem;
+  }
+
+  .c-weather-panel__forecast > .c-weather-panel__details {
+    flex: 1;
+    min-inline-size: 15rem;
   }
 
   /* Skip link */

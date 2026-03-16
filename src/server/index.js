@@ -8,7 +8,7 @@ import { getFaviconUrl, refreshFavicons, extractDomain, cleanFaviconCache } from
 import { addBookmark, removeBookmark, updateBookmark } from './writer.js';
 import { isAuthenticated, sendUnauthorized } from './auth.js';
 import { fetchMetadata } from './metadata.js';
-import { fetchWeather } from './weather.js';
+import { fetchWeather, clearWeatherCache } from './weather.js';
 
 const CONTENT_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -450,6 +450,8 @@ async function handleRequest(req, res) {
   if (weatherMatch && req.method === 'GET') {
     const slug = weatherMatch[1];
     const locale = req.headers['accept-language']?.split(',')[0] || '';
+    const refresh = url.searchParams.has('refresh');
+    if (refresh) clearWeatherCache();
     try {
       const pageData = await loadPage(slug);
       if (!pageData.location) {

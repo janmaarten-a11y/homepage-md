@@ -924,16 +924,13 @@ function renderWeather(data) {
 ${aqiHtml}
     </dl>`;
 
-  // NWS severe weather alerts (bold, prominent)
+  // NWS severe weather alerts — single line each
   let alertsHtml = '';
   if (data.nwsAlerts && data.nwsAlerts.length > 0) {
     alertsHtml += `<div class="c-weather-panel__nws-alerts">
 ${data.nwsAlerts.map((a) => {
   const link = a.url ? ` <a href="${escapeText(a.url)}" rel="noopener">Details \u2192</a>` : '';
-  return `      <div class="c-weather-panel__nws-alert" data-severity="${escapeText(a.severity)}">
-        <strong>${escapeText(a.event)}</strong>
-        <p>${escapeText(a.headline)}${link}</p>
-      </div>`;
+  return `      <p class="c-weather-panel__nws-alert" data-severity="${escapeText(a.severity)}">${escapeText(a.headline)}${link}</p>`;
 }).join('\n')}
     </div>`;
   }
