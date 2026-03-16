@@ -4,7 +4,7 @@ import { join, extname, resolve } from 'node:path';
 import { config } from './config.js';
 import { parseMarkdown } from './parser.js';
 import { renderPage } from './renderer.js';
-import { getFaviconUrl, refreshFavicons, extractDomain } from './favicon.js';
+import { getFaviconUrl, refreshFavicons, extractDomain, cleanFaviconCache } from './favicon.js';
 import { addBookmark, removeBookmark, updateBookmark } from './writer.js';
 import { isAuthenticated, sendUnauthorized } from './auth.js';
 import { fetchMetadata } from './metadata.js';
@@ -543,3 +543,4 @@ server.listen(config.port, () => {
 });
 
 startWatcher();
+cleanFaviconCache(config);
