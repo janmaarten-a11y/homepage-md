@@ -63,6 +63,10 @@ ${hasLocation ? `        <button type="button" class="c-weather-btn js-weather-t
           <span class="c-weather-btn__icon js-weather-icon" aria-hidden="true"></span>
           <span class="c-weather-btn__label js-weather-label"></span>
         </button>` : ''}
+        <button type="button" class="c-speed-btn js-speed-test" aria-label="Run speed test" aria-live="polite">
+          <span class="c-speed-btn__icon" aria-hidden="true">\uD83D\uDCF6</span>
+          <span class="c-speed-btn__label js-speed-label">Speed test</span>
+        </button>
         <button type="button" class="c-header__action-btn js-view-toggle" aria-expanded="false" aria-controls="js-view-popover" aria-label="View options">${iconSettings}</button>
         <div class="c-popover js-view-popover" id="js-view-popover" hidden>
 ${toolbar}

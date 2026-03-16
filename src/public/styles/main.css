@@ -359,6 +359,43 @@
     line-height: 1;
   }
 
+  /* Speed test button */
+  .c-speed-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding-block: var(--space-xs);
+    padding-inline: var(--space-s);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+    min-block-size: 2.75rem;
+    border-radius: var(--radius-m);
+    font-size: 1rem;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .c-speed-btn:hover {
+    background-color: var(--color-bg);
+  }
+
+  .c-speed-btn:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  .c-speed-btn:disabled {
+    cursor: default;
+    opacity: 0.7;
+  }
+
+  .c-speed-btn__icon {
+    font-size: 1.125rem;
+    line-height: 1;
+  }
+
   /* Weather panel */
   /* Weather panel — two-column layout on desktop */
   .c-weather-panel {
