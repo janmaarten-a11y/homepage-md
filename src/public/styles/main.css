@@ -583,6 +583,28 @@
     justify-content: flex-end;
   }
 
+  .c-dialog__error {
+    padding: var(--space-s);
+    background-color: oklch(95% 0.03 25);
+    color: oklch(40% 0.15 25);
+    border: 1px solid oklch(80% 0.06 25);
+    border-radius: var(--radius-s);
+    font-size: 1rem;
+  }
+
+  .c-dialog__error[hidden] {
+    display: none;
+  }
+
+  /* Noscript */
+  .c-noscript {
+    padding: var(--space-m) var(--space-l);
+    background-color: oklch(95% 0.03 80);
+    color: oklch(35% 0.1 80);
+    border-block-end: 1px solid oklch(80% 0.06 80);
+    margin: 0;
+  }
+
   /* Jump links */
   .c-jump-links {
     display: flex;
