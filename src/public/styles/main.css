@@ -1477,27 +1477,28 @@
 
   .is-list .c-bookmark__header {
     flex: 1;
-    flex-wrap: nowrap;
-    min-width: 0;
+    display: grid;
+    grid-template-columns: 1fr auto;
     align-items: center;
-    gap: var(--space-xs);
+    gap: var(--space-s);
+    min-width: 0;
   }
 
   .is-list .c-bookmark__link {
     display: inline-flex;
     align-items: center;
     gap: var(--space-xs);
-    flex-shrink: 0;
   }
 
   .is-list .c-bookmark__actions {
-    margin-inline-start: auto;
+    grid-column: 2;
     flex-shrink: 0;
   }
 
   .is-list .c-bookmark__icon {
     inline-size: 2rem;
     block-size: 2rem;
+    flex-shrink: 0;
   }
 
   .is-list .c-bookmark__title {
@@ -1505,27 +1506,23 @@
   }
 
   .is-list .c-bookmark__url {
-    display: inline;
     color: var(--color-muted);
     font-size: 0.875rem;
     white-space: nowrap;
 
     &::before {
       content: " · ";
-      color: var(--color-muted);
     }
   }
 
   .is-list .c-bookmark__description {
-    display: inline;
-    margin: 0;
-    padding: 0;
     color: var(--color-muted);
     font-size: 0.875rem;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    min-width: 0;
+    margin: 0;
+    padding: 0;
 
     &::before {
       content: " — ";
