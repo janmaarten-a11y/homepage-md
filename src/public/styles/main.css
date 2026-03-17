@@ -266,7 +266,7 @@
     gap: var(--space-xs);
     white-space: nowrap;
     flex-shrink: 0;
-    min-block-size: 2.75rem;
+    block-size: 2.75rem;
   }
 
   /* TOC button wrapper */
@@ -790,16 +790,16 @@
     border-color: var(--color-primary);
   }
 
-  .c-search__input:focus-visible + .c-search__shortcuts {
-    display: none;
-  }
-
   .c-search__shortcuts {
     position: absolute;
-    inset-inline-end: var(--space-s);
+    inset-inline-start: calc(var(--space-s) + 16px + var(--space-xs) + 14ch);
     display: flex;
     gap: var(--space-xs);
     pointer-events: none;
+  }
+
+  .c-search__shortcuts[hidden] {
+    display: none;
   }
 
   .c-search__shortcut {
@@ -962,10 +962,12 @@
     max-inline-size: 70ch;
   }
 
-  /* Hidden state for search filtering */
+  /* Hidden state for search filtering — must override layout modes */
   .c-bookmark[hidden],
   .c-category[hidden],
-  .c-subcategory[hidden] {
+  .c-subcategory[hidden],
+  .is-columns .c-category[hidden],
+  .is-columns .c-subcategory[hidden] {
     display: none;
   }
 

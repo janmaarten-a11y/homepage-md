@@ -103,6 +103,7 @@ const searchInput = document.getElementById('js-search');
 const searchEmpty = document.querySelector('.js-search-empty');
 const searchStatus = document.getElementById('js-search-status');
 const bangHint = document.querySelector('.js-bang-hint');
+const searchShortcuts = document.querySelector('.c-search__shortcuts');
 const bookmarks = document.querySelectorAll('.c-bookmark');
 const categories = document.querySelectorAll('.c-category');
 const subcategories = document.querySelectorAll('.c-subcategory');
@@ -210,6 +211,9 @@ if (searchInput) {
     const value = searchInput.value;
     const match = matchBang(value);
 
+    // Show/hide keyboard shortcut hints based on whether there's text
+    if (searchShortcuts) searchShortcuts.hidden = value.length > 0;
+
     if (match) {
       // Bang detected — freeze bookmark filtering, show hint
       activeBang = match;
@@ -241,6 +245,7 @@ if (searchInput) {
       searchInput.value = '';
       activeBang = null;
       hideBangHint();
+      if (searchShortcuts) searchShortcuts.hidden = false;
       filterBookmarks('');
     }
   });
@@ -270,6 +275,8 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && document.activeElement === searchInput) {
     searchInput.value = '';
     filterBookmarks('');
+    hideBangHint();
+    if (searchShortcuts) searchShortcuts.hidden = false;
     searchInput.blur();
   }
 });
@@ -992,8 +999,8 @@ function renderWeather(data) {
   // Override icon for extreme temperatures
   let icon = WEATHER_ICONS[data.current.icon] || '\uD83C\uDF24\uFE0F';
   const tempF = data.units.temp === '\u00B0F' ? data.current.temp : data.current.temp * 9 / 5 + 32;
-  if (tempF <= 20) icon = '\uD83E\uDD76';       // 🥶 freezing
-  else if (tempF >= 95) icon = '\uD83E\uDD75';   // 🥵 burning
+  if (tempF <= 25) icon = '\uD83E\uDD76';       // 🥶 freezing
+  else if (tempF >= 85) icon = '\uD83E\uDD75';   // 🥵 burning
   weatherIcon.textContent = icon;
   weatherLabel.textContent = `${data.current.temp}${data.units.temp}`;
   weatherBtn.disabled = false;
@@ -1280,8 +1287,14 @@ if (speedBtn && speedLabel) {
   }
 
   function showSpeedResult(down, up) {
-    speedLabel.textContent = `\u2193 ${down} \u2191 ${up} Mbps`;
+    speedLabel.textContent = `\u2193 ${down} \u2191 ${up}`;
     speedBtn.setAttribute('aria-label', `Speed test result: ${down} megabits per second download, ${up} megabits per second upload. Activate to test again.`);
+  }
+
+  function formatSpeed(mbps) {
+    const val = parseFloat(mbps);
+    if (val < 1) return val.toFixed(1);
+    return Math.round(val).toString();
   }
 
   async function measureDownload() {
@@ -1292,8 +1305,7 @@ if (speedBtn && speedLabel) {
     });
     await res.arrayBuffer();
     const elapsed = (performance.now() - start) / 1000;
-    const mbps = ((bytes * 8) / elapsed / 1_000_000).toFixed(0);
-    return mbps;
+    return formatSpeed((bytes * 8) / elapsed / 1_000_000);
   }
 
   async function measureUpload() {
@@ -1306,7 +1318,6 @@ if (speedBtn && speedLabel) {
       cache: 'no-store',
     });
     const elapsed = (performance.now() - start) / 1000;
-    const mbps = ((bytes * 8) / elapsed / 1_000_000).toFixed(0);
-    return mbps;
+    return formatSpeed((bytes * 8) / elapsed / 1_000_000);
   }
 }
