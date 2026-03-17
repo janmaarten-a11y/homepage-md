@@ -41,8 +41,8 @@ body::before {
       to bottom,
       oklch(0% 0 0 / 0%) 0px,
       oklch(0% 0 0 / 0%) 2px,
-      oklch(0% 0 0 / 8%) 2px,
-      oklch(0% 0 0 / 8%) 4px
+      oklch(0% 0 0 / 12%) 2px,
+      oklch(0% 0 0 / 12%) 4px
     ),
     radial-gradient(
       ellipse at center,
@@ -56,10 +56,11 @@ body {
   text-shadow: 0 0 2px oklch(70% 0.12 145 / 40%);
 }
 
-/* Outlined cards instead of filled backgrounds */
+/* Outlined cards with scanline-hinted backgrounds */
 .c-bookmark {
   background: transparent;
-  border: 1px solid var(--color-border);
+  border: 2px solid var(--color-border);
+  border-radius: 4px;
   box-shadow: none;
 }
 
@@ -305,5 +306,167 @@ body {
 @media (prefers-reduced-motion: no-preference) {
   .c-bookmark:hover {
     box-shadow: 0 0 6px oklch(60% 0.15 145 / 25%);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Light mode variant — bright green on light gray with scanline cards
+ * Activates via prefers-color-scheme since this theme controls its own colors
+ * ------------------------------------------------------------------------- */
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-bg: oklch(94% 0.005 145);
+    --color-text: oklch(20% 0.08 145);
+    --color-primary: oklch(40% 0.15 145);
+    --color-surface: oklch(97% 0.003 145 / 85%);
+    --color-border: oklch(70% 0.06 145);
+    --color-focus: oklch(40% 0.18 145);
+    --color-muted: oklch(45% 0.06 145);
+
+    --shadow-s: 0 1px 3px oklch(30% 0.05 145 / 12%);
+    --shadow-m: 0 4px 12px oklch(30% 0.05 145 / 15%);
+    --shadow-l: 0 8px 24px oklch(30% 0.05 145 / 20%);
+  }
+
+  body {
+    text-shadow: none;
+  }
+
+  /* Lighter scanlines + softer vignette */
+  body::before {
+    background:
+      repeating-linear-gradient(
+        to bottom,
+        oklch(0% 0 0 / 0%) 0px,
+        oklch(0% 0 0 / 0%) 2px,
+        oklch(0% 0 0 / 3%) 2px,
+        oklch(0% 0 0 / 3%) 4px
+      ),
+      radial-gradient(
+        ellipse at center,
+        oklch(0% 0 0 / 0%) 60%,
+        oklch(0% 0 0 / 15%) 100%
+      );
+  }
+
+  /* Semi-transparent bookmark cards with subtle scanlines */
+  .c-bookmark {
+    background:
+      repeating-linear-gradient(
+        to bottom,
+        oklch(40% 0.08 145 / 3%) 0px,
+        oklch(40% 0.08 145 / 3%) 1px,
+        transparent 1px,
+        transparent 3px
+      ),
+      oklch(97% 0.003 145 / 70%);
+  }
+
+  .c-bookmark:hover {
+    box-shadow: 0 0 8px oklch(40% 0.12 145 / 20%);
+  }
+
+  /* Header */
+  .c-header {
+    background-color: oklch(92% 0.005 145 / 95%);
+  }
+
+  .c-header__searchbar {
+    background-color: oklch(94% 0.005 145);
+  }
+
+  /* Welcome */
+  .c-welcome {
+    background: oklch(97% 0.003 145 / 70%);
+  }
+
+  /* Weather panel */
+  .c-weather-panel {
+    background-color: oklch(92% 0.005 145 / 95%);
+  }
+
+  /* Search input */
+  .c-search__input {
+    background-color: oklch(98% 0.002 145 / 80%);
+  }
+
+  /* Buttons */
+  .c-btn {
+    color: var(--color-text);
+  }
+
+  .c-btn--primary {
+    color: oklch(98% 0 0);
+    background-color: var(--color-primary);
+  }
+
+  .c-btn--primary:hover {
+    background-color: oklch(35% 0.15 145);
+    color: oklch(98% 0 0);
+  }
+
+  /* Dialog */
+  .c-dialog {
+    background-color: oklch(96% 0.003 145 / 98%);
+    box-shadow: 0 0 20px oklch(30% 0.08 145 / 15%);
+  }
+
+  .c-dialog::backdrop {
+    background-color: oklch(0% 0 0 / 40%);
+  }
+
+  .c-dialog__input {
+    background-color: oklch(98% 0.002 145 / 80%);
+  }
+
+  /* Popover */
+  .c-popover {
+    background-color: oklch(96% 0.003 145 / 98%);
+    box-shadow: 0 0 12px oklch(30% 0.08 145 / 12%);
+  }
+
+  /* Toolbar */
+  .c-toolbar__btn {
+    background-color: oklch(97% 0.003 145 / 80%);
+  }
+
+  .c-toolbar__btn[aria-pressed="true"] {
+    background-color: var(--color-primary);
+    color: oklch(98% 0 0);
+  }
+
+  /* Header buttons */
+  .c-header__action-btn,
+  .c-weather-btn,
+  .c-speed-btn {
+    background-color: oklch(97% 0.003 145 / 80%);
+  }
+
+  /* Tomorrow forecast + alert list */
+  .c-weather-panel__tomorrow {
+    background-color: oklch(92% 0.005 145 / 80%);
+  }
+
+  .c-weather-panel__alert-list li {
+    background-color: oklch(92% 0.005 145 / 80%);
+  }
+
+  /* Combobox */
+  .c-combobox__listbox {
+    background-color: oklch(96% 0.003 145 / 98%);
+  }
+
+  /* Keyboard shortcuts */
+  .c-shortcut-list kbd {
+    background-color: oklch(97% 0.003 145 / 80%);
+  }
+
+  /* List view */
+  .is-list .c-bookmark {
+    background: transparent;
+  }
+
+  .is-list .c-bookmark:hover {
+    box-shadow: none;
   }
 }
