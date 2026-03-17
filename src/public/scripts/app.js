@@ -1095,14 +1095,20 @@ if (weatherBtn && weatherPanel) {
   fetch(`/api/weather/${encodeURIComponent(slug)}`)
     .then((res) => res.json())
     .then((data) => {
+      if (!data) {
+        weatherBtn.hidden = true;
+        return;
+      }
       renderWeather(data);
       // Restore panel open state from localStorage
-      if (data && localStorage.getItem(weatherStorageKey) === 'true') {
+      if (localStorage.getItem(weatherStorageKey) === 'true') {
         weatherPanel.hidden = false;
         weatherBtn.setAttribute('aria-expanded', 'true');
       }
     })
-    .catch(() => {});
+    .catch(() => {
+      weatherBtn.hidden = true;
+    });
 }
 
 // ---------------------------------------------------------------------------
