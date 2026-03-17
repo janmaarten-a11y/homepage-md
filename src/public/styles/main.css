@@ -922,7 +922,12 @@
     border-block-end: 1px solid var(--color-border);
   }
 
-  .c-category > h2 {
+  /* Section header wrapper — transparent by default, inline in condensed list */
+  .c-section__header {
+    display: contents;
+  }
+
+  .c-category h2 {
     display: flex;
     align-items: center;
     gap: var(--space-xs);
@@ -954,7 +959,7 @@
     margin-block-start: var(--space-m);
   }
 
-  .c-subcategory > h3 {
+  .c-subcategory h3 {
     display: flex;
     align-items: center;
     gap: var(--space-xs);
@@ -1386,11 +1391,11 @@
     margin-inline-start: auto;
   }
 
-  .is-condensed .c-category > h2 {
+  .is-condensed .c-category h2 {
     font-size: 1.25rem;
   }
 
-  .is-condensed .c-subcategory > h3 {
+  .is-condensed .c-subcategory h3 {
     font-size: 1rem;
   }
 
@@ -1408,12 +1413,12 @@
     align-items: start;
   }
 
-  .is-columns .c-category > h2 {
+  .is-columns .c-category h2 {
     grid-column: 1 / -1;
     margin-block-end: 0;
   }
 
-  .is-columns .c-category > .c-category__subtitle {
+  .is-columns .c-category .c-category__subtitle {
     grid-column: 1 / -1;
     margin-block-end: 0;
   }
@@ -1430,12 +1435,12 @@
     flex-direction: column;
   }
 
-  .is-columns .c-subcategory > h3 {
+  .is-columns .c-subcategory h3 {
     margin-block-end: var(--space-m);
     margin-block-start: var(--space-m);
   }
 
-  .is-columns .c-subcategory > .c-subcategory__subtitle {
+  .is-columns .c-subcategory .c-subcategory__subtitle {
     display: none;
   }
 
@@ -1571,6 +1576,28 @@
 
   .is-condensed.is-list .c-bookmark__description {
     display: inline;
+  }
+
+  /* Condensed + List — headings and subtitles inline */
+  .is-condensed.is-list .c-section__header {
+    display: inline;
+  }
+
+  .is-condensed.is-list .c-section__header h2,
+  .is-condensed.is-list .c-section__header h3 {
+    display: inline;
+  }
+
+  .is-condensed.is-list .c-category__subtitle,
+  .is-condensed.is-list .c-subcategory__subtitle {
+    display: inline;
+    margin: 0;
+    font-size: inherit;
+
+    &::before {
+      content: " — ";
+      color: var(--color-muted);
+    }
   }
 
   /* Condensed + Columns — tighter columns, smaller cards for more density */

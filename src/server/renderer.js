@@ -383,7 +383,9 @@ ${category.bookmarks.map((b) => renderBookmark(b, faviconUrls, category.name, nu
   const icon = renderHeadingIcon(category.id, categoryIcons);
 
   return `    <section class="c-category" aria-labelledby="${escapeAttr(category.id)}">
-      <h2 id="${escapeAttr(category.id)}">${icon}${escapeHtml(category.name)}</h2>${subtitle}
+      <div class="c-section__header">
+        <h2 id="${escapeAttr(category.id)}">${icon}${escapeHtml(category.name)}</h2>${subtitle}
+      </div>
 ${directBookmarks}
 ${subcategories}
     </section>`;
@@ -397,7 +399,9 @@ function renderSubcategory(subcategory, faviconUrls, categoryName, categoryIcons
   const icon = renderHeadingIcon(subcategory.id, categoryIcons);
 
   return `      <section class="c-subcategory" aria-labelledby="${escapeAttr(subcategory.id)}">
-        <h3 id="${escapeAttr(subcategory.id)}">${icon}${escapeHtml(subcategory.name)}</h3>${subtitle}
+        <div class="c-section__header">
+          <h3 id="${escapeAttr(subcategory.id)}">${icon}${escapeHtml(subcategory.name)}</h3>${subtitle}
+        </div>
         <ul class="c-bookmark-list" role="list">
 ${subcategory.bookmarks.map((b) => renderBookmark(b, faviconUrls, categoryName, subcategory.name)).join('\n')}
         </ul>
