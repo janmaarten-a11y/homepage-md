@@ -137,10 +137,18 @@ function showBangHint(prefix, bang, query) {
   if (!bangHint) return;
   const name = extractBangName(bang.url);
   if (query) {
-    bangHint.textContent = `Press Enter to search ${name} for "${query}"`;
+    bangHint.textContent = `Press Enter to search ${name} for \u201C${query}\u201D`;
   } else {
     bangHint.textContent = `${prefix} \u2192 ${name} \u2014 type your search query`;
   }
+  bangHint.hidden = false;
+}
+
+function showBangList() {
+  if (!bangHint) return;
+  const entries = Object.values(allBangs);
+  if (entries.length === 0) return;
+  bangHint.textContent = entries.map((b) => `${b.prefix} ${extractBangName(b.url)}`).join('  \u00B7  ');
   bangHint.hidden = false;
 }
 
@@ -199,7 +207,8 @@ function filterBookmarks(query) {
 if (searchInput) {
   searchInput.addEventListener('input', () => {
     clearTimeout(debounceTimer);
-    const match = matchBang(searchInput.value);
+    const value = searchInput.value;
+    const match = matchBang(value);
 
     if (match) {
       // Bang detected — freeze bookmark filtering, show hint
@@ -208,11 +217,17 @@ if (searchInput) {
       showBangHint(match.prefix, match.bang, match.query);
       searchEmpty.hidden = true;
       searchStatus.textContent = '';
+    } else if (value.trim() === '!' && Object.keys(allBangs).length > 0) {
+      // Just "!" typed — show available bangs
+      activeBang = null;
+      showBangList();
+      searchEmpty.hidden = true;
+      searchStatus.textContent = '';
     } else {
       // Normal bookmark search
       activeBang = null;
       hideBangHint();
-      debounceTimer = setTimeout(() => filterBookmarks(searchInput.value), 100);
+      debounceTimer = setTimeout(() => filterBookmarks(value), 100);
     }
   });
 

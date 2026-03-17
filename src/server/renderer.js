@@ -77,7 +77,6 @@ ${toolbar}
 ${tocPopover}
 ${search}
       <button type="button" class="c-header__add-btn c-btn c-btn--primary js-add-open">${iconPlusSmall} <span>Add link</span></button>
-      <p class="c-header__bang-hint js-bang-hint" hidden aria-live="polite"></p>
     </div>
   </header>
 ${hasLocation ? `  <section class="c-weather-panel js-weather-panel" id="js-weather-panel" hidden aria-label="Weather forecast">
@@ -164,9 +163,10 @@ function renderSearch() {
       <div class="c-search__wrap">
         <input type="search" id="js-search" class="c-search__input" placeholder="Search bookmarks…" autocomplete="off">
         <kbd class="c-search__shortcut" aria-hidden="true">/</kbd>
+        <p class="c-search__bang-hint js-bang-hint" hidden aria-live="polite"></p>
       </div>
-
     </search>`;
+}
 }
 
 function renderToolbar() {

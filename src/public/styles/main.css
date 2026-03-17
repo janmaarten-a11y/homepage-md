@@ -799,12 +799,12 @@
     line-height: 1.4;
   }
 
-  /* Search bang hint — positioned absolutely below the searchbar */
-  .c-header__bang-hint {
+  /* Search bang hint — floats below the search input */
+  .c-search__bang-hint {
     position: absolute;
-    inset-inline-start: var(--space-l);
+    inset-inline-start: 0;
     inset-block-start: 100%;
-    margin: 0;
+    margin: var(--space-xs) 0 0;
     padding: var(--space-xs) var(--space-s);
     font-size: 1rem;
     color: var(--color-primary);
@@ -814,9 +814,10 @@
     border-radius: var(--radius-s);
     box-shadow: var(--shadow-s);
     z-index: 15;
+    white-space: nowrap;
   }
 
-  .c-header__bang-hint[hidden] {
+  .c-search__bang-hint[hidden] {
     display: none;
   }
 
