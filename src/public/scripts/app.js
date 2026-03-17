@@ -139,8 +139,6 @@ try {
           link.focus({ preventScroll: true });
           card.scrollIntoView({ block: 'nearest', behavior: 'instant' });
         });
-          card.scrollIntoView({ block: 'nearest', behavior: 'instant' });
-        });
       }
     }
   }
