@@ -792,7 +792,7 @@
 
   .c-search__shortcuts {
     position: absolute;
-    inset-inline-start: calc(var(--space-s) + 16px + var(--space-xs) + 14ch);
+    inset-inline-start: calc(var(--space-s) + 16px + var(--space-xs) + 16ch);
     display: flex;
     gap: var(--space-xs);
     pointer-events: none;

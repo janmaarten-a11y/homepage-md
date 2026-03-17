@@ -4,7 +4,6 @@
   - bang: !ddg https://duckduckgo.com/?q=%s
   - bang: !kagi https://kagi.com/search?q=%s
   - bang: !sp https://www.startpage.com/do/dsearch?query=%s
-  - bang: !brave https://search.brave.com/search?q=%s
   - bang: !eco https://www.ecosia.org/search?q=%s
   - bang: !w https://en.wikipedia.org/w/index.php?search=%s
 
