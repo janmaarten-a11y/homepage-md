@@ -83,6 +83,23 @@ function applySize(svg, size) {
 }
 
 /**
+ * Resolve multiple icons by name, returning a name → SVG map.
+ *
+ * @param {string[]} names - Icon names to resolve
+ * @param {object} [options]
+ * @param {number} [options.size=20] - Width and height in pixels
+ * @returns {Promise<Record<string, string>>} Map of name → SVG markup
+ */
+export async function getIcons(names, options) {
+  const map = {};
+  for (const name of names) {
+    const svg = await getIcon(name, options);
+    if (svg) map[name] = svg;
+  }
+  return map;
+}
+
+/**
  * Get all available icon names. Useful for autocomplete or validation.
  */
 export function getIconNames() {

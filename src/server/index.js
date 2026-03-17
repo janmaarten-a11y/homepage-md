@@ -9,7 +9,25 @@ import { addBookmark, removeBookmark, updateBookmark, updateLocation } from './w
 import { isAuthenticated, sendUnauthorized } from './auth.js';
 import { fetchMetadata } from './metadata.js';
 import { fetchWeather, clearWeatherCache } from './weather.js';
-import { loadIconIndex, getIcon } from './lucide.js';
+import { loadIconIndex, getIcon, getIcons } from './lucide.js';
+
+/** Lucide icon names used in the weather panel and header buttons. */
+const WEATHER_ICON_NAMES = [
+  'sun', 'cloud-sun', 'cloud', 'cloud-fog', 'cloud-drizzle', 'cloud-rain',
+  'snowflake', 'cloud-snow', 'cloud-lightning', 'thermometer', 'arrow-up-down',
+  'wind', 'haze', 'moon', 'sunrise', 'sunset', 'eclipse', 'moon-star',
+  'signal', 'triangle-alert',
+];
+
+/** Cached weather icon SVGs (resolved once at first use). */
+let weatherIconsCache = null;
+
+async function getWeatherIcons() {
+  if (!weatherIconsCache) {
+    weatherIconsCache = await getIcons(WEATHER_ICON_NAMES, { size: 16 });
+  }
+  return weatherIconsCache;
+}
 
 const CONTENT_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -639,8 +657,9 @@ async function handleRequest(req, res) {
       const bookmarks = flattenBookmarks(pageData);
       const faviconUrls = await resolveFavicons(slug, bookmarks);
       const categoryIcons = await resolveCategoryIcons(pageData);
+      const weatherIcons = await getWeatherIcons();
       const footerContent = await loadFooter();
-      const html = renderPage(pageData, { pages, currentSlug: slug, faviconUrls, categoryIcons, defaultPage: config.defaultPage, footerContent });
+      const html = renderPage(pageData, { pages, currentSlug: slug, faviconUrls, categoryIcons, weatherIcons, defaultPage: config.defaultPage, footerContent });
 
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       res.end(html);

@@ -15,7 +15,7 @@
  * @param {object} options.faviconUrls - Map of bookmark URL → resolved favicon path
  * @returns {string} Complete HTML document
  */
-export function renderPage(pageData, { pages, currentSlug, faviconUrls, categoryIcons = {}, defaultPage, footerContent }) {
+export function renderPage(pageData, { pages, currentSlug, faviconUrls, categoryIcons = {}, weatherIcons = {}, defaultPage, footerContent }) {
   const title = pageData.title || 'HomepageMD';
   const hasLocation = !!pageData.location;
   const nav = renderNav(pages, currentSlug, defaultPage);
@@ -60,11 +60,11 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, category
 ${nav}
       <div class="c-header__actions">
 ${hasLocation ? `        <button type="button" class="c-weather-btn js-weather-toggle" aria-expanded="false" aria-controls="js-weather-panel" aria-label="Loading weather\u2026" disabled>
-          <span class="c-weather-btn__icon js-weather-icon" aria-hidden="true">\u2601\uFE0F</span>
+          <span class="c-weather-btn__icon js-weather-icon" aria-hidden="true">${weatherIcons['cloud'] || '\u2601\uFE0F'}</span>
           <span class="c-weather-btn__label js-weather-label">\u2022\u2022\u2022</span>
         </button>` : ''}
         <button type="button" class="c-speed-btn js-speed-test" aria-live="polite">
-          <span class="c-speed-btn__icon" aria-hidden="true">\uD83D\uDCF6</span>
+          <span class="c-speed-btn__icon" aria-hidden="true">${weatherIcons['signal'] || '\uD83D\uDCF6'}</span>
           <span class="c-speed-btn__label js-speed-label">Speed test</span>
         </button>
         <button type="button" class="c-header__action-btn js-view-toggle" aria-expanded="false" aria-controls="js-view-popover" aria-label="View options">${iconSettings}</button>
@@ -166,7 +166,7 @@ ${hasLocation ? `  <dialog class="c-dialog c-dialog--small js-location-dialog">
       </div>
     </form>
   </dialog>` : ''}
-  <script id="js-page-data" type="application/json">${JSON.stringify({ categories, subcategories: subcategoryPairs, bangs: pageData.bangs || [] })}</script>
+  <script id="js-page-data" type="application/json">${JSON.stringify({ categories, subcategories: subcategoryPairs, bangs: pageData.bangs || [], weatherIcons })}</script>
   <script src="/scripts/app.js" type="module"></script>
 </body>
 </html>`;
