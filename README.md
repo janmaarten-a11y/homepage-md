@@ -9,19 +9,22 @@ A household bookmark dashboard that reads Markdown files and renders them as a c
 - **Markdown as source of truth** — edit `.md` files in any text editor, or use the built-in web UI
 - **Add, edit, delete** bookmarks through the dashboard — changes write back to Markdown
 - **Real-time search** — filter bookmarks instantly by title, description, or URL (press `/` to focus)
+- **Search bangs** — type `!g climate change` to search Google, `!w cats` for Wikipedia, and more — configurable per page
+- **Weather** — local conditions, forecast, air quality, moon phase, sunrise/sunset, aurora forecast, and weather alerts
+- **Speed test** — one-click download and upload speed measurement via Cloudflare
 - **Multiple pages** — each `.md` file in `bookmarks/` becomes a page in the top navigation
-- **Categories and subcategories** — `##` headings are categories, `###` headings are subcategories
+- **Categories and subcategories** — organize bookmarks with headings and optional subtitles
 - **Favicon resolution** — automatic icons via local cache, direct fetch, DuckDuckGo fallback, or manual overrides
 - **View modes** — Grid or Columns layout × Detailed or Condensed density, saved per page
-- **Dark mode** — automatic via `prefers-color-scheme`
+- **Dark mode** — automatic via `prefers-color-scheme`, or toggle manually
 - **Live updates** — Server-Sent Events push changes to all open browsers when files change
-- **Keyboard navigation** — `/` to search, `Escape` to clear, arrow keys to reach edit/delete, skip-to-content link
-- **Category jump links** — sticky navigation bar for quick access to sections
+- **Keyboard accessible** — every feature is reachable by keyboard, with shortcuts for common actions
+- **Category jump links** — table of contents for quick access to sections
+- **Footer** — editable Markdown footer displayed on every page
 - **Docker-ready** — single container, Synology-friendly
 - **Customizable** — override any design token via `custom.css`
 - **Optional auth** — `AUTH_TOKEN` env var protects write endpoints
 - **No dependencies** — zero `node_modules` in production, just Node.js built-ins
-- **Accessible** — semantic HTML, proper heading hierarchy, `aria-labelledby`, `aria-live`, `focus-visible`, WCAG 2.2 reviewed
 
 ## Quick start
 
@@ -59,6 +62,7 @@ All configuration is via environment variables. Copy `.env.example` to `.env` an
 | `ICONS_DIR` | `./icons` | Path to manual favicon overrides |
 | `FAVICON_CACHE_DIR` | `./favicon-cache` | Path to the favicon cache |
 | `CUSTOM_CSS_PATH` | `./custom.css` | Path to the user CSS overrides file |
+| `FOOTER_PATH` | `./footer.md` | Path to the footer Markdown file |
 | `AUTH_TOKEN` | *(none)* | Shared passphrase for write endpoints (disabled by default) |
 | `FAVICON_TTL_DAYS` | `7` | Days before a cached favicon is re-fetched |
 
@@ -68,10 +72,15 @@ Each `.md` file in the `bookmarks/` directory is a page. The grammar:
 
 ```markdown
 # Page Title
+  - location: City, State
+  - bang: !g https://google.com/search?q=%s
+  - bang: !w https://en.wikipedia.org/w/index.php?search=%s
 
 ## Category Name
+  - subtitle: A short description of this category
 
 ### Subcategory Name
+  - subtitle: A short description of this subcategory
 
 - [Bookmark Title](https://example.com)
   - description: A short description (max 160 chars)
@@ -81,8 +90,11 @@ Each `.md` file in the `bookmarks/` directory is a page. The grammar:
 ### Rules
 
 - `# Heading 1` — page title (one per file)
+- `- location:` — location for the weather widget (indented, under the title)
+- `- bang: !prefix url` — search bang shortcut; `%s` is replaced with the query (indented, under the title)
 - `## Heading 2` — category
 - `### Heading 3` — subcategory (within the parent category)
+- `- subtitle:` — description shown under a category or subcategory heading
 - `- [Title](URL)` — bookmark
 - `- description: text` — description (indented, under a bookmark)
 - `- icon: url` — custom icon override (indented, under a bookmark)
@@ -93,11 +105,13 @@ Each `.md` file in the `bookmarks/` directory is a page. The grammar:
 | Key | Action |
 |---|---|
 | `/` | Focus the search field |
-| `Escape` | Clear search and return focus to the page |
+| `?` | Open the keyboard shortcuts dialog |
+| `Escape` | Clear search, close dialogs, or return focus to the page |
 | `→` / `↓` | From a bookmark link, move to Edit → Delete |
 | `←` / `↑` | Reverse: Delete → Edit → Link |
-| `Escape` | From Edit/Delete, return to the bookmark link |
 | `Tab` | Move to the next bookmark (skips edit/delete buttons) |
+
+When search is focused, type `!` to see available search bangs. Type a bang prefix followed by a query (e.g., `!g climate change`) and press `Enter` to search in a new tab.
 
 ## View modes
 
@@ -119,6 +133,8 @@ All write endpoints are protected by `AUTH_TOKEN` when configured.
 | `PUT` | `/api/bookmarks/{slug}` | Update a bookmark |
 | `DELETE` | `/api/bookmarks/{slug}` | Remove a bookmark |
 | `POST` | `/api/metadata` | Fetch title and description from a URL |
+| `GET` | `/api/weather/{slug}` | Fetch weather data for a page's location |
+| `PUT` | `/api/location/{slug}` | Update the location for a page |
 | `GET` | `/api/events` | Server-Sent Events stream for live updates |
 
 ### Example: add a bookmark
@@ -166,26 +182,28 @@ homepage-md/
       parser.js           # Markdown → structured data
       favicon.js          # Favicon resolution chain (SSRF-protected)
       renderer.js         # HTML page generation
-      writer.js           # Markdown write-back (add/remove/update)
+      writer.js           # Markdown write-back (add/edit/delete, location update)
       auth.js             # Optional AUTH_TOKEN middleware
       metadata.js         # Page title/description fetcher
+      weather.js          # Weather data (Open-Meteo, NWS, AQI, astronomy)
     public/
       styles/
         main.css          # App styles (cascade layers, Piccalilli reset)
       scripts/
-        app.js            # Client: search, keyboard nav, view modes, CRUD
+        app.js            # Client: search, keyboard nav, view modes, CRUD, weather, speed test
   bookmarks/
     homepage.md           # Default bookmarks file (household example)
   icons/                  # Manual favicon overrides
   favicon-cache/          # Auto-fetched cached icons (Docker volume)
   custom.css              # User style overrides
+  footer.md               # Footer content (Markdown)
   test/
     server/
-      parser.test.js      # 15 tests
-      favicon.test.js     # 19 tests
-      renderer.test.js    # 27 tests
-      writer.test.js      # 19 tests
-      auth.test.js        # 8 tests
+      parser.test.js      # Markdown parser tests
+      favicon.test.js     # Favicon resolution tests
+      renderer.test.js    # HTML rendering tests
+      writer.test.js      # Write-back tests
+      auth.test.js        # Authentication tests
     fixtures/
       valid.md
       malformed.md
@@ -239,29 +257,16 @@ Sync only the `bookmarks/` and `icons/` directories to family devices via Sync.c
 
 ## Accessibility
 
-- Semantic HTML: proper `h1` → `h2` → `h3` heading hierarchy
-- `aria-labelledby` on every category and subcategory section
-- `role="list"` on bookmark lists (preserved despite CSS resets)
-- Skip-to-content link as the first focusable element
-- `aria-live="polite"` region announces search results to screen readers
-- `:focus-visible` focus indicators on all interactive elements
-- Roving `tabindex` — 1 tab stop per bookmark, arrow keys for edit/delete
-- `prefers-reduced-motion` — animations only when the user hasn't opted out
-- `prefers-color-scheme` — automatic dark mode
-- Minimum target size (WCAG 2.5.8) on all buttons and links
-- CSS cascade layers for predictable specificity
-- Piccalilli modern CSS reset as foundation
+HomepageMD is designed to work well for everyone, including people who use screen readers, keyboard-only navigation, or other assistive technologies.
 
-## Roadmap
-
-- [x] **v0.1** — Read and render
-- [x] **v0.2** — Search, keyboard navigation, skip-to-content
-- [x] **v0.3** — Add/edit/delete through the web UI, auth, metadata fetch
-- [ ] **v0.4** — Drag-and-drop reordering, documentation site
-- [ ] Browser extension — save to dashboard with one click
-- [ ] Per-page access control — share individual pages publicly
-- [ ] Tags in addition to categories
-- [ ] Import from browser bookmark format (Netscape HTML)
+- **Keyboard accessible** — every feature works without a mouse. A single tab stop per bookmark keeps navigation fast; arrow keys reveal edit and delete actions. Press `/` to jump to search and `?` for the full shortcut list.
+- **Screen reader friendly** — headings, sections, and lists are structured so screen readers can navigate and announce content clearly. Search results are announced as they update.
+- **Skip to content** — a skip link appears on focus so keyboard users can bypass the header.
+- **Focus indicators** — all interactive elements have visible focus outlines.
+- **Reduced motion** — animations are suppressed when the operating system preference is set.
+- **Dark mode** — respects the system color scheme preference.
+- **Target sizes** — buttons and links meet minimum touch and pointer target sizes.
+- **Reviewed against WCAG 2.2** — built with Level AA conformance as the goal.
 
 ## License
 
