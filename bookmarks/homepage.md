@@ -15,7 +15,7 @@
   - subtitle: Hark, a subtitle!
 
 - [Weather](https://www.weather.gov)
-  - description: National Weather Service forecasts
+  - description: NWS forecasts
 - [Google Calendar](https://calendar.google.com)
   - description: Shared family calendar
 - [Todoist](https://www.todoist.com/)
@@ -29,7 +29,6 @@
   - description: Family credential manager
 - [You Need A Budget](https://app.ynab.com)
   - description: Family budgeting
-
 ### Storage
   - icon: hard-drive
 - [Obsidian](https://obsidian.md/auth)
