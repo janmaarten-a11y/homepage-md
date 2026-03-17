@@ -309,7 +309,7 @@ document.addEventListener('keydown', (event) => {
   const focusable = [
     card.querySelector('.c-bookmark__link'),
     card.querySelector('.js-edit-open'),
-    card.querySelector('.js-delete'),
+    card.querySelector('.js-copy-url'),
   ].filter(Boolean);
 
   const currentIdx = focusable.indexOf(event.target);
@@ -528,7 +528,40 @@ if (editForm) {
 }
 
 // ---------------------------------------------------------------------------
-// Delete bookmark (modal dialog instead of confirm())
+// Copy bookmark URL to clipboard
+// ---------------------------------------------------------------------------
+
+document.addEventListener('click', (event) => {
+  const copyBtn = event.target.closest('.js-copy-url');
+  if (!copyBtn) return;
+
+  const card = copyBtn.closest('.c-bookmark');
+  if (!card) return;
+
+  const url = card.dataset.url || '';
+  navigator.clipboard.writeText(url).then(() => {
+    const origLabel = copyBtn.getAttribute('aria-label');
+    const origHTML = copyBtn.innerHTML;
+
+    // Swap to check icon + green color
+    const checkIcon = pageData.weatherIcons?.['clipboard-check'];
+    if (checkIcon) copyBtn.innerHTML = checkIcon;
+    copyBtn.style.color = 'oklch(55% 0.2 145)';
+    copyBtn.setAttribute('aria-label', 'Copied!');
+
+    setTimeout(() => {
+      copyBtn.innerHTML = origHTML;
+      copyBtn.style.color = '';
+      copyBtn.setAttribute('aria-label', origLabel);
+      if (document.activeElement === copyBtn || document.activeElement === document.body) {
+        copyBtn.focus();
+      }
+    }, 1500);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Delete bookmark (modal dialog)
 // ---------------------------------------------------------------------------
 
 const deleteDialog = document.querySelector('.js-delete-dialog');
@@ -543,21 +576,18 @@ for (const btn of deleteCancelBtn) {
 }
 
 document.addEventListener('click', (event) => {
-  const deleteBtn = event.target.closest('.js-delete');
+  const deleteBtn = event.target.closest('.js-edit-delete');
   if (!deleteBtn) return;
+  if (!editDialog || !deleteDialog) return;
 
-  const card = deleteBtn.closest('.c-bookmark');
-  if (!card || !deleteDialog) return;
-
-  const url = card.dataset.url || '';
-  const titleEl = card.querySelector('.c-bookmark__title');
-  const title = titleEl?.textContent || url;
+  const url = editOriginalUrl.value;
+  const title = editTitle.value || url;
 
   deleteMessage.textContent = `Are you sure you want to delete "${title}"?`;
   deleteUrlInput.value = url;
   clearError(deleteError);
-  const bookmarkLink = card.querySelector('.c-bookmark__link');
-  openDialog(deleteDialog, bookmarkLink, deleteBtn);
+  editDialog.close();
+  openDialog(deleteDialog, null, deleteBtn);
 });
 
 if (deleteConfirmBtn) {
@@ -765,7 +795,12 @@ function saveViewPrefs(prefs) {
 
 function applyView(prefs) {
   document.body.classList.toggle('is-condensed', prefs.density === 'condensed');
-  document.body.classList.toggle('is-columns', prefs.layout === 'columns');
+
+  // Layout — remove all, then add the active one
+  document.body.classList.remove('is-columns', 'is-list');
+  if (prefs.layout !== 'grid') {
+    document.body.classList.add(`is-${prefs.layout}`);
+  }
 
   // Color mode
   document.body.classList.remove('is-light', 'is-dark');

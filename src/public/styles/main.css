@@ -922,7 +922,12 @@
     border-block-end: 1px solid var(--color-border);
   }
 
-  .c-category > h2 {
+  /* Section header wrapper — transparent by default, inline in condensed list */
+  .c-section__header {
+    display: contents;
+  }
+
+  .c-category h2 {
     display: flex;
     align-items: center;
     gap: var(--space-xs);
@@ -954,7 +959,7 @@
     margin-block-start: var(--space-m);
   }
 
-  .c-subcategory > h3 {
+  .c-subcategory h3 {
     display: flex;
     align-items: center;
     gap: var(--space-xs);
@@ -998,6 +1003,11 @@
     display: flex;
     align-items: start;
     gap: var(--space-s);
+  }
+
+  .c-bookmark__content {
+    flex: 1;
+    min-width: 0;
   }
 
   .c-bookmark__link {
@@ -1048,6 +1058,7 @@
     font-size: .875rem;
     color: var(--color-muted);
     padding-inline-start: calc(2rem + var(--space-s));
+    padding-block-start: var(--space-s);
     max-inline-size: 70ch;
   }
 
@@ -1220,6 +1231,10 @@
     justify-content: flex-end;
   }
 
+  .c-dialog__actions--split {
+    justify-content: space-between;
+  }
+
   /* Combobox */
   .c-combobox {
     position: relative;
@@ -1380,6 +1395,20 @@
     margin-inline-start: auto;
   }
 
+  .is-condensed .c-category h2 {
+    font-size: 1.25rem;
+  }
+
+  .is-condensed .c-subcategory h3 {
+    font-size: 1rem;
+  }
+
+  /* Condensed + Rows — narrower cards to fit more per row */
+  .is-condensed .c-bookmark-list[role="list"] {
+    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+    gap: var(--space-s);
+  }
+
   /* Columns layout — single grid shared by direct bookmarks (via subgrid) and subcategories */
   .is-columns .c-category {
     display: grid;
@@ -1388,12 +1417,12 @@
     align-items: start;
   }
 
-  .is-columns .c-category > h2 {
+  .is-columns .c-category h2 {
     grid-column: 1 / -1;
     margin-block-end: 0;
   }
 
-  .is-columns .c-category > .c-category__subtitle {
+  .is-columns .c-category .c-category__subtitle {
     grid-column: 1 / -1;
     margin-block-end: 0;
   }
@@ -1410,12 +1439,12 @@
     flex-direction: column;
   }
 
-  .is-columns .c-subcategory > h3 {
+  .is-columns .c-subcategory h3 {
     margin-block-end: var(--space-m);
     margin-block-start: var(--space-m);
   }
 
-  .is-columns .c-subcategory > .c-subcategory__subtitle {
+  .is-columns .c-subcategory .c-subcategory__subtitle {
     display: none;
   }
 
@@ -1428,6 +1457,195 @@
 
   .is-columns .c-subcategory .c-bookmark__description {
     display: none;
+  }
+
+  /* URL display — hidden by default, shown in list and table views */
+  .c-bookmark__url {
+    display: none;
+  }
+
+  /* -----------------------------------------------------------------------
+   * List view — full-width rows, favicon + title + URL + description inline
+   * ----------------------------------------------------------------------- */
+  .is-list .c-bookmark-list[role="list"] {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .is-list .c-bookmark {
+    flex-direction: row;
+    align-items: center;
+    border-radius: 0;
+    box-shadow: none;
+    border-inline: none;
+    border-block-start: none;
+    border-block-end: 1px solid var(--color-border);
+    border-inline-start: 3px solid transparent;
+    padding: var(--space-s) var(--space-m);
+  }
+
+  .is-list .c-bookmark__header {
+    flex: 1;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .is-list .c-bookmark__content {
+    display: inline;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .is-list .c-bookmark__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    vertical-align: middle;
+  }
+
+  .is-list .c-bookmark__description {
+    display: inline;
+    vertical-align: middle;
+    color: var(--color-muted);
+    font-size: 0.875rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+
+    &::before {
+      content: " — ";
+    }
+  }
+
+  .is-list .c-bookmark__actions {
+    flex-shrink: 0;
+  }
+
+  .is-list .c-bookmark__icon {
+    inline-size: 2rem;
+    block-size: 2rem;
+    flex-shrink: 0;
+  }
+
+  .is-list .c-bookmark__title {
+    white-space: nowrap;
+  }
+
+  .is-list .c-bookmark__url {
+    display: inline;
+    color: var(--color-muted);
+    font-size: 0.875rem;
+    white-space: nowrap;
+
+    &::before {
+      content: " · ";
+    }
+  }
+
+  .is-list .c-bookmark__description {
+    color: var(--color-muted);
+    font-size: 0.875rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin: 0;
+    padding: 0;
+
+    &::before {
+      content: " — ";
+    }
+  }
+
+  /* List view focus — inset outline to avoid overlap between adjacent rows */
+  .is-list .c-bookmark:has(.c-bookmark__link:focus-visible) {
+    outline-offset: -2px;
+    border-radius: 0;
+  }
+
+  /* List hover */
+  .is-list .c-bookmark:hover {
+    border-inline-start: 3px solid var(--color-primary);
+  }
+
+  /* List focus-visible — show title in link-hover style (blue + underline) */
+  .is-list .c-bookmark:has(.c-bookmark__link:focus-visible) .c-bookmark__title {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    color: var(--color-primary);
+  }
+
+  /* Condensed + List — smaller icons, less padding, stable row height */
+  .is-condensed.is-list .c-bookmark {
+    padding: var(--space-xs) var(--space-m);
+    min-block-size: 2.5rem;
+  }
+
+  .is-condensed.is-list .c-bookmark__icon {
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+  }
+
+  .is-condensed.is-list .c-bookmark__description {
+    display: inline;
+  }
+
+  /* Condensed + List — headings and subtitles inline */
+  .is-condensed:not(.is-columns) .c-section__header {
+    display: block;
+    margin-block-end: var(--space-s);
+  }
+
+  .is-condensed:not(.is-columns) .c-section__header h2,
+  .is-condensed:not(.is-columns) .c-section__header h3 {
+    display: inline;
+  }
+
+  .is-condensed:not(.is-columns) .c-section__header h3 {
+    font-weight: 600;
+  }
+
+  .is-condensed:not(.is-columns) .c-category__subtitle,
+  .is-condensed:not(.is-columns) .c-subcategory__subtitle {
+    display: inline;
+    margin: 0;
+    font-size: inherit;
+
+    &::before {
+      content: " — ";
+      color: var(--color-muted);
+    }
+  }
+
+  /* Condensed + Columns — tighter columns, smaller cards for more density */
+  .is-condensed.is-columns .c-category {
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: var(--space-s);
+  }
+
+  .is-condensed.is-columns .c-bookmark {
+    padding: var(--space-s);
+    border-radius: var(--radius-m);
+    box-shadow: none;
+  }
+
+  .is-condensed.is-columns .c-bookmark__icon {
+    inline-size: 1.25rem;
+    block-size: 1.25rem;
+  }
+
+  .is-condensed.is-columns .c-bookmark__title {
+    font-size: 0.875rem;
+  }
+
+  .is-condensed.is-columns .c-category {
+    padding-block: var(--space-m);
+    padding-inline: var(--space-m);
   }
 
   /* Toolbar — toggle button groups (inside view popover) */

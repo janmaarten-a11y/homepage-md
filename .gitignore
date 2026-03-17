@@ -4,3 +4,6 @@ favicon-cache/
 .DS_Store
 Thumbs.db
 .env
+bookmarks/family.md
+.vscode/settings.json
+.github/

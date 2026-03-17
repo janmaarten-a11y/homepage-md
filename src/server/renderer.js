@@ -147,7 +147,8 @@ ${addDialog}
         Icon URL <span class="c-dialog__hint">(optional)</span>
         <input type="url" name="icon" class="c-dialog__input js-edit-icon" placeholder="https://…">
       </label>
-      <div class="c-dialog__actions">
+      <div class="c-dialog__actions c-dialog__actions--split">
+        <button type="button" class="c-btn c-btn--danger js-edit-delete">Delete</button>
         <button type="submit" class="c-btn c-btn--primary">Save</button>
       </div>
     </form>
@@ -188,8 +189,9 @@ function renderSearch() {
 }
 
 function renderToolbar() {
-  const iconGrid = _uiIcons['grid-2x2'] || '&#9638;';
+  const iconRows = _uiIcons['rows-3'] || '&#9638;';
   const iconColumns = _uiIcons['columns-3'] || '&#9638;';
+  const iconList = _uiIcons['list'] || '&#9776;';
   const iconDetailed = _uiIcons['list-chevrons-up-down'] || '&#9776;';
   const iconCondensed = _uiIcons['list-chevrons-down-up'] || '&#9776;';
   const iconSun = _uiIcons['sun'] || '&#9728;';
@@ -198,8 +200,9 @@ function renderToolbar() {
 
   return `      <div class="c-toolbar" role="toolbar" aria-label="View options">
         <div class="c-toolbar__group" role="group" aria-label="Layout">
-          <button type="button" class="c-toolbar__btn js-layout-btn" data-value="grid" aria-pressed="true" title="Grid layout">${iconGrid} <span class="c-toolbar__label">Grid</span></button>
           <button type="button" class="c-toolbar__btn js-layout-btn" data-value="columns" aria-pressed="false" title="Columns layout">${iconColumns} <span class="c-toolbar__label">Columns</span></button>
+          <button type="button" class="c-toolbar__btn js-layout-btn" data-value="grid" aria-pressed="true" title="Rows layout">${iconRows} <span class="c-toolbar__label">Rows</span></button>
+          <button type="button" class="c-toolbar__btn js-layout-btn" data-value="list" aria-pressed="false" title="List layout">${iconList} <span class="c-toolbar__label">List</span></button>
         </div>
         <div class="c-toolbar__separator" aria-hidden="true"></div>
         <div class="c-toolbar__group" role="group" aria-label="Density">
@@ -381,7 +384,9 @@ ${category.bookmarks.map((b) => renderBookmark(b, faviconUrls, category.name, nu
   const icon = renderHeadingIcon(category.id, categoryIcons);
 
   return `    <section class="c-category" aria-labelledby="${escapeAttr(category.id)}">
-      <h2 id="${escapeAttr(category.id)}">${icon}${escapeHtml(category.name)}</h2>${subtitle}
+      <div class="c-section__header">
+        <h2 id="${escapeAttr(category.id)}">${icon}${escapeHtml(category.name)}</h2>${subtitle}
+      </div>
 ${directBookmarks}
 ${subcategories}
     </section>`;
@@ -395,7 +400,9 @@ function renderSubcategory(subcategory, faviconUrls, categoryName, categoryIcons
   const icon = renderHeadingIcon(subcategory.id, categoryIcons);
 
   return `      <section class="c-subcategory" aria-labelledby="${escapeAttr(subcategory.id)}">
-        <h3 id="${escapeAttr(subcategory.id)}">${icon}${escapeHtml(subcategory.name)}</h3>${subtitle}
+        <div class="c-section__header">
+          <h3 id="${escapeAttr(subcategory.id)}">${icon}${escapeHtml(subcategory.name)}</h3>${subtitle}
+        </div>
         <ul class="c-bookmark-list" role="list">
 ${subcategory.bookmarks.map((b) => renderBookmark(b, faviconUrls, categoryName, subcategory.name)).join('\n')}
         </ul>
@@ -414,19 +421,25 @@ function renderBookmark(bookmark, faviconUrls, categoryName, subcategoryName) {
   const subData = subcategoryName ? ` data-subcategory="${escapeAttr(subcategoryName)}"` : '';
 
   const ICON_EDIT = _uiIcons['pencil'] || '&#9998;';
-  const ICON_DELETE = _uiIcons['trash-2'] || '&#128465;';
+  const ICON_COPY = _uiIcons['copy'] || '&#128203;';
+
+  let displayUrl;
+  try { displayUrl = new URL(bookmark.url).hostname; } catch { displayUrl = bookmark.url; }
 
   return `          <li class="c-bookmark" data-search="${escapeAttr(searchText.toLowerCase())}" data-url="${escapeAttr(bookmark.url)}"${iconData}${catData}${subData} aria-roledescription="bookmark, use arrow keys for actions">
             <div class="c-bookmark__header">
-              <a href="${escapeAttr(bookmark.url)}" class="c-bookmark__link">
-                <img src="${escapeAttr(faviconUrl)}" alt="" class="c-bookmark__icon" loading="lazy" width="32" height="32">
-                <span class="c-bookmark__title">${escapeHtml(bookmark.title)}</span>
-              </a>
+              <div class="c-bookmark__content">
+                <a href="${escapeAttr(bookmark.url)}" class="c-bookmark__link">
+                  <img src="${escapeAttr(faviconUrl)}" alt="" class="c-bookmark__icon" loading="lazy" width="32" height="32">
+                  <span class="c-bookmark__title">${escapeHtml(bookmark.title)}</span>
+                  <span class="c-bookmark__url">${escapeHtml(displayUrl)}</span>
+                </a>${description}
+              </div>
               <div class="c-bookmark__actions">
                 <button type="button" class="c-btn c-btn--icon js-edit-open" aria-label="Edit ${escapeAttr(bookmark.title)}" tabindex="-1">${ICON_EDIT}</button>
-                <button type="button" class="c-btn c-btn--icon c-btn--danger js-delete" aria-label="Delete ${escapeAttr(bookmark.title)}" tabindex="-1">${ICON_DELETE}</button>
+                <button type="button" class="c-btn c-btn--icon js-copy-url" aria-label="Copy URL for ${escapeAttr(bookmark.title)}" tabindex="-1">${ICON_COPY}</button>
               </div>
-            </div>${description}
+            </div>
           </li>`;
 }
 
