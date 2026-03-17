@@ -540,9 +540,20 @@ document.addEventListener('click', (event) => {
 
   const url = card.dataset.url || '';
   navigator.clipboard.writeText(url).then(() => {
-    const label = copyBtn.getAttribute('aria-label');
+    const origLabel = copyBtn.getAttribute('aria-label');
+    const origHTML = copyBtn.innerHTML;
+
+    // Swap to check icon + green color
+    const checkIcon = pageData.weatherIcons?.['copy-check'];
+    if (checkIcon) copyBtn.innerHTML = checkIcon;
+    copyBtn.style.color = 'oklch(55% 0.2 145)';
     copyBtn.setAttribute('aria-label', 'Copied!');
-    setTimeout(() => copyBtn.setAttribute('aria-label', label), 1500);
+
+    setTimeout(() => {
+      copyBtn.innerHTML = origHTML;
+      copyBtn.style.color = '';
+      copyBtn.setAttribute('aria-label', origLabel);
+    }, 1500);
   });
 });
 

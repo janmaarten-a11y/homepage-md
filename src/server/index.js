@@ -16,7 +16,7 @@ const WEATHER_ICON_NAMES = [
   'sun', 'cloud-sun', 'cloud', 'cloud-fog', 'cloud-drizzle', 'cloud-rain',
   'snowflake', 'cloud-snow', 'cloud-lightning', 'thermometer', 'arrow-up-down',
   'wind', 'haze', 'moon', 'sunrise', 'sunset', 'eclipse', 'moon-star',
-  'signal', 'triangle-alert', 'pencil',
+  'signal', 'triangle-alert', 'pencil', 'copy-check',
 ];
 
 /** Lucide icon names used in the server-rendered UI. */
