@@ -552,7 +552,7 @@ document.addEventListener('click', (event) => {
     const origHTML = copyBtn.innerHTML;
 
     // Swap to check icon + green color
-    const checkIcon = pageData.weatherIcons?.['copy-check'];
+    const checkIcon = pageData.weatherIcons?.['clipboard-check'];
     if (checkIcon) copyBtn.innerHTML = checkIcon;
     copyBtn.style.color = 'oklch(55% 0.2 145)';
     copyBtn.setAttribute('aria-label', 'Copied!');
@@ -561,6 +561,9 @@ document.addEventListener('click', (event) => {
       copyBtn.innerHTML = origHTML;
       copyBtn.style.color = '';
       copyBtn.setAttribute('aria-label', origLabel);
+      if (document.activeElement === copyBtn || document.activeElement === document.body) {
+        copyBtn.focus();
+      }
     }, 1500);
   });
 });
