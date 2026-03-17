@@ -427,12 +427,12 @@ function renderBookmark(bookmark, faviconUrls, categoryName, subcategoryName) {
                 <img src="${escapeAttr(faviconUrl)}" alt="" class="c-bookmark__icon" loading="lazy" width="32" height="32">
                 <span class="c-bookmark__title">${escapeHtml(bookmark.title)}</span>
                 <span class="c-bookmark__url">${escapeHtml(displayUrl)}</span>
-              </a>
+              </a>${description}
               <div class="c-bookmark__actions">
                 <button type="button" class="c-btn c-btn--icon js-edit-open" aria-label="Edit ${escapeAttr(bookmark.title)}" tabindex="-1">${ICON_EDIT}</button>
                 <button type="button" class="c-btn c-btn--icon c-btn--danger js-delete" aria-label="Delete ${escapeAttr(bookmark.title)}" tabindex="-1">${ICON_DELETE}</button>
               </div>
-            </div>${description}
+            </div>
           </li>`;
 }
 
