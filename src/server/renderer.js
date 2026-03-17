@@ -151,7 +151,7 @@ ${addDialog}
   </dialog>
 ${deleteDialog}
 ${keyboardHelp}
-  <script id="js-page-data" type="application/json">${JSON.stringify({ categories, subcategories: subcategoryPairs })}</script>
+  <script id="js-page-data" type="application/json">${JSON.stringify({ categories, subcategories: subcategoryPairs, bangs: pageData.bangs || [] })}</script>
   <script src="/scripts/app.js" type="module"></script>
 </body>
 </html>`;
@@ -164,6 +164,7 @@ function renderSearch() {
         <input type="search" id="js-search" class="c-search__input" placeholder="Search bookmarks…" autocomplete="off">
         <kbd class="c-search__shortcut" aria-hidden="true">/</kbd>
       </div>
+      <p class="c-search__bang-hint js-bang-hint" hidden aria-live="polite"></p>
     </search>`;
 }
 

@@ -798,6 +798,18 @@
     line-height: 1.4;
   }
 
+  /* Search bang hint */
+  .c-search__bang-hint {
+    margin: var(--space-xs) 0 0;
+    font-size: 1rem;
+    color: var(--color-primary);
+    font-weight: 500;
+  }
+
+  .c-search__bang-hint[hidden] {
+    display: none;
+  }
+
   /* Search empty state */
   .c-search-empty {
     padding-block: var(--space-xl);

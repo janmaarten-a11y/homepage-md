@@ -96,11 +96,63 @@ evtSource.addEventListener('message', (event) => {
 const searchInput = document.getElementById('js-search');
 const searchEmpty = document.querySelector('.js-search-empty');
 const searchStatus = document.getElementById('js-search-status');
+const bangHint = document.querySelector('.js-bang-hint');
 const bookmarks = document.querySelectorAll('.c-bookmark');
 const categories = document.querySelectorAll('.c-category');
 const subcategories = document.querySelectorAll('.c-subcategory');
 
 let debounceTimer;
+let activeBang = null;
+
+// Load bangs from page data
+const allBangs = (pageData.bangs || []).reduce((map, b) => {
+  map[b.prefix.toLowerCase()] = b;
+  return map;
+}, {});
+
+/**
+ * Check if the search value starts with a bang prefix.
+ * Returns { bang, query } or null.
+ */
+function matchBang(value) {
+  const trimmed = value.trim();
+  if (!trimmed.startsWith('!')) return null;
+
+  // Try to match "!prefix rest of query"
+  const spaceIdx = trimmed.indexOf(' ');
+  const prefix = spaceIdx > 0 ? trimmed.substring(0, spaceIdx) : trimmed;
+  const query = spaceIdx > 0 ? trimmed.substring(spaceIdx + 1).trim() : '';
+  const bang = allBangs[prefix.toLowerCase()];
+
+  return bang ? { bang, query, prefix } : null;
+}
+
+function showBangHint(prefix, bang, query) {
+  if (!bangHint) return;
+  const name = extractBangName(bang.url);
+  if (query) {
+    bangHint.textContent = `Press Enter to search ${name} for "${query}"`;
+  } else {
+    bangHint.textContent = `${prefix} \u2192 ${name} \u2014 type your search query`;
+  }
+  bangHint.hidden = false;
+}
+
+function hideBangHint() {
+  if (!bangHint) return;
+  bangHint.textContent = '';
+  bangHint.hidden = true;
+}
+
+function extractBangName(url) {
+  try {
+    const host = new URL(url).hostname.replace('www.', '');
+    // Capitalize first letter
+    return host.charAt(0).toUpperCase() + host.slice(1);
+  } catch {
+    return 'the web';
+  }
+}
 
 function filterBookmarks(query) {
   const term = query.toLowerCase().trim();
@@ -141,7 +193,35 @@ function filterBookmarks(query) {
 if (searchInput) {
   searchInput.addEventListener('input', () => {
     clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => filterBookmarks(searchInput.value), 100);
+    const match = matchBang(searchInput.value);
+
+    if (match) {
+      // Bang detected — freeze bookmark filtering, show hint
+      activeBang = match;
+      hideBangHint();
+      showBangHint(match.prefix, match.bang, match.query);
+      searchEmpty.hidden = true;
+      searchStatus.textContent = '';
+    } else {
+      // Normal bookmark search
+      activeBang = null;
+      hideBangHint();
+      debounceTimer = setTimeout(() => filterBookmarks(searchInput.value), 100);
+    }
+  });
+
+  // Enter key: if a bang is active and there's a query, redirect
+  searchInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && activeBang && activeBang.query) {
+      event.preventDefault();
+      const url = activeBang.bang.url.replace('%s', encodeURIComponent(activeBang.query));
+      window.open(url, '_blank', 'noopener');
+      // Clear the search after redirect
+      searchInput.value = '';
+      activeBang = null;
+      hideBangHint();
+      filterBookmarks('');
+    }
   });
 }
 
