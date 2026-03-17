@@ -931,25 +931,40 @@ ${data.alerts.map((a) => `      <li>${escapeText(a.text)}</li>`).join('\n')}
     ? nwsHtml + derivedHtml
     : `<p class="c-weather-panel__no-alerts">No notable weather changes expected.</p>`;
 
-  // Full moon hero
-  const fullMoonText = data.moon.daysToFullMoon === 0
-    ? 'Tonight!'
-    : `${escapeText(data.moon.nextFullMoon)}`;
-  const daysLabel = data.moon.daysToFullMoon === 0
-    ? ''
-    : `<span class="c-weather-panel__astro-sub">in ${data.moon.daysToFullMoon} days</span>`;
-
-  const moonHero = data.moon
-    ? `<div class="c-weather-panel__moon-hero">
+  // Moon hero — conditional display for full moon vs. upcoming
+  let moonHero = '';
+  if (data.moon) {
+    if (data.moon.isFullMoon) {
+      // It's a full moon now — celebrate it
+      moonHero = `<div class="c-weather-panel__moon-hero">
+        <p class="c-weather-panel__moon-label">\uD83C\uDF15 ${escapeText(data.moon.fullMoonName || 'Full Moon')} tonight!</p>
+        <p class="c-weather-panel__moon-date">${data.moon.emoji} ${data.moon.illumination}% illuminated</p>
+        <p class="c-weather-panel__astro-line">Next new moon \u2014 ${escapeText(data.moon.nextNewMoon)} (in ${data.moon.daysToNewMoon} days)</p>
+      </div>`;
+    } else {
+      const fullMoonText = `${escapeText(data.moon.nextFullMoon)}`;
+      const daysLabel = `<span class="c-weather-panel__astro-sub">in ${data.moon.daysToFullMoon} days</span>`;
+      moonHero = `<div class="c-weather-panel__moon-hero">
         <p class="c-weather-panel__moon-label">Next full moon \u2014 ${escapeText(data.moon.fullMoonName || 'Full Moon')}</p>
         <p class="c-weather-panel__moon-date">\uD83C\uDF15 ${fullMoonText} ${daysLabel}</p>
         <p class="c-weather-panel__astro-line">${data.moon.emoji} ${escapeText(data.moon.phase)}, ${data.moon.illumination}% illuminated</p>
-      </div>`
-    : '';
+      </div>`;
+    }
+  }
 
   // Sun times
   const sunLine = data.today.sunrise && data.today.sunset
     ? `<p class="c-weather-panel__astro-line">\u2600\uFE0F Sunrise ${data.today.sunrise} \u00B7 \uD83C\uDF05 Sunset ${data.today.sunset}</p>`
+    : '';
+
+  // Eclipse
+  const eclipseLine = data.eclipse
+    ? `<p class="c-weather-panel__astro-line">${data.eclipse.emoji} Next eclipse \u2014 <a href="${escapeText(data.eclipse.url)}" rel="noopener">${escapeText(data.eclipse.type)}, ${escapeText(data.eclipse.date)}</a></p>`
+    : '';
+
+  // Aurora
+  const auroraLine = data.aurora?.possible
+    ? `<p class="c-weather-panel__astro-line c-weather-panel__aurora">\uD83C\uDF0C Aurora possible${data.aurora.hoursAway > 0 ? ` in ~${data.aurora.hoursAway}h` : ''} (Kp ${data.aurora.kp}) \u2014 <a href="${escapeText(data.aurora.url)}" rel="noopener">Forecast</a></p>`
     : '';
 
   // Tomorrow
@@ -982,6 +997,8 @@ ${alertsHtml}`;
       <div class="c-weather-panel__astro-section">
 ${moonHero}
 ${sunLine}
+${eclipseLine}
+${auroraLine}
       </div>
 ${tomorrowHtml}
     </div>`;
