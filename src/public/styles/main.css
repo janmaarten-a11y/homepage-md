@@ -749,6 +749,7 @@
   /* Search */
   .c-search {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
   }
 
@@ -804,6 +805,7 @@
     font-size: 1rem;
     color: var(--color-primary);
     font-weight: 500;
+    inline-size: 100%;
   }
 
   .c-search__bang-hint[hidden] {
