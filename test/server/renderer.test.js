@@ -92,7 +92,7 @@ describe('renderPage', () => {
   it('renders the page title in the heading and document title', () => {
     const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
     assert.ok(html.includes('<h1 class="c-header__title">Test Page</h1>'));
-    assert.ok(html.includes('<title>Test Page — HomepageMD</title>'));
+    assert.ok(html.includes('<title>Test Page — homepage.md</title>'));
   });
 
   it('renders categories with aria-labelledby', () => {
