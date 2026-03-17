@@ -1581,11 +1581,16 @@
   /* Condensed + List — headings and subtitles inline */
   .is-condensed.is-list .c-section__header {
     display: inline;
+    padding-block-end: var(--space-s);
   }
 
   .is-condensed.is-list .c-section__header h2,
   .is-condensed.is-list .c-section__header h3 {
     display: inline;
+  }
+
+  .is-condensed.is-list .c-section__header h3 {
+    font-weight: 600;
   }
 
   .is-condensed.is-list .c-category__subtitle,
