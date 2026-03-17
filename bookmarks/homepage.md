@@ -11,6 +11,7 @@
 > Your household dashboard for bookmarks, weather, and quick searches.
 
 ## Today
+  - icon: sun
   - subtitle: Seize the thing!
 
 - [Weather](https://www.weather.gov)
@@ -22,7 +23,7 @@
 
 
 ## Home
-
+  - icon: home
 
 - [1Password](https://my.1password.com)
   - description: Family credential manager
@@ -70,6 +71,7 @@
 - [Instacart](https://instacart.com)
 
 ## Media
+  - icon: clapperboard
   - subtitle: Steaming and reading for the whole family
   
 ### Video
@@ -96,5 +98,6 @@
 - [Steam](https://store.steampowered.com/)
 
 ## Travel
+  - icon: plane
 
 - [HERE WeGo](https://wego.here.com)

@@ -15,12 +15,12 @@
  * @param {object} options.faviconUrls - Map of bookmark URL → resolved favicon path
  * @returns {string} Complete HTML document
  */
-export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultPage, footerContent }) {
+export function renderPage(pageData, { pages, currentSlug, faviconUrls, categoryIcons = {}, defaultPage, footerContent }) {
   const title = pageData.title || 'HomepageMD';
   const hasLocation = !!pageData.location;
   const nav = renderNav(pages, currentSlug, defaultPage);
   const tocPopover = renderTocPopover(pageData.categories);
-  const main = renderMain(pageData, faviconUrls);
+  const main = renderMain(pageData, faviconUrls, categoryIcons);
   const categories = pageData.categories.map((c) => c.name);
   const subcategoryPairs = pageData.categories.flatMap((c) =>
     c.subcategories.map((s) => ({ category: c.name, subcategory: s.name }))
@@ -338,9 +338,9 @@ ${links}
     </nav>`;
 }
 
-function renderMain(pageData, faviconUrls) {
+function renderMain(pageData, faviconUrls, categoryIcons) {
   const welcome = pageData.welcome ? renderWelcome(pageData.welcome) : '';
-  const categories = pageData.categories.map((category) => renderCategory(category, faviconUrls)).join('\n');
+  const categories = pageData.categories.map((category) => renderCategory(category, faviconUrls, categoryIcons)).join('\n');
   return welcome + categories;
 }
 
@@ -355,7 +355,13 @@ function renderWelcome(welcome) {
     </section>\n`;
 }
 
-function renderCategory(category, faviconUrls) {
+function renderHeadingIcon(sectionId, categoryIcons) {
+  const svg = categoryIcons[sectionId];
+  if (!svg) return '';
+  return `<span class="c-heading-icon" aria-hidden="true">${svg}</span> `;
+}
+
+function renderCategory(category, faviconUrls, categoryIcons) {
   const directBookmarks = category.bookmarks.length
     ? `      <ul class="c-bookmark-list" role="list">
 ${category.bookmarks.map((b) => renderBookmark(b, faviconUrls, category.name, null)).join('\n')}
@@ -363,27 +369,31 @@ ${category.bookmarks.map((b) => renderBookmark(b, faviconUrls, category.name, nu
     : '';
 
   const subcategories = category.subcategories
-    .map((sub) => renderSubcategory(sub, faviconUrls, category.name))
+    .map((sub) => renderSubcategory(sub, faviconUrls, category.name, categoryIcons))
     .join('\n');
 
   const subtitle = category.subtitle
     ? `\n      <p class="c-category__subtitle">${escapeHtml(category.subtitle)}</p>`
     : '';
 
+  const icon = renderHeadingIcon(category.id, categoryIcons);
+
   return `    <section class="c-category" aria-labelledby="${escapeAttr(category.id)}">
-      <h2 id="${escapeAttr(category.id)}">${escapeHtml(category.name)}</h2>${subtitle}
+      <h2 id="${escapeAttr(category.id)}">${icon}${escapeHtml(category.name)}</h2>${subtitle}
 ${directBookmarks}
 ${subcategories}
     </section>`;
 }
 
-function renderSubcategory(subcategory, faviconUrls, categoryName) {
+function renderSubcategory(subcategory, faviconUrls, categoryName, categoryIcons) {
   const subtitle = subcategory.subtitle
     ? `\n        <p class="c-subcategory__subtitle">${escapeHtml(subcategory.subtitle)}</p>`
     : '';
 
+  const icon = renderHeadingIcon(subcategory.id, categoryIcons);
+
   return `      <section class="c-subcategory" aria-labelledby="${escapeAttr(subcategory.id)}">
-        <h3 id="${escapeAttr(subcategory.id)}">${escapeHtml(subcategory.name)}</h3>${subtitle}
+        <h3 id="${escapeAttr(subcategory.id)}">${icon}${escapeHtml(subcategory.name)}</h3>${subtitle}
         <ul class="c-bookmark-list" role="list">
 ${subcategory.bookmarks.map((b) => renderBookmark(b, faviconUrls, categoryName, subcategory.name)).join('\n')}
         </ul>

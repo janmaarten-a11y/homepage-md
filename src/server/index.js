@@ -9,6 +9,7 @@ import { addBookmark, removeBookmark, updateBookmark, updateLocation } from './w
 import { isAuthenticated, sendUnauthorized } from './auth.js';
 import { fetchMetadata } from './metadata.js';
 import { fetchWeather, clearWeatherCache } from './weather.js';
+import { loadIconIndex, getIcon } from './lucide.js';
 
 const CONTENT_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -135,6 +136,27 @@ async function resolveFavicons(slug, bookmarks) {
   }
 
   faviconCache.set(slug, map);
+  return map;
+}
+
+/**
+ * Resolve Lucide icon SVGs for all categories and subcategories.
+ * Returns a map of section id → SVG markup.
+ */
+async function resolveCategoryIcons(pageData) {
+  const map = {};
+  for (const cat of pageData.categories) {
+    if (cat.icon) {
+      const svg = await getIcon(cat.icon);
+      if (svg) map[cat.id] = svg;
+    }
+    for (const sub of cat.subcategories) {
+      if (sub.icon) {
+        const svg = await getIcon(sub.icon);
+        if (svg) map[sub.id] = svg;
+      }
+    }
+  }
   return map;
 }
 
@@ -616,8 +638,9 @@ async function handleRequest(req, res) {
       const pages = await getPageList();
       const bookmarks = flattenBookmarks(pageData);
       const faviconUrls = await resolveFavicons(slug, bookmarks);
+      const categoryIcons = await resolveCategoryIcons(pageData);
       const footerContent = await loadFooter();
-      const html = renderPage(pageData, { pages, currentSlug: slug, faviconUrls, defaultPage: config.defaultPage, footerContent });
+      const html = renderPage(pageData, { pages, currentSlug: slug, faviconUrls, categoryIcons, defaultPage: config.defaultPage, footerContent });
 
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       res.end(html);
@@ -647,3 +670,4 @@ server.listen(config.port, () => {
 
 startWatcher();
 cleanFaviconCache(config);
+loadIconIndex();

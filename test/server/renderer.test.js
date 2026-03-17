@@ -397,4 +397,18 @@ describe('renderPage', () => {
     const html = renderPage(page, DEFAULT_OPTIONS);
     assert.ok(!html.includes('c-welcome'));
   });
+
+  it('renders a Lucide icon in category heading when provided', () => {
+    const html = renderPage(MINIMAL_PAGE, {
+      ...DEFAULT_OPTIONS,
+      categoryIcons: { 'category-one': '<svg class="test-icon"></svg>' },
+    });
+    assert.ok(html.includes('c-heading-icon'));
+    assert.ok(html.includes('test-icon'));
+  });
+
+  it('does not render heading icon when categoryIcons is empty', () => {
+    const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
+    assert.ok(!html.includes('c-heading-icon'));
+  });
 });

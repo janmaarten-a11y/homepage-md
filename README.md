@@ -24,7 +24,7 @@ A household bookmark dashboard that reads Markdown files and renders them as a c
 - **Docker-ready** — single container, Synology-friendly
 - **Customizable** — override any design token via `custom.css`
 - **Optional auth** — `AUTH_TOKEN` env var protects write endpoints
-- **No dependencies** — zero `node_modules` in production, just Node.js built-ins
+- **No framework** — vanilla Node.js and one dependency: [Lucide](https://lucide.dev) for category icons
 
 ## Quick start
 
@@ -80,9 +80,11 @@ Each `.md` file in the `bookmarks/` directory is a page. The grammar:
 > Your household dashboard for bookmarks and quick searches.
 
 ## Category Name
+  - icon: home
   - subtitle: A short description of this category
 
 ### Subcategory Name
+  - icon: server
   - subtitle: A short description of this subcategory
 
 - [Bookmark Title](https://example.com)
@@ -98,6 +100,7 @@ Each `.md` file in the `bookmarks/` directory is a page. The grammar:
 - `> [!WELCOME] Title` — welcome banner with optional description on subsequent `>` lines
 - `## Heading 2` — category
 - `### Heading 3` — subcategory (within the parent category)
+- `- icon: name` — Lucide icon shown next to a category or subcategory heading (see [lucide.dev/icons](https://lucide.dev/icons))
 - `- subtitle:` — description shown under a category or subcategory heading
 - `- [Title](URL)` — bookmark
 - `- description: text` — description (indented, under a bookmark)
@@ -190,6 +193,7 @@ homepage-md/
       auth.js             # Optional AUTH_TOKEN middleware
       metadata.js         # Page title/description fetcher
       weather.js          # Weather data (Open-Meteo, NWS, AQI, astronomy)
+      lucide.js           # Lucide icon resolver (SVG lookup by name)
     public/
       styles/
         main.css          # App styles (cascade layers, Piccalilli reset)

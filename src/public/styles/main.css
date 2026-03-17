@@ -922,6 +922,17 @@
     margin-inline-end: calc(100% - 80ch);
   }
 
+  /* Heading icons (Lucide SVGs in category/subcategory headings) */
+  .c-heading-icon {
+    display: inline-flex;
+    vertical-align: middle;
+    color: var(--color-muted);
+  }
+
+  .c-heading-icon svg {
+    display: block;
+  }
+
   /* Subcategory sections */
   .c-subcategory {
     margin-block-start: var(--space-m);
