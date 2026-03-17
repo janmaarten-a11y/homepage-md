@@ -11,7 +11,8 @@
 > Your household dashboard for bookmarks, weather, and quick searches.
 
 ## Today
-  - subtitle: Seize the thing!
+  - icon: calendar-1
+  - subtitle: Hark, a subtitle!
 
 - [Weather](https://www.weather.gov)
   - description: National Weather Service forecasts
@@ -22,7 +23,7 @@
 
 
 ## Home
-
+  - icon: home
 
 - [1Password](https://my.1password.com)
   - description: Family credential manager
@@ -30,6 +31,7 @@
   - description: Family budgeting
 
 ### Storage
+  - icon: hard-drive
 - [Obsidian](https://obsidian.md/auth)
   - description: Shared notes vault
 - [Ente Photos](https://web.ente.io)
@@ -38,7 +40,7 @@
   - description: Shared cloud storage
 
 ### Smart Home
-
+  - icon: house-wifi
 - [Home Assistant](http://homeassistant.local:8123)
   - description: Smart home dashboard
   - icon: https://brands.home-assistant.io/homeassistant/icon.png
@@ -48,7 +50,7 @@
 
 ### Home Server
   - subtitle: Admin panels for self-hosted services
-
+   - icon: server
 - [Plex](http://synology.local:32400/web)
   - description: Media server
   - icon: https://app.plex.tv/desktop/favicon.ico
@@ -57,6 +59,7 @@
   - description: Recipe management
 
 ### Networking
+  - icon: network
 - [ASUS Router](https://192.168.1.1)
   - icon: https://www.asus.com/favicon.ico
 - [Mullvad VPN](https://mullvad.net)
@@ -64,16 +67,18 @@
 - [NextDNS](https://my.nextdns.io/)
 
 ### House Subscriptions
+  - icon: calendar-sync
 - [Blue Apron](https://blueapron.com)
   - description: Discover chef-designed meal kits...
 - [Ridwell](https://ridwell.com)
 - [Instacart](https://instacart.com)
 
 ## Media
+  - icon: clapperboard
   - subtitle: Steaming and reading for the whole family
   
 ### Video
-
+  - icon: video
 - [Plex](https://plex.tv)
   - description: Family media library
 - [Apple TV](https://tv.apple.com/)
@@ -82,19 +87,22 @@
   - description: Family streaming account
 
 ### Music
-
+  - icon: music
 - [Qobuz](https://play.qobuz.com/)
   - description: Listen to your music in high quality
 - [Bandcamp](https://bandcamp.com)
   - description: Indie music and merch
 
 ### Audiobooks
+  - icon: book-headphones
 - [Libro.fm](https://libro.fm)
 - [Audiobookshelf](https://www.audiobookshelf.org/)
 
 ### Games
+  - icon: gamepad-2
 - [Steam](https://store.steampowered.com/)
 
 ## Travel
+  - icon: plane
 
 - [HERE WeGo](https://wego.here.com)

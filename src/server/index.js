@@ -9,6 +9,45 @@ import { addBookmark, removeBookmark, updateBookmark, updateLocation } from './w
 import { isAuthenticated, sendUnauthorized } from './auth.js';
 import { fetchMetadata } from './metadata.js';
 import { fetchWeather, clearWeatherCache } from './weather.js';
+import { loadIconIndex, getIcon, getIcons } from './lucide.js';
+
+/** Lucide icon names used in the weather panel (sent to client as 16px). */
+const WEATHER_ICON_NAMES = [
+  'sun', 'cloud-sun', 'cloud', 'cloud-fog', 'cloud-drizzle', 'cloud-rain',
+  'snowflake', 'cloud-snow', 'cloud-lightning', 'thermometer', 'arrow-up-down',
+  'wind', 'haze', 'moon', 'sunrise', 'sunset', 'eclipse', 'moon-star',
+  'signal', 'triangle-alert', 'pencil',
+];
+
+/** Lucide icon names used in the server-rendered UI. */
+const UI_ICON_NAMES_20 = ['menu', 'settings', 'table-of-contents', 'bookmark-plus'];
+const UI_ICON_NAMES_16 = ['grid-2x2', 'columns-3', 'list-chevrons-up-down', 'list-chevrons-down-up', 'sun', 'moon', 'monitor'];
+const UI_ICON_NAMES_14 = ['pencil', 'trash-2'];
+const UI_ICON_NAMES_24 = ['plus'];
+
+/** Cached icon SVGs (resolved once at first use). */
+let weatherIconsCache = null;
+let uiIconsCache = null;
+
+async function getWeatherIcons() {
+  if (!weatherIconsCache) {
+    weatherIconsCache = await getIcons(WEATHER_ICON_NAMES, { size: 16 });
+  }
+  return weatherIconsCache;
+}
+
+async function getUIIcons() {
+  if (!uiIconsCache) {
+    const [icons20, icons16, icons14, icons24] = await Promise.all([
+      getIcons(UI_ICON_NAMES_20, { size: 20 }),
+      getIcons(UI_ICON_NAMES_16, { size: 16 }),
+      getIcons(UI_ICON_NAMES_14, { size: 14 }),
+      getIcons(UI_ICON_NAMES_24, { size: 24 }),
+    ]);
+    uiIconsCache = { ...icons20, ...icons16, ...icons14, ...icons24 };
+  }
+  return uiIconsCache;
+}
 
 const CONTENT_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -135,6 +174,27 @@ async function resolveFavicons(slug, bookmarks) {
   }
 
   faviconCache.set(slug, map);
+  return map;
+}
+
+/**
+ * Resolve Lucide icon SVGs for all categories and subcategories.
+ * Returns a map of section id → SVG markup.
+ */
+async function resolveCategoryIcons(pageData) {
+  const map = {};
+  for (const cat of pageData.categories) {
+    if (cat.icon) {
+      const svg = await getIcon(cat.icon, { size: 24 });
+      if (svg) map[cat.id] = svg;
+    }
+    for (const sub of cat.subcategories) {
+      if (sub.icon) {
+        const svg = await getIcon(sub.icon, { size: 24 });
+        if (svg) map[sub.id] = svg;
+      }
+    }
+  }
   return map;
 }
 
@@ -616,8 +676,11 @@ async function handleRequest(req, res) {
       const pages = await getPageList();
       const bookmarks = flattenBookmarks(pageData);
       const faviconUrls = await resolveFavicons(slug, bookmarks);
+      const categoryIcons = await resolveCategoryIcons(pageData);
+      const weatherIcons = await getWeatherIcons();
+      const uiIcons = await getUIIcons();
       const footerContent = await loadFooter();
-      const html = renderPage(pageData, { pages, currentSlug: slug, faviconUrls, defaultPage: config.defaultPage, footerContent });
+      const html = renderPage(pageData, { pages, currentSlug: slug, faviconUrls, categoryIcons, weatherIcons, uiIcons, defaultPage: config.defaultPage, footerContent });
 
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       res.end(html);
@@ -647,3 +710,4 @@ server.listen(config.port, () => {
 
 startWatcher();
 cleanFaviconCache(config);
+loadIconIndex();

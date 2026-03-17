@@ -184,4 +184,29 @@ describe('parseMarkdown', () => {
     const result = parseMarkdown(source);
     assert.strictEqual(result.welcome, null);
   });
+
+  it('extracts icon from a category', () => {
+    const source = '# T\n## Cat\n  - icon: home\n- [Link](https://x.com)\n';
+    const result = parseMarkdown(source);
+    assert.equal(result.categories[0].icon, 'home');
+  });
+
+  it('extracts icon from a subcategory', () => {
+    const source = '# T\n## Cat\n### Sub\n  - icon: server\n- [Link](https://x.com)\n';
+    const result = parseMarkdown(source);
+    assert.equal(result.categories[0].subcategories[0].icon, 'server');
+  });
+
+  it('sets category icon to null when not provided', () => {
+    const source = '# T\n## Cat\n- [Link](https://x.com)\n';
+    const result = parseMarkdown(source);
+    assert.strictEqual(result.categories[0].icon, null);
+  });
+
+  it('does not confuse bookmark icon with category icon', () => {
+    const source = '# T\n## Cat\n- [Link](https://x.com)\n  - icon: https://example.com/icon.png\n';
+    const result = parseMarkdown(source);
+    assert.strictEqual(result.categories[0].icon, null);
+    assert.equal(result.categories[0].bookmarks[0].icon, 'https://example.com/icon.png');
+  });
 });

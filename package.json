@@ -19,5 +19,8 @@
   "license": "MIT",
   "engines": {
     "node": ">=22.0.0"
+  },
+  "dependencies": {
+    "lucide-static": "^0.577.0"
   }
 }

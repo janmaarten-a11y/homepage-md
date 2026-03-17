@@ -362,7 +362,8 @@
   }
 
   .c-weather-btn__icon {
-    font-size: 1.125rem;
+    display: inline-flex;
+    align-items: center;
     line-height: 1;
   }
 
@@ -399,7 +400,8 @@
   }
 
   .c-speed-btn__icon {
-    font-size: 1.125rem;
+    display: inline-flex;
+    align-items: center;
     line-height: 1;
   }
 
@@ -413,6 +415,12 @@
     padding-inline: var(--space-l);
     border-block-end: 1px solid var(--color-border);
     background-color: var(--color-surface);
+
+  & svg {
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+  }
   }
 
   @media (min-width: 48rem) {
@@ -698,6 +706,11 @@
     font-size: 1.5rem;
     font-weight: 700;
     letter-spacing: -0.02em;
+
+    & svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
   }
 
   .c-weather-panel__astro-sub {
@@ -910,7 +923,10 @@
   }
 
   .c-category > h2 {
-    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: 1.5rem;
     margin-block-end: var(--space-m);
   }
 
@@ -922,13 +938,28 @@
     margin-inline-end: calc(100% - 80ch);
   }
 
+  /* Heading icons (Lucide SVGs in category/subcategory headings) */
+  .c-heading-icon {
+    display: inline-flex;
+    vertical-align: middle;
+    color: var(--color-muted);
+  }
+
+  .c-heading-icon svg {
+    display: block;
+  }
+
   /* Subcategory sections */
   .c-subcategory {
     margin-block-start: var(--space-m);
   }
 
   .c-subcategory > h3 {
-    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: 1.2rem;
+    font-weight: normal;
     color: var(--color-muted);
     margin-block-end: var(--space-s);
   }
@@ -1340,6 +1371,11 @@
     padding: var(--space-s);
   }
 
+  .is-condensed .c-bookmark__icon {
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
+  }
+
   .is-condensed .c-bookmark__actions {
     margin-inline-start: auto;
   }
@@ -1375,7 +1411,8 @@
   }
 
   .is-columns .c-subcategory > h3 {
-    margin-block-end: var(--space-s);
+    margin-block-end: var(--space-m);
+    margin-block-start: var(--space-m);
   }
 
   .is-columns .c-subcategory > .c-subcategory__subtitle {

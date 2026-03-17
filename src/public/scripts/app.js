@@ -978,16 +978,21 @@ const weatherAlerts = document.querySelector('.js-weather-alerts');
 const weatherForecast = document.querySelector('.js-weather-forecast');
 
 const WEATHER_ICONS = {
-  'clear': '\u2600\uFE0F',
-  'partly-cloudy': '\u26C5',
-  'cloudy': '\u2601\uFE0F',
-  'fog': '\uD83C\uDF2B\uFE0F',
-  'drizzle': '\uD83C\uDF26\uFE0F',
-  'rain': '\uD83C\uDF27\uFE0F',
-  'freezing': '\uD83E\uDDCA',
-  'snow': '\u2744\uFE0F',
-  'thunderstorm': '\u26C8\uFE0F',
+  'clear': 'sun',
+  'partly-cloudy': 'cloud-sun',
+  'cloudy': 'cloud',
+  'fog': 'cloud-fog',
+  'drizzle': 'cloud-drizzle',
+  'rain': 'cloud-rain',
+  'freezing': 'snowflake',
+  'snow': 'cloud-snow',
+  'thunderstorm': 'cloud-lightning',
 };
+
+/** Resolve a Lucide icon name to inline SVG, with emoji fallback. */
+function wi(name, fallback = '') {
+  return pageData.weatherIcons?.[name] || fallback;
+}
 
 function renderWeather(data) {
   if (!data || !weatherBtn) return;
@@ -998,12 +1003,12 @@ function renderWeather(data) {
   weatherCurrentLocation = locationName;
 
   // Update the button with current temp and icon
-  // Override icon for extreme temperatures
-  let icon = WEATHER_ICONS[data.current.icon] || '\uD83C\uDF24\uFE0F';
+  const iconName = WEATHER_ICONS[data.current.icon] || 'cloud-sun';
   const tempF = data.units.temp === '\u00B0F' ? data.current.temp : data.current.temp * 9 / 5 + 32;
-  if (tempF <= 25) icon = '\uD83E\uDD76';       // 🥶 freezing
-  else if (tempF >= 85) icon = '\uD83E\uDD75';   // 🥵 burning
-  weatherIcon.textContent = icon;
+  let btnIconName = iconName;
+  if (tempF <= 25) btnIconName = 'snowflake';
+  else if (tempF >= 85) btnIconName = 'thermometer';
+  weatherIcon.innerHTML = wi(btnIconName, '\u2601\uFE0F');
   weatherLabel.textContent = `${data.current.temp}${data.units.temp}`;
   weatherBtn.disabled = false;
   weatherBtn.setAttribute('aria-label', `Weather for ${locationName}: ${data.current.temp}${data.units.temp}, ${data.current.condition}. Activate to show forecast.`);
@@ -1014,7 +1019,7 @@ function renderWeather(data) {
   // AQI stat
   const aqiHtml = data.aqi
     ? `<div class="c-weather-panel__stat">
-        <dt>\uD83C\uDF2B\uFE0F <a href="https://www.airnow.gov" rel="noopener">Air quality</a></dt>
+        <dt>${wi('haze', '\uD83C\uDF2B\uFE0F')} <a href="https://www.airnow.gov" rel="noopener">Air quality</a></dt>
         <dd><span class="c-weather-panel__aqi" data-level="${aqiLevel(data.aqi.value)}">${data.aqi.value}</span> ${escapeText(data.aqi.label)}</dd>
       </div>`
     : '';
@@ -1048,8 +1053,8 @@ ${data.alerts.map((a) => `      <li>${escapeText(a.text)}</li>`).join('\n')}
     if (data.moon.isFullMoon) {
       // It's a full moon now — celebrate it
       moonHero = `<div class="c-weather-panel__moon-hero">
-        <p class="c-weather-panel__moon-label">\uD83C\uDF15 ${escapeText(data.moon.fullMoonName || 'Full Moon')} tonight!</p>
-        <p class="c-weather-panel__moon-date">${data.moon.emoji} ${data.moon.illumination}% illuminated</p>
+        <p class="c-weather-panel__moon-label">${wi('moon', '\uD83C\uDF15')} ${escapeText(data.moon.fullMoonName || 'Full Moon')} tonight!</p>
+        <p class="c-weather-panel__moon-date">${data.moon.illumination}% illuminated</p>
         <p class="c-weather-panel__astro-line">Next new moon \u2014 ${escapeText(data.moon.nextNewMoon)} (in ${data.moon.daysToNewMoon} days)</p>
       </div>`;
     } else {
@@ -1057,25 +1062,25 @@ ${data.alerts.map((a) => `      <li>${escapeText(a.text)}</li>`).join('\n')}
       const daysLabel = `<span class="c-weather-panel__astro-sub">in ${data.moon.daysToFullMoon} days</span>`;
       moonHero = `<div class="c-weather-panel__moon-hero">
         <p class="c-weather-panel__moon-label">Next full moon \u2014 ${escapeText(data.moon.fullMoonName || 'Full Moon')}</p>
-        <p class="c-weather-panel__moon-date">\uD83C\uDF15 ${fullMoonText} ${daysLabel}</p>
-        <p class="c-weather-panel__astro-line">${data.moon.emoji} ${escapeText(data.moon.phase)}, ${data.moon.illumination}% illuminated</p>
+        <p class="c-weather-panel__moon-date">${wi('moon', '\uD83C\uDF15')} ${fullMoonText} ${daysLabel}</p>
+        <p class="c-weather-panel__astro-line">${escapeText(data.moon.phase)}, ${data.moon.illumination}% illuminated</p>
       </div>`;
     }
   }
 
   // Sun times
   const sunLine = data.today.sunrise && data.today.sunset
-    ? `<p class="c-weather-panel__astro-line">\u2600\uFE0F Sunrise ${data.today.sunrise} \u00B7 \uD83C\uDF05 Sunset ${data.today.sunset}</p>`
+    ? `<p class="c-weather-panel__astro-line">${wi('sunrise', '\u2600\uFE0F')} Sunrise ${data.today.sunrise} \u00B7 ${wi('sunset', '\uD83C\uDF05')} Sunset ${data.today.sunset}</p>`
     : '';
 
   // Eclipse
   const eclipseLine = data.eclipse
-    ? `<p class="c-weather-panel__astro-line">${data.eclipse.emoji} Next eclipse \u2014 <a href="${escapeText(data.eclipse.url)}" rel="noopener">${escapeText(data.eclipse.type)}, ${escapeText(data.eclipse.date)}</a></p>`
+    ? `<p class="c-weather-panel__astro-line">${wi('eclipse', '\uD83D\uDD2D')} Next eclipse \u2014 <a href="${escapeText(data.eclipse.url)}" rel="noopener">${escapeText(data.eclipse.type)}, ${escapeText(data.eclipse.date)}</a></p>`
     : '';
 
   // Aurora
   const auroraLine = data.aurora?.possible
-    ? `<p class="c-weather-panel__astro-line c-weather-panel__aurora">\uD83C\uDF0C Aurora possible${data.aurora.hoursAway > 0 ? ` in ~${data.aurora.hoursAway}h` : ''} (Kp ${data.aurora.kp}) \u2014 <a href="${escapeText(data.aurora.url)}" rel="noopener">Forecast</a></p>`
+    ? `<p class="c-weather-panel__astro-line c-weather-panel__aurora">${wi('moon-star', '\uD83C\uDF0C')} Aurora possible${data.aurora.hoursAway > 0 ? ` in ~${data.aurora.hoursAway}h` : ''} (Kp ${data.aurora.kp}) \u2014 <a href="${escapeText(data.aurora.url)}" rel="noopener">Forecast</a></p>`
     : '';
 
   // Tomorrow
@@ -1084,7 +1089,7 @@ ${data.alerts.map((a) => `      <li>${escapeText(a.text)}</li>`).join('\n')}
     ${data.tomorrow.high}\u00B0 / ${data.tomorrow.low}\u00B0${data.tomorrow.precipChance > 0 ? `, ${data.tomorrow.precipChance}% precip` : ''}
   </div>`;
 
-  const editLocationIcon = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 1.5l3 3L5 14H2v-3z"/></svg>';
+  const editLocationIcon = wi('pencil', '&#9998;');
 
   // Left column: heading + conditions + alerts
   weatherCurrent.innerHTML = `
@@ -1097,9 +1102,9 @@ ${data.alerts.map((a) => `      <li>${escapeText(a.text)}</li>`).join('\n')}
       <span class="c-weather-panel__condition">${escapeText(data.current.condition)}</span>
     </div>
     <dl class="c-weather-panel__details">
-      <div class="c-weather-panel__stat"><dt>\uD83C\uDF21\uFE0F Feels like</dt><dd>${data.current.feelsLike}${data.units.temp}</dd></div>
-      <div class="c-weather-panel__stat"><dt>\u2195\uFE0F High / Low</dt><dd>${data.today.high}\u00B0 / ${data.today.low}\u00B0</dd></div>
-      <div class="c-weather-panel__stat"><dt>\uD83D\uDCA8 Wind</dt><dd>${data.current.wind} ${data.units.wind}</dd></div>
+      <div class="c-weather-panel__stat"><dt>${wi('thermometer', '\uD83C\uDF21\uFE0F')} Feels like</dt><dd>${data.current.feelsLike}${data.units.temp}</dd></div>
+      <div class="c-weather-panel__stat"><dt>${wi('arrow-up-down', '\u2195\uFE0F')} High / Low</dt><dd>${data.today.high}\u00B0 / ${data.today.low}\u00B0</dd></div>
+      <div class="c-weather-panel__stat"><dt>${wi('wind', '\uD83D\uDCA8')} Wind</dt><dd>${data.current.wind} ${data.units.wind}</dd></div>
 ${aqiHtml}
     </dl>
 ${alertsHtml}`;

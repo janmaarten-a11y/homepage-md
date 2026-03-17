@@ -5,6 +5,9 @@
  * Server-rendered MPA — each route gets a fully formed HTML document.
  */
 
+/** Module-level UI icons set per renderPage call. */
+let _uiIcons = {};
+
 /**
  * Render a full HTML page for a set of parsed bookmark data.
  *
@@ -15,12 +18,13 @@
  * @param {object} options.faviconUrls - Map of bookmark URL → resolved favicon path
  * @returns {string} Complete HTML document
  */
-export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultPage, footerContent }) {
+export function renderPage(pageData, { pages, currentSlug, faviconUrls, categoryIcons = {}, weatherIcons = {}, uiIcons = {}, defaultPage, footerContent }) {
+  _uiIcons = uiIcons;
   const title = pageData.title || 'HomepageMD';
   const hasLocation = !!pageData.location;
   const nav = renderNav(pages, currentSlug, defaultPage);
-  const tocPopover = renderTocPopover(pageData.categories);
-  const main = renderMain(pageData, faviconUrls);
+  const tocPopover = renderTocPopover(pageData.categories, uiIcons);
+  const main = renderMain(pageData, faviconUrls, categoryIcons);
   const categories = pageData.categories.map((c) => c.name);
   const subcategoryPairs = pageData.categories.flatMap((c) =>
     c.subcategories.map((s) => ({ category: c.name, subcategory: s.name }))
@@ -33,11 +37,10 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultP
   const keyboardHelp = renderKeyboardHelp();
   const footer = renderFooter(footerContent);
 
-  const iconMenu = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/></svg>';
-  const iconSettings = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.3 2h3.4l.5 2.3a6 6 0 0 1 1.5.9l2.2-.7 1.7 3-1.7 1.6a6 6 0 0 1 0 1.8l1.7 1.6-1.7 3-2.2-.7a6 6 0 0 1-1.5.9L11.7 18H8.3l-.5-2.3a6 6 0 0 1-1.5-.9l-2.2.7-1.7-3 1.7-1.6a6 6 0 0 1 0-1.8L2.4 7.5l1.7-3 2.2.7a6 6 0 0 1 1.5-.9L8.3 2z"/><circle cx="10" cy="10" r="2.5"/></svg>';
-  const iconPlus = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
-  const iconToc = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="7" y1="4" x2="17" y2="4"/><line x1="7" y1="10" x2="17" y2="10"/><line x1="7" y1="16" x2="17" y2="16"/><circle cx="3.5" cy="4" r="1" fill="currentColor" stroke="none"/><circle cx="3.5" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="3.5" cy="16" r="1" fill="currentColor" stroke="none"/></svg>';
-  const iconPlusSmall = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>';
+  const iconMenu = uiIcons['menu'] || '&#9776;';
+  const iconSettings = uiIcons['settings'] || '&#9881;';
+  const iconPlus = uiIcons['plus'] || '+';
+  const iconAddLink = uiIcons['bookmark-plus'] || '+';
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -60,11 +63,11 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultP
 ${nav}
       <div class="c-header__actions">
 ${hasLocation ? `        <button type="button" class="c-weather-btn js-weather-toggle" aria-expanded="false" aria-controls="js-weather-panel" aria-label="Loading weather\u2026" disabled>
-          <span class="c-weather-btn__icon js-weather-icon" aria-hidden="true">\u2601\uFE0F</span>
+          <span class="c-weather-btn__icon js-weather-icon" aria-hidden="true">${weatherIcons['cloud'] || '\u2601\uFE0F'}</span>
           <span class="c-weather-btn__label js-weather-label">\u2022\u2022\u2022</span>
         </button>` : ''}
         <button type="button" class="c-speed-btn js-speed-test" aria-live="polite">
-          <span class="c-speed-btn__icon" aria-hidden="true">\uD83D\uDCF6</span>
+          <span class="c-speed-btn__icon" aria-hidden="true">${weatherIcons['signal'] || '\uD83D\uDCF6'}</span>
           <span class="c-speed-btn__label js-speed-label">Speed test</span>
         </button>
         <button type="button" class="c-header__action-btn js-view-toggle" aria-expanded="false" aria-controls="js-view-popover" aria-label="View options">${iconSettings}</button>
@@ -81,7 +84,7 @@ ${hasLocation ? `    <section class="c-weather-panel js-weather-panel" id="js-we
     <div class="c-header__searchbar">
 ${tocPopover}
 ${search}
-      <button type="button" class="c-header__add-btn c-btn c-btn--primary js-add-open">${iconPlusSmall} <span>Add link</span></button>
+      <button type="button" class="c-header__add-btn c-btn c-btn--primary js-add-open">${iconAddLink} <span>Add link</span></button>
     </div>
   </header>
   <aside class="c-drawer js-menu-drawer" id="js-menu-drawer" hidden>
@@ -166,7 +169,7 @@ ${hasLocation ? `  <dialog class="c-dialog c-dialog--small js-location-dialog">
       </div>
     </form>
   </dialog>` : ''}
-  <script id="js-page-data" type="application/json">${JSON.stringify({ categories, subcategories: subcategoryPairs, bangs: pageData.bangs || [] })}</script>
+  <script id="js-page-data" type="application/json">${JSON.stringify({ categories, subcategories: subcategoryPairs, bangs: pageData.bangs || [], weatherIcons })}</script>
   <script src="/scripts/app.js" type="module"></script>
 </body>
 </html>`;
@@ -185,14 +188,13 @@ function renderSearch() {
 }
 
 function renderToolbar() {
-  // Inline SVG icons (16×16, currentColor)
-  const iconGrid = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>';
-  const iconColumns = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="1" y="1" width="4" height="14" rx="1"/><rect x="6" y="1" width="4" height="14" rx="1"/><rect x="11" y="1" width="4" height="14" rx="1"/></svg>';
-  const iconDetailed = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="1" y1="3" x2="15" y2="3"/><line x1="1" y1="6" x2="10" y2="6"/><line x1="1" y1="10" x2="15" y2="10"/><line x1="1" y1="13" x2="10" y2="13"/></svg>';
-  const iconCondensed = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="1" y1="3" x2="15" y2="3"/><line x1="1" y1="7" x2="15" y2="7"/><line x1="1" y1="11" x2="15" y2="11"/></svg>';
-  const iconSun = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="3"/><line x1="8" y1="1" x2="8" y2="3"/><line x1="8" y1="13" x2="8" y2="15"/><line x1="1" y1="8" x2="3" y2="8"/><line x1="13" y1="8" x2="15" y2="8"/><line x1="3.05" y1="3.05" x2="4.46" y2="4.46"/><line x1="11.54" y1="11.54" x2="12.95" y2="12.95"/><line x1="3.05" y1="12.95" x2="4.46" y2="11.54"/><line x1="11.54" y1="4.46" x2="12.95" y2="3.05"/></svg>';
-  const iconMoon = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M13.5 8.5a5.5 5.5 0 0 1-6-6 5.5 5.5 0 1 0 6 6z"/></svg>';
-  const iconSystem = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="9" rx="1.5"/><line x1="5" y1="14" x2="11" y2="14"/><line x1="8" y1="11" x2="8" y2="14"/></svg>';
+  const iconGrid = _uiIcons['grid-2x2'] || '&#9638;';
+  const iconColumns = _uiIcons['columns-3'] || '&#9638;';
+  const iconDetailed = _uiIcons['list-chevrons-up-down'] || '&#9776;';
+  const iconCondensed = _uiIcons['list-chevrons-down-up'] || '&#9776;';
+  const iconSun = _uiIcons['sun'] || '&#9728;';
+  const iconMoon = _uiIcons['moon'] || '&#9790;';
+  const iconSystem = _uiIcons['monitor'] || '&#9776;';
 
   return `      <div class="c-toolbar" role="toolbar" aria-label="View options">
         <div class="c-toolbar__group" role="group" aria-label="Layout">
@@ -250,10 +252,10 @@ function renderKeyboardHelp() {
   </dialog>`;
 }
 
-function renderTocPopover(categories) {
+function renderTocPopover(categories, uiIcons = {}) {
   if (categories.length <= 1) return '';
 
-  const iconToc = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="7" y1="4" x2="17" y2="4"/><line x1="7" y1="10" x2="17" y2="10"/><line x1="7" y1="16" x2="17" y2="16"/><circle cx="3.5" cy="4" r="1" fill="currentColor" stroke="none"/><circle cx="3.5" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="3.5" cy="16" r="1" fill="currentColor" stroke="none"/></svg>';
+  const iconToc = uiIcons['table-of-contents'] || '&#9776;';
 
   const links = categories
     .map((cat) => `        <a href="#${escapeAttr(cat.id)}" class="c-popover__link js-toc-link">${escapeHtml(cat.name)}</a>`)
@@ -338,9 +340,9 @@ ${links}
     </nav>`;
 }
 
-function renderMain(pageData, faviconUrls) {
+function renderMain(pageData, faviconUrls, categoryIcons) {
   const welcome = pageData.welcome ? renderWelcome(pageData.welcome) : '';
-  const categories = pageData.categories.map((category) => renderCategory(category, faviconUrls)).join('\n');
+  const categories = pageData.categories.map((category) => renderCategory(category, faviconUrls, categoryIcons)).join('\n');
   return welcome + categories;
 }
 
@@ -355,7 +357,13 @@ function renderWelcome(welcome) {
     </section>\n`;
 }
 
-function renderCategory(category, faviconUrls) {
+function renderHeadingIcon(sectionId, categoryIcons) {
+  const svg = categoryIcons[sectionId];
+  if (!svg) return '';
+  return `<span class="c-heading-icon" aria-hidden="true">${svg}</span> `;
+}
+
+function renderCategory(category, faviconUrls, categoryIcons) {
   const directBookmarks = category.bookmarks.length
     ? `      <ul class="c-bookmark-list" role="list">
 ${category.bookmarks.map((b) => renderBookmark(b, faviconUrls, category.name, null)).join('\n')}
@@ -363,27 +371,31 @@ ${category.bookmarks.map((b) => renderBookmark(b, faviconUrls, category.name, nu
     : '';
 
   const subcategories = category.subcategories
-    .map((sub) => renderSubcategory(sub, faviconUrls, category.name))
+    .map((sub) => renderSubcategory(sub, faviconUrls, category.name, categoryIcons))
     .join('\n');
 
   const subtitle = category.subtitle
     ? `\n      <p class="c-category__subtitle">${escapeHtml(category.subtitle)}</p>`
     : '';
 
+  const icon = renderHeadingIcon(category.id, categoryIcons);
+
   return `    <section class="c-category" aria-labelledby="${escapeAttr(category.id)}">
-      <h2 id="${escapeAttr(category.id)}">${escapeHtml(category.name)}</h2>${subtitle}
+      <h2 id="${escapeAttr(category.id)}">${icon}${escapeHtml(category.name)}</h2>${subtitle}
 ${directBookmarks}
 ${subcategories}
     </section>`;
 }
 
-function renderSubcategory(subcategory, faviconUrls, categoryName) {
+function renderSubcategory(subcategory, faviconUrls, categoryName, categoryIcons) {
   const subtitle = subcategory.subtitle
     ? `\n        <p class="c-subcategory__subtitle">${escapeHtml(subcategory.subtitle)}</p>`
     : '';
 
+  const icon = renderHeadingIcon(subcategory.id, categoryIcons);
+
   return `      <section class="c-subcategory" aria-labelledby="${escapeAttr(subcategory.id)}">
-        <h3 id="${escapeAttr(subcategory.id)}">${escapeHtml(subcategory.name)}</h3>${subtitle}
+        <h3 id="${escapeAttr(subcategory.id)}">${icon}${escapeHtml(subcategory.name)}</h3>${subtitle}
         <ul class="c-bookmark-list" role="list">
 ${subcategory.bookmarks.map((b) => renderBookmark(b, faviconUrls, categoryName, subcategory.name)).join('\n')}
         </ul>
@@ -401,8 +413,8 @@ function renderBookmark(bookmark, faviconUrls, categoryName, subcategoryName) {
   const catData = categoryName ? ` data-category="${escapeAttr(categoryName)}"` : '';
   const subData = subcategoryName ? ` data-subcategory="${escapeAttr(subcategoryName)}"` : '';
 
-  const ICON_EDIT = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 1.5l3 3L5 14H2v-3z"/></svg>';
-  const ICON_DELETE = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="4" x2="13" y2="4"/><path d="M5 4V2.5A.5.5 0 0 1 5.5 2h5a.5.5 0 0 1 .5.5V4"/><path d="M4 4l.7 9.1a1 1 0 0 0 1 .9h4.6a1 1 0 0 0 1-.9L12 4"/></svg>';
+  const ICON_EDIT = _uiIcons['pencil'] || '&#9998;';
+  const ICON_DELETE = _uiIcons['trash-2'] || '&#128465;';
 
   return `          <li class="c-bookmark" data-search="${escapeAttr(searchText.toLowerCase())}" data-url="${escapeAttr(bookmark.url)}"${iconData}${catData}${subData} aria-roledescription="bookmark, use arrow keys for actions">
             <div class="c-bookmark__header">

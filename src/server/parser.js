@@ -11,9 +11,10 @@
  *   categories: [{
  *     name: string,
  *     id: string,
+ *     icon: string | null,
  *     subtitle: string | null,
  *     bookmarks: [{ title, url, description, icon }],
- *     subcategories: [{ name, id, subtitle, bookmarks }]
+ *     subcategories: [{ name, id, icon, subtitle, bookmarks }]
  *   }]
  * }
  */
@@ -75,6 +76,7 @@ export function parseMarkdown(source) {
         currentCategory = {
           name,
           id: slugify(name),
+          icon: null,
           subtitle: null,
           bookmarks: [],
           subcategories: [],
@@ -86,6 +88,7 @@ export function parseMarkdown(source) {
         currentSubcategory = {
           name,
           id: `${currentCategory.id}-${slugify(name)}`,
+          icon: null,
           subtitle: null,
           bookmarks: [],
         };
@@ -132,6 +135,13 @@ export function parseMarkdown(source) {
         if (bangMatch) {
           result.bangs.push({ prefix: bangMatch[1], url: bangMatch[2] });
         }
+        continue;
+      }
+
+      // icon: on a section (category or subcategory) when no current bookmark
+      if (key === 'icon' && !currentBookmark) {
+        const target = currentSubcategory || currentCategory;
+        if (target) target.icon = value.trim();
         continue;
       }
 
