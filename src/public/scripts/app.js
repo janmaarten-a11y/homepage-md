@@ -77,10 +77,24 @@ async function apiRequest(method, slug, body) {
 // ---------------------------------------------------------------------------
 
 const evtSource = new EventSource('/api/events');
-let suppressSSEReload = false;
+
+// Suppress SSE reloads for 3s after a CRUD operation to prevent double-reload.
+// The flag is persisted in sessionStorage because window.location.reload()
+// creates a fresh JS context where in-memory flags are lost.
+const SSE_SUPPRESS_KEY = 'homepage-md-sse-suppress';
+const SSE_SUPPRESS_MS = 3000;
+
+function isSSESuppressed() {
+  try {
+    const ts = sessionStorage.getItem(SSE_SUPPRESS_KEY);
+    if (ts && Date.now() - Number(ts) < SSE_SUPPRESS_MS) return true;
+    sessionStorage.removeItem(SSE_SUPPRESS_KEY);
+  } catch { /* ignore */ }
+  return false;
+}
 
 evtSource.addEventListener('message', (event) => {
-  if (suppressSSEReload) return;
+  if (isSSESuppressed()) return;
   try {
     const data = JSON.parse(event.data);
     if (data.type === 'update') {
@@ -96,10 +110,10 @@ evtSource.addEventListener('message', (event) => {
  * reload and optionally restoring focus to a specific bookmark.
  */
 function reloadAfterEdit(focusUrl) {
-  suppressSSEReload = true;
-  if (focusUrl) {
-    try { sessionStorage.setItem('homepage-md-focus', focusUrl); } catch { /* ignore */ }
-  }
+  try {
+    sessionStorage.setItem(SSE_SUPPRESS_KEY, String(Date.now()));
+    if (focusUrl) sessionStorage.setItem('homepage-md-focus', focusUrl);
+  } catch { /* ignore */ }
   window.location.reload();
 }
 
