@@ -1096,7 +1096,7 @@ if (weatherBtn && weatherPanel) {
     .then((res) => res.json())
     .then((data) => {
       if (!data) {
-        weatherBtn.hidden = true;
+        showWeatherError();
         return;
       }
       renderWeather(data);
@@ -1107,8 +1107,19 @@ if (weatherBtn && weatherPanel) {
       }
     })
     .catch(() => {
-      weatherBtn.hidden = true;
+      showWeatherError();
     });
+
+  function showWeatherError() {
+    weatherIcon.textContent = '\u26A0\uFE0F';
+    weatherLabel.textContent = 'Unavailable';
+    weatherBtn.disabled = false;
+    weatherBtn.setAttribute('aria-label', 'Weather data unavailable. Activate to retry.');
+    // Click to retry
+    weatherBtn.addEventListener('click', () => {
+      window.location.reload();
+    }, { once: true });
+  }
 }
 
 // ---------------------------------------------------------------------------
