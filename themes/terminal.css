@@ -12,7 +12,7 @@
   --color-text: oklch(82% 0.2 140);
   --color-primary: oklch(78% 0.22 140);
   --color-surface: oklch(10% 0.01 140);
-  --color-border: oklch(30% 0.06 140);
+  --color-border: oklch(50% 0.08 140);
   --color-focus: oklch(82% 0.24 140);
   --color-muted: oklch(55% 0.1 140);
 
@@ -36,7 +36,7 @@
   --color-text: oklch(82% 0.2 140);
   --color-primary: oklch(78% 0.22 140);
   --color-surface: oklch(10% 0.01 140);
-  --color-border: oklch(30% 0.06 140);
+  --color-border: oklch(50% 0.08 140);
   --color-focus: oklch(82% 0.24 140);
   --color-muted: oklch(55% 0.1 140);
   --shadow-s: 0 0 4px oklch(65% 0.18 140 / 20%);
@@ -69,6 +69,21 @@ body::before {
 /* Phosphor glow on text */
 body {
   text-shadow: 0 0 2px oklch(72% 0.16 140 / 40%);
+}
+
+/* Standardize 2px borders on all interactive elements */
+.c-search__input,
+.c-btn,
+.c-header__action-btn,
+.c-weather-btn,
+.c-speed-btn,
+.c-dialog,
+.c-dialog__input,
+.c-popover,
+.c-toolbar__group,
+.c-combobox__listbox,
+.c-welcome {
+  border-width: 2px;
 }
 
 /* Tint bookmark favicons to match green palette + phosphor glow */
