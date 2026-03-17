@@ -5,6 +5,9 @@
  * Server-rendered MPA — each route gets a fully formed HTML document.
  */
 
+/** Module-level UI icons set per renderPage call. */
+let _uiIcons = {};
+
 /**
  * Render a full HTML page for a set of parsed bookmark data.
  *
@@ -15,11 +18,12 @@
  * @param {object} options.faviconUrls - Map of bookmark URL → resolved favicon path
  * @returns {string} Complete HTML document
  */
-export function renderPage(pageData, { pages, currentSlug, faviconUrls, categoryIcons = {}, weatherIcons = {}, defaultPage, footerContent }) {
+export function renderPage(pageData, { pages, currentSlug, faviconUrls, categoryIcons = {}, weatherIcons = {}, uiIcons = {}, defaultPage, footerContent }) {
+  _uiIcons = uiIcons;
   const title = pageData.title || 'HomepageMD';
   const hasLocation = !!pageData.location;
   const nav = renderNav(pages, currentSlug, defaultPage);
-  const tocPopover = renderTocPopover(pageData.categories);
+  const tocPopover = renderTocPopover(pageData.categories, uiIcons);
   const main = renderMain(pageData, faviconUrls, categoryIcons);
   const categories = pageData.categories.map((c) => c.name);
   const subcategoryPairs = pageData.categories.flatMap((c) =>
@@ -33,11 +37,10 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, category
   const keyboardHelp = renderKeyboardHelp();
   const footer = renderFooter(footerContent);
 
-  const iconMenu = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/></svg>';
-  const iconSettings = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8.3 2h3.4l.5 2.3a6 6 0 0 1 1.5.9l2.2-.7 1.7 3-1.7 1.6a6 6 0 0 1 0 1.8l1.7 1.6-1.7 3-2.2-.7a6 6 0 0 1-1.5.9L11.7 18H8.3l-.5-2.3a6 6 0 0 1-1.5-.9l-2.2.7-1.7-3 1.7-1.6a6 6 0 0 1 0-1.8L2.4 7.5l1.7-3 2.2.7a6 6 0 0 1 1.5-.9L8.3 2z"/><circle cx="10" cy="10" r="2.5"/></svg>';
-  const iconPlus = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>';
-  const iconToc = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="7" y1="4" x2="17" y2="4"/><line x1="7" y1="10" x2="17" y2="10"/><line x1="7" y1="16" x2="17" y2="16"/><circle cx="3.5" cy="4" r="1" fill="currentColor" stroke="none"/><circle cx="3.5" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="3.5" cy="16" r="1" fill="currentColor" stroke="none"/></svg>';
-  const iconPlusSmall = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="8" y1="3" x2="8" y2="13"/><line x1="3" y1="8" x2="13" y2="8"/></svg>';
+  const iconMenu = uiIcons['menu'] || '&#9776;';
+  const iconSettings = uiIcons['settings'] || '&#9881;';
+  const iconPlus = uiIcons['plus'] || '+';
+  const iconAddLink = uiIcons['bookmark-plus'] || '+';
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -81,7 +84,7 @@ ${hasLocation ? `    <section class="c-weather-panel js-weather-panel" id="js-we
     <div class="c-header__searchbar">
 ${tocPopover}
 ${search}
-      <button type="button" class="c-header__add-btn c-btn c-btn--primary js-add-open">${iconPlusSmall} <span>Add link</span></button>
+      <button type="button" class="c-header__add-btn c-btn c-btn--primary js-add-open">${iconAddLink} <span>Add link</span></button>
     </div>
   </header>
   <aside class="c-drawer js-menu-drawer" id="js-menu-drawer" hidden>
@@ -250,10 +253,10 @@ function renderKeyboardHelp() {
   </dialog>`;
 }
 
-function renderTocPopover(categories) {
+function renderTocPopover(categories, uiIcons = {}) {
   if (categories.length <= 1) return '';
 
-  const iconToc = '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="7" y1="4" x2="17" y2="4"/><line x1="7" y1="10" x2="17" y2="10"/><line x1="7" y1="16" x2="17" y2="16"/><circle cx="3.5" cy="4" r="1" fill="currentColor" stroke="none"/><circle cx="3.5" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="3.5" cy="16" r="1" fill="currentColor" stroke="none"/></svg>';
+  const iconToc = uiIcons['table-of-contents'] || '&#9776;';
 
   const links = categories
     .map((cat) => `        <a href="#${escapeAttr(cat.id)}" class="c-popover__link js-toc-link">${escapeHtml(cat.name)}</a>`)
@@ -411,8 +414,8 @@ function renderBookmark(bookmark, faviconUrls, categoryName, subcategoryName) {
   const catData = categoryName ? ` data-category="${escapeAttr(categoryName)}"` : '';
   const subData = subcategoryName ? ` data-subcategory="${escapeAttr(subcategoryName)}"` : '';
 
-  const ICON_EDIT = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 1.5l3 3L5 14H2v-3z"/></svg>';
-  const ICON_DELETE = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="4" x2="13" y2="4"/><path d="M5 4V2.5A.5.5 0 0 1 5.5 2h5a.5.5 0 0 1 .5.5V4"/><path d="M4 4l.7 9.1a1 1 0 0 0 1 .9h4.6a1 1 0 0 0 1-.9L12 4"/></svg>';
+  const ICON_EDIT = _uiIcons['pencil'] || '&#9998;';
+  const ICON_DELETE = _uiIcons['trash-2'] || '&#128465;';
 
   return `          <li class="c-bookmark" data-search="${escapeAttr(searchText.toLowerCase())}" data-url="${escapeAttr(bookmark.url)}"${iconData}${catData}${subData} aria-roledescription="bookmark, use arrow keys for actions">
             <div class="c-bookmark__header">

@@ -11,22 +11,40 @@ import { fetchMetadata } from './metadata.js';
 import { fetchWeather, clearWeatherCache } from './weather.js';
 import { loadIconIndex, getIcon, getIcons } from './lucide.js';
 
-/** Lucide icon names used in the weather panel and header buttons. */
+/** Lucide icon names used in the weather panel (sent to client as 16px). */
 const WEATHER_ICON_NAMES = [
   'sun', 'cloud-sun', 'cloud', 'cloud-fog', 'cloud-drizzle', 'cloud-rain',
   'snowflake', 'cloud-snow', 'cloud-lightning', 'thermometer', 'arrow-up-down',
   'wind', 'haze', 'moon', 'sunrise', 'sunset', 'eclipse', 'moon-star',
-  'signal', 'triangle-alert',
+  'signal', 'triangle-alert', 'pencil',
 ];
 
-/** Cached weather icon SVGs (resolved once at first use). */
+/** Lucide icon names used in the server-rendered UI. */
+const UI_ICON_NAMES_20 = ['menu', 'settings', 'table-of-contents', 'bookmark-plus'];
+const UI_ICON_NAMES_14 = ['pencil', 'trash-2'];
+const UI_ICON_NAMES_24 = ['plus'];
+
+/** Cached icon SVGs (resolved once at first use). */
 let weatherIconsCache = null;
+let uiIconsCache = null;
 
 async function getWeatherIcons() {
   if (!weatherIconsCache) {
     weatherIconsCache = await getIcons(WEATHER_ICON_NAMES, { size: 16 });
   }
   return weatherIconsCache;
+}
+
+async function getUIIcons() {
+  if (!uiIconsCache) {
+    const [icons20, icons14, icons24] = await Promise.all([
+      getIcons(UI_ICON_NAMES_20, { size: 20 }),
+      getIcons(UI_ICON_NAMES_14, { size: 14 }),
+      getIcons(UI_ICON_NAMES_24, { size: 24 }),
+    ]);
+    uiIconsCache = { ...icons20, ...icons14, ...icons24 };
+  }
+  return uiIconsCache;
 }
 
 const CONTENT_TYPES = {
@@ -658,8 +676,9 @@ async function handleRequest(req, res) {
       const faviconUrls = await resolveFavicons(slug, bookmarks);
       const categoryIcons = await resolveCategoryIcons(pageData);
       const weatherIcons = await getWeatherIcons();
+      const uiIcons = await getUIIcons();
       const footerContent = await loadFooter();
-      const html = renderPage(pageData, { pages, currentSlug: slug, faviconUrls, categoryIcons, weatherIcons, defaultPage: config.defaultPage, footerContent });
+      const html = renderPage(pageData, { pages, currentSlug: slug, faviconUrls, categoryIcons, weatherIcons, uiIcons, defaultPage: config.defaultPage, footerContent });
 
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       res.end(html);
