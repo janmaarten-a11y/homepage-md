@@ -410,7 +410,7 @@
   .c-weather-panel {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 0 var(--space-xl);
+    gap: var(--space-m) var(--space-xl);
     padding-block: var(--space-m);
     padding-inline: var(--space-l);
     border-block-end: 1px solid var(--color-border);
