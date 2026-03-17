@@ -217,21 +217,21 @@ describe('renderPage', () => {
     assert.ok(html.includes('data-category="Category One"'));
   });
 
-  it('includes edit and delete buttons on each bookmark', () => {
+  it('includes edit and copy buttons on each bookmark', () => {
     const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
     const editBtns = html.match(/js-edit-open/g) || [];
-    const bookmarkDeleteBtns = html.match(/class="c-btn c-btn--icon c-btn--danger js-delete"/g) || [];
+    const copyBtns = html.match(/js-copy-url/g) || [];
     // MINIMAL_PAGE has 2 bookmarks
     assert.equal(editBtns.length, 2);
-    assert.equal(bookmarkDeleteBtns.length, 2);
+    assert.equal(copyBtns.length, 2);
   });
 
-  it('edit and delete buttons have tabindex=-1 for roving focus', () => {
+  it('edit and copy buttons have tabindex=-1 for roving focus', () => {
     const html = renderPage(MINIMAL_PAGE, DEFAULT_OPTIONS);
     const editBtnMatches = html.match(/js-edit-open"[^>]*tabindex="-1"/g) || [];
-    const deleteBtnMatches = html.match(/js-delete"[^>]*tabindex="-1"/g) || [];
+    const copyBtnMatches = html.match(/js-copy-url"[^>]*tabindex="-1"/g) || [];
     assert.ok(editBtnMatches.length > 0, 'edit buttons should have tabindex="-1"');
-    assert.ok(deleteBtnMatches.length > 0, 'delete buttons should have tabindex="-1"');
+    assert.ok(copyBtnMatches.length > 0, 'copy buttons should have tabindex="-1"');
   });
 
   it('includes an Edit Bookmark dialog', () => {

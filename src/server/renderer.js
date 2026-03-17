@@ -147,7 +147,8 @@ ${addDialog}
         Icon URL <span class="c-dialog__hint">(optional)</span>
         <input type="url" name="icon" class="c-dialog__input js-edit-icon" placeholder="https://…">
       </label>
-      <div class="c-dialog__actions">
+      <div class="c-dialog__actions c-dialog__actions--split">
+        <button type="button" class="c-btn c-btn--danger js-edit-delete">Delete</button>
         <button type="submit" class="c-btn c-btn--primary">Save</button>
       </div>
     </form>
@@ -420,7 +421,7 @@ function renderBookmark(bookmark, faviconUrls, categoryName, subcategoryName) {
   const subData = subcategoryName ? ` data-subcategory="${escapeAttr(subcategoryName)}"` : '';
 
   const ICON_EDIT = _uiIcons['pencil'] || '&#9998;';
-  const ICON_DELETE = _uiIcons['trash-2'] || '&#128465;';
+  const ICON_COPY = _uiIcons['copy'] || '&#128203;';
 
   let displayUrl;
   try { displayUrl = new URL(bookmark.url).hostname; } catch { displayUrl = bookmark.url; }
@@ -436,7 +437,7 @@ function renderBookmark(bookmark, faviconUrls, categoryName, subcategoryName) {
               </div>
               <div class="c-bookmark__actions">
                 <button type="button" class="c-btn c-btn--icon js-edit-open" aria-label="Edit ${escapeAttr(bookmark.title)}" tabindex="-1">${ICON_EDIT}</button>
-                <button type="button" class="c-btn c-btn--icon c-btn--danger js-delete" aria-label="Delete ${escapeAttr(bookmark.title)}" tabindex="-1">${ICON_DELETE}</button>
+                <button type="button" class="c-btn c-btn--icon js-copy-url" aria-label="Copy URL for ${escapeAttr(bookmark.title)}" tabindex="-1">${ICON_COPY}</button>
               </div>
             </div>
           </li>`;

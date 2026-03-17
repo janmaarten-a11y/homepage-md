@@ -22,7 +22,7 @@ const WEATHER_ICON_NAMES = [
 /** Lucide icon names used in the server-rendered UI. */
 const UI_ICON_NAMES_20 = ['menu', 'settings', 'table-of-contents', 'bookmark-plus'];
 const UI_ICON_NAMES_16 = ['rows-3', 'columns-3', 'list', 'list-chevrons-up-down', 'list-chevrons-down-up', 'sun', 'moon', 'monitor'];
-const UI_ICON_NAMES_14 = ['pencil', 'trash-2'];
+const UI_ICON_NAMES_14 = ['pencil', 'trash-2', 'copy'];
 const UI_ICON_NAMES_24 = ['plus'];
 
 /** Cached icon SVGs (resolved once at first use). */

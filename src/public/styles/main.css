@@ -1231,6 +1231,10 @@
     justify-content: flex-end;
   }
 
+  .c-dialog__actions--split {
+    justify-content: space-between;
+  }
+
   /* Combobox */
   .c-combobox {
     position: relative;

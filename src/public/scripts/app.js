@@ -309,7 +309,7 @@ document.addEventListener('keydown', (event) => {
   const focusable = [
     card.querySelector('.c-bookmark__link'),
     card.querySelector('.js-edit-open'),
-    card.querySelector('.js-delete'),
+    card.querySelector('.js-copy-url'),
   ].filter(Boolean);
 
   const currentIdx = focusable.indexOf(event.target);
@@ -528,7 +528,26 @@ if (editForm) {
 }
 
 // ---------------------------------------------------------------------------
-// Delete bookmark (modal dialog instead of confirm())
+// Copy bookmark URL to clipboard
+// ---------------------------------------------------------------------------
+
+document.addEventListener('click', (event) => {
+  const copyBtn = event.target.closest('.js-copy-url');
+  if (!copyBtn) return;
+
+  const card = copyBtn.closest('.c-bookmark');
+  if (!card) return;
+
+  const url = card.dataset.url || '';
+  navigator.clipboard.writeText(url).then(() => {
+    const label = copyBtn.getAttribute('aria-label');
+    copyBtn.setAttribute('aria-label', 'Copied!');
+    setTimeout(() => copyBtn.setAttribute('aria-label', label), 1500);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Delete bookmark (modal dialog)
 // ---------------------------------------------------------------------------
 
 const deleteDialog = document.querySelector('.js-delete-dialog');
@@ -543,21 +562,18 @@ for (const btn of deleteCancelBtn) {
 }
 
 document.addEventListener('click', (event) => {
-  const deleteBtn = event.target.closest('.js-delete');
+  const deleteBtn = event.target.closest('.js-edit-delete');
   if (!deleteBtn) return;
+  if (!editDialog || !deleteDialog) return;
 
-  const card = deleteBtn.closest('.c-bookmark');
-  if (!card || !deleteDialog) return;
-
-  const url = card.dataset.url || '';
-  const titleEl = card.querySelector('.c-bookmark__title');
-  const title = titleEl?.textContent || url;
+  const url = editOriginalUrl.value;
+  const title = editTitle.value || url;
 
   deleteMessage.textContent = `Are you sure you want to delete "${title}"?`;
   deleteUrlInput.value = url;
   clearError(deleteError);
-  const bookmarkLink = card.querySelector('.c-bookmark__link');
-  openDialog(deleteDialog, bookmarkLink, deleteBtn);
+  editDialog.close();
+  openDialog(deleteDialog, null, deleteBtn);
 });
 
 if (deleteConfirmBtn) {
