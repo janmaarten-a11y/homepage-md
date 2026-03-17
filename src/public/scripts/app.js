@@ -888,11 +888,11 @@ function renderWeather(data) {
     ? `${data.location.name}, ${data.location.region}`
     : data.location.name;
 
-  // Show the button with current temp and icon
+  // Update the button with current temp and icon
   const icon = WEATHER_ICONS[data.current.icon] || '\uD83C\uDF24\uFE0F';
   weatherIcon.textContent = icon;
   weatherLabel.textContent = `${data.current.temp}${data.units.temp}`;
-  weatherBtn.hidden = false;
+  weatherBtn.disabled = false;
   weatherBtn.setAttribute('aria-label', `Weather for ${locationName}: ${data.current.temp}${data.units.temp}, ${data.current.condition}. Activate to show forecast.`);
 
   // Location-specific weather.gov link
@@ -1037,4 +1037,85 @@ if (weatherBtn && weatherPanel) {
       }
     })
     .catch(() => {});
+}
+
+// ---------------------------------------------------------------------------
+// Speed test — on-demand via Cloudflare endpoints
+// ---------------------------------------------------------------------------
+
+const speedBtn = document.querySelector('.js-speed-test');
+const speedLabel = document.querySelector('.js-speed-label');
+
+if (speedBtn && speedLabel) {
+  let testing = false;
+
+  // Restore last result from sessionStorage
+  const lastResult = sessionStorage.getItem('homepage-md-speed');
+  if (lastResult) {
+    try {
+      const saved = JSON.parse(lastResult);
+      showSpeedResult(saved.down, saved.up);
+    } catch { /* ignore */ }
+  }
+
+  speedBtn.addEventListener('click', async () => {
+    if (testing) return;
+    testing = true;
+    speedBtn.disabled = true;
+
+    try {
+      // Download test
+      updateSpeedLabel('Testing \u2193\u2026', 'Measuring download speed');
+      const down = await measureDownload();
+
+      // Upload test
+      updateSpeedLabel(`\u2193 ${down} \u2022 Testing \u2191\u2026`, 'Measuring upload speed');
+      const up = await measureUpload();
+
+      // Show result
+      showSpeedResult(down, up);
+      sessionStorage.setItem('homepage-md-speed', JSON.stringify({ down, up }));
+    } catch {
+      updateSpeedLabel('Test failed', 'Speed test failed. Try again.');
+    } finally {
+      testing = false;
+      speedBtn.disabled = false;
+    }
+  });
+
+  function updateSpeedLabel(text, ariaLabel) {
+    speedLabel.textContent = text;
+    speedBtn.setAttribute('aria-label', ariaLabel);
+  }
+
+  function showSpeedResult(down, up) {
+    speedLabel.textContent = `\u2193 ${down} \u2191 ${up} Mbps`;
+    speedBtn.setAttribute('aria-label', `Speed test result: ${down} megabits per second download, ${up} megabits per second upload. Activate to test again.`);
+  }
+
+  async function measureDownload() {
+    const bytes = 10_000_000; // 10 MB
+    const start = performance.now();
+    const res = await fetch(`https://speed.cloudflare.com/__down?bytes=${bytes}`, {
+      cache: 'no-store',
+    });
+    await res.arrayBuffer();
+    const elapsed = (performance.now() - start) / 1000;
+    const mbps = ((bytes * 8) / elapsed / 1_000_000).toFixed(0);
+    return mbps;
+  }
+
+  async function measureUpload() {
+    const bytes = 2_000_000; // 2 MB
+    const blob = new Blob([new ArrayBuffer(bytes)]);
+    const start = performance.now();
+    await fetch('https://speed.cloudflare.com/__up', {
+      method: 'POST',
+      body: blob,
+      cache: 'no-store',
+    });
+    const elapsed = (performance.now() - start) / 1000;
+    const mbps = ((bytes * 8) / elapsed / 1_000_000).toFixed(0);
+    return mbps;
+  }
 }

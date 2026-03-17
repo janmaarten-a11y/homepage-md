@@ -59,10 +59,14 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultP
       <h1 class="c-header__title">${escapeHtml(title)}</h1>
 ${nav}
       <div class="c-header__actions">
-${hasLocation ? `        <button type="button" class="c-weather-btn js-weather-toggle" aria-expanded="false" aria-label="Weather" hidden>
-          <span class="c-weather-btn__icon js-weather-icon" aria-hidden="true"></span>
-          <span class="c-weather-btn__label js-weather-label"></span>
+${hasLocation ? `        <button type="button" class="c-weather-btn js-weather-toggle" aria-expanded="false" aria-label="Loading weather\u2026" disabled>
+          <span class="c-weather-btn__icon js-weather-icon" aria-hidden="true">\u2601\uFE0F</span>
+          <span class="c-weather-btn__label js-weather-label">\u2022\u2022\u2022</span>
         </button>` : ''}
+        <button type="button" class="c-speed-btn js-speed-test" aria-label="Run speed test" aria-live="polite">
+          <span class="c-speed-btn__icon" aria-hidden="true">\uD83D\uDCF6</span>
+          <span class="c-speed-btn__label js-speed-label">Speed test</span>
+        </button>
         <button type="button" class="c-header__action-btn js-view-toggle" aria-expanded="false" aria-controls="js-view-popover" aria-label="View options">${iconSettings}</button>
         <div class="c-popover js-view-popover" id="js-view-popover" hidden>
 ${toolbar}
