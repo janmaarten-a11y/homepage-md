@@ -350,6 +350,11 @@
     background-color: var(--color-bg);
   }
 
+  .c-weather-btn:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+
   .c-weather-btn[hidden] {
     display: none;
   }

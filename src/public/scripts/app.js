@@ -888,11 +888,11 @@ function renderWeather(data) {
     ? `${data.location.name}, ${data.location.region}`
     : data.location.name;
 
-  // Show the button with current temp and icon
+  // Update the button with current temp and icon
   const icon = WEATHER_ICONS[data.current.icon] || '\uD83C\uDF24\uFE0F';
   weatherIcon.textContent = icon;
   weatherLabel.textContent = `${data.current.temp}${data.units.temp}`;
-  weatherBtn.hidden = false;
+  weatherBtn.disabled = false;
   weatherBtn.setAttribute('aria-label', `Weather for ${locationName}: ${data.current.temp}${data.units.temp}, ${data.current.condition}. Activate to show forecast.`);
 
   // Location-specific weather.gov link
