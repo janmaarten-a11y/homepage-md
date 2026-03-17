@@ -1563,6 +1563,18 @@
     border-radius: 0;
   }
 
+  /* List hover — background highlight on the whole row */
+  .is-list .c-bookmark:hover {
+    background-color: var(--color-surface);
+  }
+
+  /* List focus-visible — show title in link-hover style (blue + underline) */
+  .is-list .c-bookmark:has(.c-bookmark__link:focus-visible) .c-bookmark__title {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    color: var(--color-primary);
+  }
+
   /* Condensed + List — smaller icons, less padding, stable row height */
   .is-condensed.is-list .c-bookmark {
     padding: var(--space-xs) var(--space-m);
