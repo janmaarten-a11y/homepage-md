@@ -410,7 +410,7 @@
   .c-weather-panel {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 0 var(--space-xl);
+    gap: var(--space-m) var(--space-xl);
     padding-block: var(--space-m);
     padding-inline: var(--space-l);
     border-block-end: 1px solid var(--color-border);
@@ -1080,7 +1080,8 @@
   }
 
   .c-bookmark:hover .c-bookmark__actions,
-  .c-bookmark:focus-within .c-bookmark__actions {
+  .c-bookmark:focus-within .c-bookmark__actions,
+  .c-bookmark.is-focus-restore .c-bookmark__actions {
     display: flex;
   }
 
@@ -1858,15 +1859,23 @@
     display: none;
   }
 
-  /* On mobile, flatten actions so the popover can span full width
-     within the wrapping c-header__top flex container */
+  /* On mobile, keep action buttons grouped so they wrap together */
   .c-header__actions {
-    display: contents;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin-inline-start: 0;
   }
 
-  /* View popover: full-width panel below the top row on mobile */
+  /* View popover: full-width panel — positioned relative to the header, not actions */
+  .c-header__top {
+    position: relative;
+  }
+
   .c-popover.js-view-popover {
-    position: static;
+    position: absolute;
+    inset-inline: 0;
+    inset-block-start: 100%;
     margin-block-start: 0;
     border: none;
     border-radius: 0;
@@ -1905,8 +1914,8 @@
 
   .c-header__title {
     font-size: 1.125rem;
-    flex: 1;
-    min-inline-size: 0;
+    flex: 1 1 0;
+    min-inline-size: min(10rem, 50%);
   }
 
   /* Drawers */

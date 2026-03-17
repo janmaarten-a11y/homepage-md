@@ -35,6 +35,9 @@ function openDialog(dialog, opener, targetBtn) {
   if (!dialog) return;
   dialogOpeners.set(dialog, opener || document.activeElement);
   if (targetBtn) dialogTargetBtns.set(dialog, targetBtn);
+  // Remove dialog from tab order so Shift+Tab from close button
+  // goes to the browser chrome, not the dialog container
+  dialog.setAttribute('tabindex', '-1');
   dialog.showModal();
   const closeBtn = dialog.querySelector('.c-dialog__close');
   if (closeBtn) closeBtn.focus();
@@ -78,7 +81,23 @@ async function apiRequest(method, slug, body) {
 
 const evtSource = new EventSource('/api/events');
 
+// Suppress SSE reloads for 3s after a CRUD operation to prevent double-reload.
+// The flag is persisted in sessionStorage because window.location.reload()
+// creates a fresh JS context where in-memory flags are lost.
+const SSE_SUPPRESS_KEY = 'homepage-md-sse-suppress';
+const SSE_SUPPRESS_MS = 3000;
+
+function isSSESuppressed() {
+  try {
+    const ts = sessionStorage.getItem(SSE_SUPPRESS_KEY);
+    if (ts && Date.now() - Number(ts) < SSE_SUPPRESS_MS) return true;
+    sessionStorage.removeItem(SSE_SUPPRESS_KEY);
+  } catch { /* ignore */ }
+  return false;
+}
+
 evtSource.addEventListener('message', (event) => {
+  if (isSSESuppressed()) return;
   try {
     const data = JSON.parse(event.data);
     if (data.type === 'update') {
@@ -89,11 +108,45 @@ evtSource.addEventListener('message', (event) => {
   }
 });
 
+/**
+ * Reload the page after a CRUD operation, suppressing the SSE-triggered
+ * reload and optionally restoring focus to a specific bookmark.
+ */
+function reloadAfterEdit(focusUrl) {
+  try {
+    sessionStorage.setItem(SSE_SUPPRESS_KEY, String(Date.now()));
+    if (focusUrl) sessionStorage.setItem('homepage-md-focus', focusUrl);
+  } catch { /* ignore */ }
+  window.location.reload();
+}
+
 // ---------------------------------------------------------------------------
 // Page data — shared by search bangs and comboboxes
 // ---------------------------------------------------------------------------
 
 const pageData = JSON.parse(document.getElementById('js-page-data')?.textContent || '{}');
+
+// ---------------------------------------------------------------------------
+// Focus restoration — after a CRUD reload, focus the edited bookmark
+// ---------------------------------------------------------------------------
+
+try {
+  const focusUrl = sessionStorage.getItem('homepage-md-focus');
+  if (focusUrl) {
+    sessionStorage.removeItem('homepage-md-focus');
+    const card = document.querySelector(`.c-bookmark[data-url="${CSS.escape(focusUrl)}"]`);
+    if (card) {
+      // Force actions visible so we can focus the edit button directly
+      // without the link→button dance that double-announces in screen readers
+      card.classList.add('is-focus-restore');
+      requestAnimationFrame(() => {
+        card.scrollIntoView({ block: 'nearest', behavior: 'instant' });
+        const editBtn = card.querySelector('.js-edit-open');
+        if (editBtn) editBtn.focus();
+      });
+    }
+  }
+} catch { /* ignore */ }
 
 // ---------------------------------------------------------------------------
 // Search — filter bookmarks on the current page
@@ -408,8 +461,7 @@ if (addForm) {
       });
       addDialog.close();
       addForm.reset();
-      // SSE will trigger reload, but reload immediately for responsiveness
-      window.location.reload();
+      reloadAfterEdit(formData.get('url'));
     } catch (err) {
       showError(addError, `Failed to add bookmark: ${err.message}`);
     }
@@ -520,7 +572,17 @@ if (editForm) {
         subcategory: categoryChanged ? (editSubcategoryVal || undefined) : undefined,
       });
       editDialog.close();
-      window.location.reload();
+
+      // Flash green check on the edit button before reloading
+      const targetUrl = editUrl.value || originalUrl;
+      const card = document.querySelector(`.c-bookmark[data-url="${CSS.escape(originalUrl)}"]`);
+      const editBtn = card?.querySelector('.js-edit-open');
+      if (editBtn) {
+        const checkIcon = pageData.weatherIcons?.['check'];
+        if (checkIcon) editBtn.innerHTML = checkIcon;
+        editBtn.style.color = 'oklch(55% 0.2 145)';
+      }
+      setTimeout(() => reloadAfterEdit(targetUrl), 400);
     } catch (err) {
       showError(editError, `Failed to update bookmark: ${err.message}`);
     }
@@ -598,7 +660,7 @@ if (deleteConfirmBtn) {
     try {
       await apiRequest('DELETE', slug, { url });
       closeDialog(deleteDialog);
-      window.location.reload();
+      reloadAfterEdit();
     } catch (err) {
       showError(deleteError, `Failed to delete bookmark: ${err.message}`);
     }
@@ -1309,7 +1371,7 @@ if (weatherBtn && weatherPanel) {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error);
         locationDialog.close();
-        window.location.reload();
+        reloadAfterEdit();
       } catch (err) {
         // Show error inline (reuse dialog pattern)
         locationInput.setCustomValidity(err.message);
