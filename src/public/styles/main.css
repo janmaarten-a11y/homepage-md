@@ -1579,22 +1579,22 @@
   }
 
   /* Condensed + List — headings and subtitles inline */
-  .is-condensed.is-list .c-section__header {
+  .is-condensed:not(.is-columns) .c-section__header {
     display: block;
     margin-block-end: var(--space-s);
   }
 
-  .is-condensed.is-list .c-section__header h2,
-  .is-condensed.is-list .c-section__header h3 {
+  .is-condensed:not(.is-columns) .c-section__header h2,
+  .is-condensed:not(.is-columns) .c-section__header h3 {
     display: inline;
   }
 
-  .is-condensed.is-list .c-section__header h3 {
+  .is-condensed:not(.is-columns) .c-section__header h3 {
     font-weight: 600;
   }
 
-  .is-condensed.is-list .c-category__subtitle,
-  .is-condensed.is-list .c-subcategory__subtitle {
+  .is-condensed:not(.is-columns) .c-category__subtitle,
+  .is-condensed:not(.is-columns) .c-subcategory__subtitle {
     display: inline;
     margin: 0;
     font-size: inherit;
