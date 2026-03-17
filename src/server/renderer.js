@@ -97,10 +97,10 @@ ${pageData.categories.map((cat) => `      <a href="#${escapeAttr(cat.id)}" class
   </aside>
   <main id="main-content">
 ${main}
+    <p class="c-search-empty js-search-empty" hidden>No bookmarks match your search.</p>
   </main>
 ${footer}
   <button type="button" class="c-fab js-add-open">${iconPlus} <span class="c-fab__label">Add link</span></button>
-  <p class="c-search-empty js-search-empty" hidden>No bookmarks match your search.</p>
   <div class="u-visually-hidden" aria-live="polite" id="js-search-status"></div>
 ${addDialog}
   <dialog class="c-dialog js-edit-dialog">
@@ -151,7 +151,7 @@ ${addDialog}
   </dialog>
 ${deleteDialog}
 ${keyboardHelp}
-  <script id="js-page-data" type="application/json">${JSON.stringify({ categories, subcategories: subcategoryPairs })}</script>
+  <script id="js-page-data" type="application/json">${JSON.stringify({ categories, subcategories: subcategoryPairs, bangs: pageData.bangs || [] })}</script>
   <script src="/scripts/app.js" type="module"></script>
 </body>
 </html>`;
@@ -161,8 +161,10 @@ function renderSearch() {
   return `    <search class="c-search">
       <label for="js-search" class="u-visually-hidden">Search bookmarks</label>
       <div class="c-search__wrap">
-        <input type="search" id="js-search" class="c-search__input" placeholder="Search bookmarks…" autocomplete="off">
-        <kbd class="c-search__shortcut" aria-hidden="true">/</kbd>
+        <svg class="c-search__icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="6.5" cy="6.5" r="5"/><line x1="10" y1="10" x2="14.5" y2="14.5"/></svg>
+        <input type="search" id="js-search" class="c-search__input" placeholder="Search bookmarks\u2026" autocomplete="off">
+        <span class="c-search__shortcuts"><kbd class="c-search__shortcut" aria-hidden="true">/</kbd><kbd class="c-search__shortcut" aria-hidden="true">\u0021</kbd></span>
+        <p class="c-search__bang-hint js-bang-hint" hidden aria-live="polite"></p>
       </div>
     </search>`;
 }
@@ -223,9 +225,10 @@ function renderKeyboardHelp() {
       </div>
       <dl class="c-shortcut-list">
         <div class="c-shortcut-list__item"><dt><kbd>/</kbd></dt><dd>Focus search</dd></div>
+        <div class="c-shortcut-list__item"><dt><kbd>!</kbd></dt><dd>Search bangs (e.g. !g, !ddg, !w)</dd></div>
         <div class="c-shortcut-list__item"><dt><kbd>Esc</kbd></dt><dd>Clear search / close dialog</dd></div>
-        <div class="c-shortcut-list__item"><dt><kbd>→</kbd> <kbd>↓</kbd></dt><dd>Edit / Delete actions</dd></div>
-        <div class="c-shortcut-list__item"><dt><kbd>←</kbd> <kbd>↑</kbd></dt><dd>Return to bookmark</dd></div>
+        <div class="c-shortcut-list__item"><dt><kbd>\u2192</kbd> <kbd>\u2193</kbd></dt><dd>Edit / Delete actions</dd></div>
+        <div class="c-shortcut-list__item"><dt><kbd>\u2190</kbd> <kbd>\u2191</kbd></dt><dd>Return to bookmark</dd></div>
         <div class="c-shortcut-list__item"><dt><kbd>?</kbd></dt><dd>This help</dd></div>
       </dl>
     </div>

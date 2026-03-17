@@ -90,17 +90,84 @@ evtSource.addEventListener('message', (event) => {
 });
 
 // ---------------------------------------------------------------------------
+// Page data — shared by search bangs and comboboxes
+// ---------------------------------------------------------------------------
+
+const pageData = JSON.parse(document.getElementById('js-page-data')?.textContent || '{}');
+
+// ---------------------------------------------------------------------------
 // Search — filter bookmarks on the current page
 // ---------------------------------------------------------------------------
 
 const searchInput = document.getElementById('js-search');
 const searchEmpty = document.querySelector('.js-search-empty');
 const searchStatus = document.getElementById('js-search-status');
+const bangHint = document.querySelector('.js-bang-hint');
+const searchShortcuts = document.querySelector('.c-search__shortcuts');
 const bookmarks = document.querySelectorAll('.c-bookmark');
 const categories = document.querySelectorAll('.c-category');
 const subcategories = document.querySelectorAll('.c-subcategory');
 
 let debounceTimer;
+let activeBang = null;
+
+// Load bangs from page data
+const allBangs = (pageData.bangs || []).reduce((map, b) => {
+  map[b.prefix.toLowerCase()] = b;
+  return map;
+}, {});
+
+/**
+ * Check if the search value starts with a bang prefix.
+ * Returns { bang, query } or null.
+ */
+function matchBang(value) {
+  const trimmed = value.trim();
+  if (!trimmed.startsWith('!')) return null;
+
+  // Try to match "!prefix rest of query"
+  const spaceIdx = trimmed.indexOf(' ');
+  const prefix = spaceIdx > 0 ? trimmed.substring(0, spaceIdx) : trimmed;
+  const query = spaceIdx > 0 ? trimmed.substring(spaceIdx + 1).trim() : '';
+  const bang = allBangs[prefix.toLowerCase()];
+
+  return bang ? { bang, query, prefix } : null;
+}
+
+function showBangHint(prefix, bang, query) {
+  if (!bangHint) return;
+  const name = extractBangName(bang.url);
+  if (query) {
+    bangHint.textContent = `Press Enter to search ${name} for \u201C${query}\u201D`;
+  } else {
+    bangHint.textContent = `${prefix} \u2192 ${name} \u2014 type your search query`;
+  }
+  bangHint.hidden = false;
+}
+
+function showBangList() {
+  if (!bangHint) return;
+  const entries = Object.values(allBangs);
+  if (entries.length === 0) return;
+  bangHint.textContent = entries.map((b) => `${b.prefix} ${extractBangName(b.url)}`).join('  \u00B7  ');
+  bangHint.hidden = false;
+}
+
+function hideBangHint() {
+  if (!bangHint) return;
+  bangHint.textContent = '';
+  bangHint.hidden = true;
+}
+
+function extractBangName(url) {
+  try {
+    const host = new URL(url).hostname.replace('www.', '');
+    // Capitalize first letter
+    return host.charAt(0).toUpperCase() + host.slice(1);
+  } catch {
+    return 'the web';
+  }
+}
 
 function filterBookmarks(query) {
   const term = query.toLowerCase().trim();
@@ -141,7 +208,46 @@ function filterBookmarks(query) {
 if (searchInput) {
   searchInput.addEventListener('input', () => {
     clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => filterBookmarks(searchInput.value), 100);
+    const value = searchInput.value;
+    const match = matchBang(value);
+
+    // Show/hide keyboard shortcut hints based on whether there's text
+    if (searchShortcuts) searchShortcuts.hidden = value.length > 0;
+
+    if (match) {
+      // Bang detected — freeze bookmark filtering, show hint
+      activeBang = match;
+      hideBangHint();
+      showBangHint(match.prefix, match.bang, match.query);
+      searchEmpty.hidden = true;
+      searchStatus.textContent = '';
+    } else if (value.trim() === '!' && Object.keys(allBangs).length > 0) {
+      // Just "!" typed — show available bangs
+      activeBang = null;
+      showBangList();
+      searchEmpty.hidden = true;
+      searchStatus.textContent = '';
+    } else {
+      // Normal bookmark search
+      activeBang = null;
+      hideBangHint();
+      debounceTimer = setTimeout(() => filterBookmarks(value), 100);
+    }
+  });
+
+  // Enter key: if a bang is active and there's a query, redirect
+  searchInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && activeBang && activeBang.query) {
+      event.preventDefault();
+      const url = activeBang.bang.url.replace('%s', encodeURIComponent(activeBang.query));
+      window.open(url, '_blank', 'noopener');
+      // Clear the search after redirect
+      searchInput.value = '';
+      activeBang = null;
+      hideBangHint();
+      if (searchShortcuts) searchShortcuts.hidden = false;
+      filterBookmarks('');
+    }
   });
 }
 
@@ -169,6 +275,8 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && document.activeElement === searchInput) {
     searchInput.value = '';
     filterBookmarks('');
+    hideBangHint();
+    if (searchShortcuts) searchShortcuts.hidden = false;
     searchInput.blur();
   }
 });
@@ -711,7 +819,6 @@ for (const btn of document.querySelectorAll('.js-color-btn')) {
 // ARIA Combobox — filtered autocomplete for category/subcategory fields
 // ---------------------------------------------------------------------------
 
-const pageData = JSON.parse(document.getElementById('js-page-data')?.textContent || '{}');
 const allCategories = (pageData.categories || []).map((c) => ({ label: c, value: c }));
 const allSubcategoryPairs = (pageData.subcategories || []).map((s) => ({
   label: `${s.category} > ${s.subcategory}`,
@@ -889,7 +996,11 @@ function renderWeather(data) {
     : data.location.name;
 
   // Update the button with current temp and icon
-  const icon = WEATHER_ICONS[data.current.icon] || '\uD83C\uDF24\uFE0F';
+  // Override icon for extreme temperatures
+  let icon = WEATHER_ICONS[data.current.icon] || '\uD83C\uDF24\uFE0F';
+  const tempF = data.units.temp === '\u00B0F' ? data.current.temp : data.current.temp * 9 / 5 + 32;
+  if (tempF <= 25) icon = '\uD83E\uDD76';       // 🥶 freezing
+  else if (tempF >= 85) icon = '\uD83E\uDD75';   // 🥵 burning
   weatherIcon.textContent = icon;
   weatherLabel.textContent = `${data.current.temp}${data.units.temp}`;
   weatherBtn.disabled = false;
@@ -1176,8 +1287,14 @@ if (speedBtn && speedLabel) {
   }
 
   function showSpeedResult(down, up) {
-    speedLabel.textContent = `\u2193 ${down} \u2191 ${up} Mbps`;
+    speedLabel.textContent = `\u2193 ${down} \u2191 ${up}`;
     speedBtn.setAttribute('aria-label', `Speed test result: ${down} megabits per second download, ${up} megabits per second upload. Activate to test again.`);
+  }
+
+  function formatSpeed(mbps) {
+    const val = parseFloat(mbps);
+    if (val < 1) return val.toFixed(1);
+    return Math.round(val).toString();
   }
 
   async function measureDownload() {
@@ -1188,8 +1305,7 @@ if (speedBtn && speedLabel) {
     });
     await res.arrayBuffer();
     const elapsed = (performance.now() - start) / 1000;
-    const mbps = ((bytes * 8) / elapsed / 1_000_000).toFixed(0);
-    return mbps;
+    return formatSpeed((bytes * 8) / elapsed / 1_000_000);
   }
 
   async function measureUpload() {
@@ -1202,7 +1318,6 @@ if (speedBtn && speedLabel) {
       cache: 'no-store',
     });
     const elapsed = (performance.now() - start) / 1000;
-    const mbps = ((bytes * 8) / elapsed / 1_000_000).toFixed(0);
-    return mbps;
+    return formatSpeed((bytes * 8) / elapsed / 1_000_000);
   }
 }
