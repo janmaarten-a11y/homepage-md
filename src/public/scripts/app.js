@@ -846,7 +846,7 @@ function getViewPrefs() {
     const stored = localStorage.getItem(`homepage-md-view-${slug}`);
     if (stored) return JSON.parse(stored);
   } catch { /* ignore */ }
-  return { density: 'detailed', layout: 'grid', colorMode: 'system' };
+  return { density: 'detailed', layout: 'grid', colorMode: 'system', theme: 'default' };
 }
 
 function saveViewPrefs(prefs) {
@@ -879,6 +879,20 @@ function applyView(prefs) {
   for (const btn of document.querySelectorAll('.js-color-btn')) {
     btn.setAttribute('aria-pressed', String(btn.dataset.value === prefs.colorMode));
   }
+
+  // Theme — swap the theme stylesheet
+  const themeLink = document.getElementById('js-theme-link');
+  if (themeLink && prefs.theme) {
+    const newHref = `/themes/${encodeURIComponent(prefs.theme)}.css`;
+    if (themeLink.getAttribute('href') !== newHref) {
+      themeLink.setAttribute('href', newHref);
+    }
+    // Set cookie so server renders the correct theme on next load (avoids FOUC)
+    document.cookie = `homepage-md-theme=${encodeURIComponent(prefs.theme)};path=/;max-age=31536000;SameSite=Lax`;
+  }
+  for (const btn of document.querySelectorAll('.js-theme-btn')) {
+    btn.setAttribute('aria-pressed', String(btn.dataset.value === prefs.theme));
+  }
 }
 
 // Initialize
@@ -907,6 +921,15 @@ for (const btn of document.querySelectorAll('.js-density-btn')) {
 for (const btn of document.querySelectorAll('.js-color-btn')) {
   btn.addEventListener('click', () => {
     viewPrefs.colorMode = btn.dataset.value;
+    saveViewPrefs(viewPrefs);
+    applyView(viewPrefs);
+  });
+}
+
+// Theme toggle buttons
+for (const btn of document.querySelectorAll('.js-theme-btn')) {
+  btn.addEventListener('click', () => {
+    viewPrefs.theme = btn.dataset.value;
     saveViewPrefs(viewPrefs);
     applyView(viewPrefs);
   });
