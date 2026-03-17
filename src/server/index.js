@@ -23,6 +23,9 @@ const CONTENT_TYPES = {
 
 const sseClients = new Set();
 
+/** In-memory cache: slug → { bookmarkUrl: faviconUrl } */
+const faviconCache = new Map();
+
 /**
  * Load footer content from the footer Markdown file.
  * Returns null if the file doesn't exist.
@@ -97,28 +100,41 @@ function flattenBookmarks(pageData) {
 
 /**
  * Build a map of bookmark URL → favicon URL for rendering.
+ * Uses an in-memory cache per slug to avoid repeated file-system lookups.
  */
-async function resolveFavicons(bookmarks) {
-  const map = {};
-  const TIMEOUT = 2000; // Don't block page render for more than 2s
+async function resolveFavicons(slug, bookmarks) {
+  const cached = faviconCache.get(slug);
+  if (cached) {
+    // Check if all bookmarks are in the cached map
+    const missing = bookmarks.filter((b) => !(b.url in cached));
+    if (missing.length === 0) return cached;
+  }
 
-  const raceWithTimeout = (promise, fallback) =>
-    Promise.race([promise, new Promise((resolve) => setTimeout(() => resolve(fallback), TIMEOUT))]);
+  const map = cached ? { ...cached } : {};
+  const uncached = bookmarks.filter((b) => !(b.url in map));
 
-  const entries = await Promise.allSettled(
-    bookmarks.map(async (b) => {
-      const url = await raceWithTimeout(
-        getFaviconUrl(b.url, b.icon, config),
-        '/icons/default.svg'
-      );
-      return { bookmarkUrl: b.url, faviconUrl: url };
-    }),
-  );
-  for (const entry of entries) {
-    if (entry.status === 'fulfilled') {
-      map[entry.value.bookmarkUrl] = entry.value.faviconUrl;
+  if (uncached.length > 0) {
+    const TIMEOUT = 2000;
+    const raceWithTimeout = (promise, fallback) =>
+      Promise.race([promise, new Promise((resolve) => setTimeout(() => resolve(fallback), TIMEOUT))]);
+
+    const entries = await Promise.allSettled(
+      uncached.map(async (b) => {
+        const url = await raceWithTimeout(
+          getFaviconUrl(b.url, b.icon, config),
+          '/icons/default.svg'
+        );
+        return { bookmarkUrl: b.url, faviconUrl: url };
+      }),
+    );
+    for (const entry of entries) {
+      if (entry.status === 'fulfilled') {
+        map[entry.value.bookmarkUrl] = entry.value.faviconUrl;
+      }
     }
   }
+
+  faviconCache.set(slug, map);
   return map;
 }
 
@@ -184,10 +200,33 @@ async function startWatcher() {
         debounceTimer = setTimeout(() => {
           broadcastSSE({ type: 'update', file: event.filename });
 
-          // Refresh favicons in the background (don't block SSE or page loads)
+          // Refresh favicons in the background and rebuild the in-memory cache
           const slug = event.filename.replace(/\.md$/, '');
           loadPage(slug)
-            .then((pageData) => refreshFavicons(flattenBookmarks(pageData), config))
+            .then(async (pageData) => {
+              const bookmarks = flattenBookmarks(pageData);
+              await refreshFavicons(bookmarks, config);
+              // Rebuild the in-memory map from disk cache
+              const map = {};
+              const TIMEOUT = 2000;
+              const raceWithTimeout = (promise, fallback) =>
+                Promise.race([promise, new Promise((resolve) => setTimeout(() => resolve(fallback), TIMEOUT))]);
+              const entries = await Promise.allSettled(
+                bookmarks.map(async (b) => {
+                  const url = await raceWithTimeout(
+                    getFaviconUrl(b.url, b.icon, config),
+                    '/icons/default.svg'
+                  );
+                  return { bookmarkUrl: b.url, faviconUrl: url };
+                }),
+              );
+              for (const entry of entries) {
+                if (entry.status === 'fulfilled') {
+                  map[entry.value.bookmarkUrl] = entry.value.faviconUrl;
+                }
+              }
+              faviconCache.set(slug, map);
+            })
             .catch(() => {});
         }, 500);
       }
@@ -576,7 +615,7 @@ async function handleRequest(req, res) {
       const pageData = await loadPage(slug);
       const pages = await getPageList();
       const bookmarks = flattenBookmarks(pageData);
-      const faviconUrls = await resolveFavicons(bookmarks);
+      const faviconUrls = await resolveFavicons(slug, bookmarks);
       const footerContent = await loadFooter();
       const html = renderPage(pageData, { pages, currentSlug: slug, faviconUrls, defaultPage: config.defaultPage, footerContent });
 
