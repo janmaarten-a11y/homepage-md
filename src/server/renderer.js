@@ -18,7 +18,7 @@ let _uiIcons = {};
  * @param {object} options.faviconUrls - Map of bookmark URL → resolved favicon path
  * @returns {string} Complete HTML document
  */
-export function renderPage(pageData, { pages, currentSlug, faviconUrls, categoryIcons = {}, weatherIcons = {}, uiIcons = {}, defaultPage, footerContent }) {
+export function renderPage(pageData, { pages, currentSlug, faviconUrls, categoryIcons = {}, weatherIcons = {}, uiIcons = {}, defaultPage, footerContent, themes = ['default'], activeTheme = 'default' }) {
   _uiIcons = uiIcons;
   const title = pageData.title || 'homepage.md';
   const hasLocation = !!pageData.location;
@@ -31,11 +31,15 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, category
   );
 
   const search = renderSearch();
-  const toolbar = renderToolbar();
+  const toolbar = renderToolbar(themes);
   const addDialog = renderAddDialog(categories, currentSlug);
   const deleteDialog = renderDeleteDialog();
   const keyboardHelp = renderKeyboardHelp();
   const footer = renderFooter(footerContent);
+
+  const themeLink = activeTheme && activeTheme !== 'default'
+    ? `\n  <link rel="stylesheet" href="/themes/${encodeURIComponent(activeTheme)}.css" id="js-theme-link">`
+    : '\n  <link rel="stylesheet" href="/themes/default.css" id="js-theme-link">';
 
   const iconMenu = uiIcons['menu'] || '&#9776;';
   const iconSettings = uiIcons['settings'] || '&#9881;';
@@ -50,7 +54,7 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, category
   <title>${escapeHtml(title)} — homepage.md</title>
   <link rel="preconnect" href="https://fonts.bunny.net">
   <link rel="stylesheet" href="https://fonts.bunny.net/css?family=inter:400,500,600,700">
-  <link rel="stylesheet" href="/styles/main.css">
+  <link rel="stylesheet" href="/styles/main.css">${themeLink}
   <link rel="stylesheet" href="/custom.css">
 </head>
 <body data-slug="${escapeAttr(currentSlug)}">
@@ -170,7 +174,7 @@ ${hasLocation ? `  <dialog class="c-dialog c-dialog--small js-location-dialog">
       </div>
     </form>
   </dialog>` : ''}
-  <script id="js-page-data" type="application/json">${JSON.stringify({ categories, subcategories: subcategoryPairs, bangs: pageData.bangs || [], weatherIcons })}</script>
+  <script id="js-page-data" type="application/json">${JSON.stringify({ categories, subcategories: subcategoryPairs, bangs: pageData.bangs || [], weatherIcons, themes })}</script>
   <script src="/scripts/app.js" type="module"></script>
 </body>
 </html>`;
@@ -188,7 +192,7 @@ function renderSearch() {
     </search>`;
 }
 
-function renderToolbar() {
+function renderToolbar(themes = ['default']) {
   const iconRows = _uiIcons['rows-3'] || '&#9638;';
   const iconColumns = _uiIcons['columns-3'] || '&#9638;';
   const iconList = _uiIcons['list'] || '&#9776;';
@@ -209,11 +213,18 @@ function renderToolbar() {
           <button type="button" class="c-toolbar__btn js-density-btn" data-value="detailed" aria-pressed="true" title="Detailed view">${iconDetailed} <span class="c-toolbar__label">Detailed</span></button>
           <button type="button" class="c-toolbar__btn js-density-btn" data-value="condensed" aria-pressed="false" title="Condensed view">${iconCondensed} <span class="c-toolbar__label">Condensed</span></button>
         </div>
-        <div class="c-toolbar__separator" aria-hidden="true"></div>
-        <div class="c-toolbar__group" role="group" aria-label="Color mode">
-          <button type="button" class="c-toolbar__btn js-color-btn" data-value="system" aria-pressed="true" title="System theme">${iconSystem} <span class="c-toolbar__label">System</span></button>
-          <button type="button" class="c-toolbar__btn js-color-btn" data-value="light" aria-pressed="false" title="Light theme">${iconSun} <span class="c-toolbar__label">Light</span></button>
-          <button type="button" class="c-toolbar__btn js-color-btn" data-value="dark" aria-pressed="false" title="Dark theme">${iconMoon} <span class="c-toolbar__label">Dark</span></button>
+${themes.length > 1 ? `        <div class="c-toolbar__separator" aria-hidden="true"></div>
+        <div class="c-toolbar__group" role="group" aria-label="Theme">
+${themes.map((t) => {
+  const label = t.charAt(0).toUpperCase() + t.slice(1);
+  return `          <button type="button" class="c-toolbar__btn js-theme-btn" data-value="${escapeAttr(t)}" aria-pressed="${t === 'default' ? 'true' : 'false'}">${escapeHtml(label)}</button>`;
+}).join('\n')}
+        </div>` : ''}
+        <div class="c-toolbar__separator js-color-mode-separator" aria-hidden="true"></div>
+        <div class="c-toolbar__group js-color-mode-group" role="group" aria-label="Color mode">
+          <button type="button" class="c-toolbar__btn js-color-btn" data-value="system" aria-pressed="true">${iconSystem} <span class="c-toolbar__label">System</span></button>
+          <button type="button" class="c-toolbar__btn js-color-btn" data-value="light" aria-pressed="false">${iconSun} <span class="c-toolbar__label">Light</span></button>
+          <button type="button" class="c-toolbar__btn js-color-btn" data-value="dark" aria-pressed="false">${iconMoon} <span class="c-toolbar__label">Dark</span></button>
         </div>
       </div>`;
 }

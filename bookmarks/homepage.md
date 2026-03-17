@@ -15,7 +15,7 @@
   - subtitle: Hark, a subtitle!
 
 - [Weather](https://www.weather.gov)
-  - description: National Weather Service forecasts
+  - description: NWS forecasts
 - [Google Calendar](https://calendar.google.com)
   - description: Shared family calendar
 - [Todoist](https://www.todoist.com/)
@@ -29,13 +29,12 @@
   - description: Family credential manager
 - [You Need A Budget](https://app.ynab.com)
   - description: Family budgeting
-
 ### Storage
   - icon: hard-drive
 - [Obsidian](https://obsidian.md/auth)
   - description: Shared notes vault
 - [Ente Photos](https://web.ente.io)
-  - description: End-to-end encrypted photo storage
+  - description: Encrypted photo storage
 - [Dropbox](https://www.dropbox.com)
   - description: Shared cloud storage
 
@@ -55,23 +54,28 @@
   - description: Media server
   - icon: https://app.plex.tv/desktop/favicon.ico
 - [Nextcloud Portal](https://portal.nextcloud.com/login)
+  - description: Self hosted cloud
 - [Mealie](https://mealie.org/login)
   - description: Recipe management
 
 ### Networking
   - icon: network
 - [ASUS Router](https://192.168.1.1)
+  - description: Is this thing on
   - icon: https://www.asus.com/favicon.ico
 - [Mullvad VPN](https://mullvad.net)
   - description: Privacy-focused VPN
 - [NextDNS](https://my.nextdns.io/)
+  - description: It's always DNS
 
 ### House Subscriptions
   - icon: calendar-sync
 - [Blue Apron](https://blueapron.com)
-  - description: Discover chef-designed meal kits...
+  - description: Eat mostly sodium!
 - [Ridwell](https://ridwell.com)
+  - description: Landfill bad
 - [Instacart](https://instacart.com)
+  - description: Make someone else do it
 
 ## Media
   - icon: clapperboard
@@ -80,18 +84,13 @@
 ### Video
   - icon: video
 - [Plex](https://plex.tv)
-  - description: Family media library
 - [Apple TV](https://tv.apple.com/)
-  - description: Browse all movies, TV shows, and more from Apple TV.
 - [Netflix](https://www.netflix.com)
-  - description: Family streaming account
 
 ### Music
   - icon: music
 - [Qobuz](https://play.qobuz.com/)
-  - description: Listen to your music in high quality
 - [Bandcamp](https://bandcamp.com)
-  - description: Indie music and merch
 
 ### Audiobooks
   - icon: book-headphones

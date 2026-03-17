@@ -21,7 +21,7 @@ const WEATHER_ICON_NAMES = [
 
 /** Lucide icon names used in the server-rendered UI. */
 const UI_ICON_NAMES_20 = ['menu', 'settings', 'table-of-contents', 'bookmark-plus'];
-const UI_ICON_NAMES_16 = ['rows-3', 'columns-3', 'list', 'list-chevrons-up-down', 'list-chevrons-down-up', 'sun', 'moon', 'monitor'];
+const UI_ICON_NAMES_16 = ['rows-3', 'columns-3', 'list', 'list-chevrons-up-down', 'list-chevrons-down-up', 'sun', 'moon', 'monitor', 'palette'];
 const UI_ICON_NAMES_14 = ['pencil', 'trash-2', 'copy'];
 const UI_ICON_NAMES_24 = ['plus'];
 
@@ -75,6 +75,22 @@ async function loadFooter() {
     return source.trim() || null;
   } catch {
     return null;
+  }
+}
+
+/**
+ * Scan the themes directory for available .css theme files.
+ * Returns an array of theme names (without extension).
+ */
+async function getThemeList() {
+  try {
+    const files = await readdir(config.themesDir);
+    return files
+      .filter((f) => f.endsWith('.css'))
+      .map((f) => f.replace(/\.css$/, ''))
+      .sort((a, b) => a === 'default' ? -1 : b === 'default' ? 1 : a.localeCompare(b));
+  } catch {
+    return ['default'];
   }
 }
 
@@ -640,6 +656,13 @@ async function handleRequest(req, res) {
     return;
   }
 
+  // Theme stylesheets
+  if (pathname.startsWith('/themes/')) {
+    const file = pathname.slice('/themes/'.length);
+    await serveStatic(res, config.themesDir, file);
+    return;
+  }
+
   // Manual icon overrides
   if (pathname.startsWith('/icons/')) {
     const file = pathname.slice('/icons/'.length);
@@ -680,7 +703,14 @@ async function handleRequest(req, res) {
       const weatherIcons = await getWeatherIcons();
       const uiIcons = await getUIIcons();
       const footerContent = await loadFooter();
-      const html = renderPage(pageData, { pages, currentSlug: slug, faviconUrls, categoryIcons, weatherIcons, uiIcons, defaultPage: config.defaultPage, footerContent });
+      const themes = await getThemeList();
+
+      // Read theme preference from cookie (avoids FOUC)
+      const cookieHeader = req.headers.cookie || '';
+      const themeMatch = cookieHeader.match(/(?:^|;\s*)homepage-md-theme=([^;]+)/);
+      const activeTheme = themeMatch ? decodeURIComponent(themeMatch[1]) : 'default';
+
+      const html = renderPage(pageData, { pages, currentSlug: slug, faviconUrls, categoryIcons, weatherIcons, uiIcons, defaultPage: config.defaultPage, footerContent, themes, activeTheme });
 
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       res.end(html);

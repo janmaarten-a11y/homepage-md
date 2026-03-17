@@ -12,7 +12,7 @@
     --color-surface: oklch(100% 0 0);
     --color-border: oklch(88% 0.005 260);
     --color-focus: oklch(48% 0.2 260);
-    --color-muted: oklch(52% 0.01 260);
+    --color-muted: oklch(44% 0.01 260);
 
     /* Spacing */
     --space-xs: 0.25rem;
@@ -29,7 +29,7 @@
     /* Shadows */
     --shadow-s: 0 1px 3px oklch(20% 0.01 260 / 8%);
     --shadow-m: 0 4px 12px oklch(20% 0.01 260 / 10%);
-    --shadow-l: 0 8px 24px oklch(20% 0.01 260 / 50%);
+    --shadow-l: 0 8px 24px oklch(20% 0.01 260 / 12%);
 
     /* Typography */
     --font-base: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -179,6 +179,7 @@
     border-block-end: 1px solid var(--color-border);
     background-color: var(--color-surface);
     position: relative;
+    z-index: 10;
   }
 
   .c-header__top {
@@ -997,6 +998,7 @@
     border-radius: var(--radius-l);
     box-shadow: var(--shadow-s);
     width:100%;
+    position: relative;
   }
 
   .c-bookmark__header {
@@ -1028,6 +1030,19 @@
     outline: none;
   }
 
+  /* Extend link click target to entire card */
+  .c-bookmark__link::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Action buttons sit above the link overlay */
+  .c-bookmark__actions {
+    position: relative;
+    z-index: 1;
+  }
+
   /* Card outline only when the bookmark link is focused (not edit/delete) */
   .c-bookmark:has(.c-bookmark__link:focus-visible) {
     outline: 2px solid var(--color-focus);
@@ -1035,7 +1050,7 @@
     border-radius: var(--radius-l);
   }
 
-  .c-bookmark__link:hover .c-bookmark__title {
+  .c-bookmark:hover .c-bookmark__title {
     text-decoration: underline;
     text-decoration-thickness: 2px;
     color: var(--color-primary);
@@ -1665,6 +1680,10 @@
     overflow: hidden;
   }
 
+  .c-toolbar__group[hidden] {
+    display: none;
+  }
+
   .c-toolbar__btn {
     display: inline-flex;
     align-items: center;
@@ -1714,6 +1733,10 @@
     inline-size: 100%;
     block-size: 1px;
     background-color: var(--color-border);
+  }
+
+  .c-toolbar__separator[hidden] {
+    display: none;
   }
 
   /* Small dialog variant (delete confirmation) */

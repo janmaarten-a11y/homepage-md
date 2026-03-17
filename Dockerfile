@@ -6,6 +6,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 
 COPY src/ ./src/
+COPY themes/ ./themes/
 
 RUN mkdir -p favicon-cache
 
