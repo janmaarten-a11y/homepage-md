@@ -199,7 +199,7 @@ function renderToolbar() {
 
   return `      <div class="c-toolbar" role="toolbar" aria-label="View options">
         <div class="c-toolbar__group" role="group" aria-label="Layout">
-          <button type="button" class="c-toolbar__btn js-layout-btn" data-value="grid" aria-pressed="true" title="Grid layout">${iconGrid} <span class="c-toolbar__label">Grid</span></button>
+          <button type="button" class="c-toolbar__btn js-layout-btn" data-value="grid" aria-pressed="true" title="Rows layout">${iconGrid} <span class="c-toolbar__label">Rows</span></button>
           <button type="button" class="c-toolbar__btn js-layout-btn" data-value="columns" aria-pressed="false" title="Columns layout">${iconColumns} <span class="c-toolbar__label">Columns</span></button>
           <button type="button" class="c-toolbar__btn js-layout-btn" data-value="list" aria-pressed="false" title="List layout">${iconList} <span class="c-toolbar__label">List</span></button>
         </div>

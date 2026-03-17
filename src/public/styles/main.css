@@ -1053,6 +1053,7 @@
     font-size: .875rem;
     color: var(--color-muted);
     padding-inline-start: calc(2rem + var(--space-s));
+    padding-block-start: var(--space-s);
     max-inline-size: 70ch;
   }
 
@@ -1479,6 +1480,7 @@
 
   .is-list .c-bookmark__title {
     white-space: nowrap;
+    margin-inline-end: var(--space-s);
   }
 
   .is-list .c-bookmark__url {
