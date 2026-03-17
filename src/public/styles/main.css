@@ -854,7 +854,7 @@
 
   .c-search__shortcut {
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: 0.875rem;
     padding-block: 0.0625rem;
     padding-inline: var(--space-xs);
     border: 1px solid var(--color-border);

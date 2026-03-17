@@ -20,7 +20,7 @@ let _uiIcons = {};
  */
 export function renderPage(pageData, { pages, currentSlug, faviconUrls, categoryIcons = {}, weatherIcons = {}, uiIcons = {}, defaultPage, footerContent }) {
   _uiIcons = uiIcons;
-  const title = pageData.title || 'HomepageMD';
+  const title = pageData.title || 'homepage.md';
   const hasLocation = !!pageData.location;
   const nav = renderNav(pages, currentSlug, defaultPage);
   const tocPopover = renderTocPopover(pageData.categories, uiIcons);
@@ -47,7 +47,7 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, category
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>${escapeHtml(title)} — HomepageMD</title>
+  <title>${escapeHtml(title)} — homepage.md</title>
   <link rel="preconnect" href="https://fonts.bunny.net">
   <link rel="stylesheet" href="https://fonts.bunny.net/css?family=inter:400,500,600,700">
   <link rel="stylesheet" href="/styles/main.css">
