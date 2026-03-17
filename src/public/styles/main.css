@@ -1487,7 +1487,12 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-xs);
-    min-width: 0;
+    flex-shrink: 0;
+  }
+
+  .is-list .c-bookmark__actions {
+    margin-inline-start: auto;
+    flex-shrink: 0;
   }
 
   .is-list .c-bookmark__icon {
@@ -1513,6 +1518,7 @@
 
   .is-list .c-bookmark__description {
     display: inline;
+    flex: 1;
     flex-basis: auto;
     margin: 0;
     padding: 0;
@@ -1526,6 +1532,12 @@
     &::before {
       content: " — ";
     }
+  }
+
+  /* List view focus — inset outline to avoid overlap between adjacent rows */
+  .is-list .c-bookmark:has(.c-bookmark__link:focus-visible) {
+    outline-offset: -2px;
+    border-radius: 0;
   }
 
   /* Condensed + List — smaller icons, less padding */
