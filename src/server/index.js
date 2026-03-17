@@ -5,7 +5,7 @@ import { config } from './config.js';
 import { parseMarkdown } from './parser.js';
 import { renderPage } from './renderer.js';
 import { getFaviconUrl, refreshFavicons, extractDomain, cleanFaviconCache } from './favicon.js';
-import { addBookmark, removeBookmark, updateBookmark } from './writer.js';
+import { addBookmark, removeBookmark, updateBookmark, updateLocation } from './writer.js';
 import { isAuthenticated, sendUnauthorized } from './auth.js';
 import { fetchMetadata } from './metadata.js';
 import { fetchWeather, clearWeatherCache } from './weather.js';
@@ -472,6 +472,27 @@ async function handleRequest(req, res) {
       res.end(JSON.stringify(weather));
     } catch {
       sendJSON(res, 200, null);
+    }
+    return;
+  }
+
+  // API: update location — PUT /api/location/{slug}
+  const locationMatch = pathname.match(/^\/api\/location\/([a-zA-Z0-9_-]+)$/);
+  if (locationMatch && req.method === 'PUT') {
+    if (!isAuthenticated(req)) { sendUnauthorized(res); return; }
+    if (!hasCsrfHeader(req)) { sendJSON(res, 403, { error: 'Missing CSRF header' }); return; }
+    if (isRateLimited(req, RATE_LIMIT_MAX_WRITES)) { sendJSON(res, 429, { error: 'Too many requests' }); return; }
+
+    const slug = locationMatch[1];
+    const filePath = join(config.bookmarksDir, `${slug}.md`);
+    try {
+      const body = JSON.parse(await readBody(req));
+      const location = body.location?.trim() || null;
+      await updateLocation(filePath, location);
+      clearWeatherCache();
+      sendJSON(res, 200, { ok: true });
+    } catch (err) {
+      sendJSON(res, 500, { error: err.message });
     }
     return;
   }

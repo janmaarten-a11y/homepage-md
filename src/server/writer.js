@@ -224,3 +224,34 @@ export async function updateBookmark(filePath, url, updates) {
 
   await atomicWriteFile(filePath, lines.join('\n'));
 }
+
+/**
+ * Update or add the location metadata in a Markdown file.
+ * If location is null/empty, removes the existing location line.
+ *
+ * @param {string} filePath - Absolute path to the .md file
+ * @param {string|null} location - The new location value, or null to remove
+ */
+export async function updateLocation(filePath, location) {
+  const source = await readFile(filePath, 'utf-8');
+  const lines = source.split('\n');
+
+  const locationRE = /^\s+-\s+location:\s+.+$/;
+  const existingIdx = lines.findIndex((line) => locationRE.test(line));
+
+  if (location) {
+    const newLine = `  - location: ${location}`;
+    if (existingIdx >= 0) {
+      lines[existingIdx] = newLine;
+    } else {
+      // Insert after the title (first H1) or at line 1
+      const titleIdx = lines.findIndex((line) => /^#\s+/.test(line));
+      const insertAt = titleIdx >= 0 ? titleIdx + 1 : 1;
+      lines.splice(insertAt, 0, newLine);
+    }
+  } else if (existingIdx >= 0) {
+    lines.splice(existingIdx, 1);
+  }
+
+  await atomicWriteFile(filePath, lines.join('\n'));
+}

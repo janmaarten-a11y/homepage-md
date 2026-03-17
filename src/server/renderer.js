@@ -151,6 +151,21 @@ ${addDialog}
   </dialog>
 ${deleteDialog}
 ${keyboardHelp}
+${hasLocation ? `  <dialog class="c-dialog c-dialog--small js-location-dialog">
+    <form method="dialog" class="c-dialog__form js-location-form">
+      <div class="c-dialog__header">
+        <h2 class="c-dialog__title">Edit Location</h2>
+        <button type="button" class="c-btn c-btn--icon c-dialog__close js-location-cancel" aria-label="Close">&times;</button>
+      </div>
+      <label class="c-dialog__label">
+        Location <span class="c-dialog__hint">(city, state or zip code)</span>
+        <input type="text" name="location" class="c-dialog__input js-location-input" required placeholder="Seattle, WA">
+      </label>
+      <div class="c-dialog__actions">
+        <button type="submit" class="c-btn c-btn--primary">Save</button>
+      </div>
+    </form>
+  </dialog>` : ''}
   <script id="js-page-data" type="application/json">${JSON.stringify({ categories, subcategories: subcategoryPairs, bangs: pageData.bangs || [] })}</script>
   <script src="/scripts/app.js" type="module"></script>
 </body>

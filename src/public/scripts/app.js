@@ -971,6 +971,7 @@ initCombobox(
 const weatherBtn = document.querySelector('.js-weather-toggle');
 const weatherPanel = document.querySelector('.js-weather-panel');
 const weatherIcon = document.querySelector('.js-weather-icon');
+let weatherCurrentLocation = '';
 const weatherLabel = document.querySelector('.js-weather-label');
 const weatherCurrent = document.querySelector('.js-weather-current');
 const weatherAlerts = document.querySelector('.js-weather-alerts');
@@ -994,6 +995,7 @@ function renderWeather(data) {
   const locationName = data.location.region
     ? `${data.location.name}, ${data.location.region}`
     : data.location.name;
+  weatherCurrentLocation = locationName;
 
   // Update the button with current temp and icon
   // Override icon for extreme temperatures
@@ -1082,10 +1084,13 @@ ${data.alerts.map((a) => `      <li>${escapeText(a.text)}</li>`).join('\n')}
     ${data.tomorrow.high}\u00B0 / ${data.tomorrow.low}\u00B0${data.tomorrow.precipChance > 0 ? `, ${data.tomorrow.precipChance}% precip` : ''}
   </div>`;
 
+  const editLocationIcon = '<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 1.5l3 3L5 14H2v-3z"/></svg>';
+
   // Left column: heading + conditions + alerts
   weatherCurrent.innerHTML = `
     <div class="c-weather-panel__heading">
       <h2 class="c-weather-panel__location">Forecast for <a href="${forecastUrl}" rel="noopener">${escapeText(locationName)}</a></h2>
+      <button type="button" class="c-btn c-btn--icon c-weather-panel__edit-btn js-location-edit" aria-label="Edit location">${editLocationIcon}</button>
     </div>
     <div class="c-weather-panel__summary">
       <span class="c-weather-panel__temp">${data.current.temp}${data.units.temp}</span>
@@ -1226,10 +1231,51 @@ if (weatherBtn && weatherPanel) {
     weatherLabel.textContent = 'Unavailable';
     weatherBtn.disabled = false;
     weatherBtn.setAttribute('aria-label', 'Weather data unavailable. Activate to retry.');
-    // Click to retry
     weatherBtn.addEventListener('click', () => {
       window.location.reload();
     }, { once: true });
+  }
+
+  // Edit location dialog
+  const locationDialog = document.querySelector('.js-location-dialog');
+  const locationForm = document.querySelector('.js-location-form');
+  const locationInput = document.querySelector('.js-location-input');
+  const locationCancel = document.querySelector('.js-location-cancel');
+
+  if (locationDialog && locationForm && locationInput) {
+    // Open dialog when pencil button is clicked (delegated since it's injected)
+    weatherPanel.addEventListener('click', (event) => {
+      const editBtn = event.target.closest('.js-location-edit');
+      if (!editBtn) return;
+      locationInput.value = weatherCurrentLocation || '';
+      openDialog(locationDialog, editBtn);
+    });
+
+    if (locationCancel) {
+      locationCancel.addEventListener('click', () => closeDialog(locationDialog));
+    }
+
+    locationForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const newLocation = locationInput.value.trim();
+      if (!newLocation) return;
+
+      try {
+        const res = await fetch(`/api/location/${encodeURIComponent(getPageSlug())}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'HomepageMD' },
+          body: JSON.stringify({ location: newLocation }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        locationDialog.close();
+        window.location.reload();
+      } catch (err) {
+        // Show error inline (reuse dialog pattern)
+        locationInput.setCustomValidity(err.message);
+        locationInput.reportValidity();
+      }
+    });
   }
 }
 
