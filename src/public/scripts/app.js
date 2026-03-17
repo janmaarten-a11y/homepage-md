@@ -133,19 +133,14 @@ try {
     sessionStorage.removeItem('homepage-md-focus');
     const card = document.querySelector(`.c-bookmark[data-url="${CSS.escape(focusUrl)}"]`);
     if (card) {
-      const link = card.querySelector('.c-bookmark__link');
-      if (link) {
-        requestAnimationFrame(() => {
-          // Focus link first — triggers :focus-within so action buttons appear
-          link.focus({ preventScroll: true });
-          card.scrollIntoView({ block: 'nearest', behavior: 'instant' });
-          // After actions are visible, shift focus to the edit button
-          setTimeout(() => {
-            const editBtn = card.querySelector('.js-edit-open');
-            if (editBtn) editBtn.focus();
-          }, 50);
-        });
-      }
+      // Force actions visible so we can focus the edit button directly
+      // without the link→button dance that double-announces in screen readers
+      card.classList.add('is-focus-restore');
+      requestAnimationFrame(() => {
+        card.scrollIntoView({ block: 'nearest', behavior: 'instant' });
+        const editBtn = card.querySelector('.js-edit-open');
+        if (editBtn) editBtn.focus();
+      });
     }
   }
 } catch { /* ignore */ }
@@ -574,7 +569,17 @@ if (editForm) {
         subcategory: categoryChanged ? (editSubcategoryVal || undefined) : undefined,
       });
       editDialog.close();
-      reloadAfterEdit(editUrl.value || originalUrl);
+
+      // Flash green check on the edit button before reloading
+      const targetUrl = editUrl.value || originalUrl;
+      const card = document.querySelector(`.c-bookmark[data-url="${CSS.escape(originalUrl)}"]`);
+      const editBtn = card?.querySelector('.js-edit-open');
+      if (editBtn) {
+        const checkIcon = pageData.weatherIcons?.['check'];
+        if (checkIcon) editBtn.innerHTML = checkIcon;
+        editBtn.style.color = 'oklch(55% 0.2 145)';
+      }
+      setTimeout(() => reloadAfterEdit(targetUrl), 400);
     } catch (err) {
       showError(editError, `Failed to update bookmark: ${err.message}`);
     }

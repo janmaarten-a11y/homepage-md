@@ -1080,7 +1080,8 @@
   }
 
   .c-bookmark:hover .c-bookmark__actions,
-  .c-bookmark:focus-within .c-bookmark__actions {
+  .c-bookmark:focus-within .c-bookmark__actions,
+  .c-bookmark.is-focus-restore .c-bookmark__actions {
     display: flex;
   }
 
