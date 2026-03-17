@@ -1483,7 +1483,7 @@
   }
 
   .is-list .c-bookmark__content {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: var(--space-xs);
     min-width: 0;
@@ -1498,6 +1498,7 @@
   }
 
   .is-list .c-bookmark__description {
+    display: inline;
     color: var(--color-muted);
     font-size: 0.875rem;
     white-space: nowrap;
@@ -1566,6 +1567,10 @@
   .is-condensed.is-list .c-bookmark__icon {
     inline-size: 1.5rem;
     block-size: 1.5rem;
+  }
+
+  .is-condensed.is-list .c-bookmark__description {
+    display: inline;
   }
 
   /* Condensed + Columns — tighter columns, smaller cards for more density */
