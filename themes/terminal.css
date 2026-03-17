@@ -36,7 +36,7 @@
   --color-text: oklch(82% 0.2 140);
   --color-primary: oklch(78% 0.22 140);
   --color-surface: oklch(10% 0.01 140);
-  --color-border: oklch(38% 0.1 140);
+  --color-border: oklch(55% 0.1 140);
   --color-focus: oklch(82% 0.24 140);
   --color-muted: oklch(55% 0.1 140);
   --shadow-s: 0 0 4px oklch(65% 0.18 140 / 20%);
@@ -71,6 +71,11 @@ body {
   text-shadow: 0 0 2px oklch(72% 0.16 140 / 40%);
 }
 
+/* Tint bookmark favicons to match green palette */
+.c-bookmark__icon {
+  filter: grayscale(1) sepia(1) hue-rotate(70deg) saturate(5) brightness(0.85);
+}
+
 /* Outlined cards with scanline-hinted backgrounds */
 .c-bookmark {
   background: transparent;
@@ -81,7 +86,7 @@ body {
 
 .c-bookmark:hover {
   border-color: var(--color-primary);
-  box-shadow: 0 0 6px oklch(65% 0.18 140 / 25%);
+  box-shadow: 0 0 6px oklch(85% 0.18 140 / 100%);
 }
 
 /* Header */
@@ -372,6 +377,11 @@ body {
       transparent 3px
     ),
     oklch(97% 0.003 140 / 70%);
+}
+
+/* Darker icon tint for light mode */
+.is-light .c-bookmark__icon {
+  filter: grayscale(1) sepia(1) hue-rotate(70deg) saturate(3) brightness(0.5);
 }
 
 .is-light .c-bookmark:hover {
