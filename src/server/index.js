@@ -100,9 +100,17 @@ function flattenBookmarks(pageData) {
  */
 async function resolveFavicons(bookmarks) {
   const map = {};
+  const TIMEOUT = 2000; // Don't block page render for more than 2s
+
+  const raceWithTimeout = (promise, fallback) =>
+    Promise.race([promise, new Promise((resolve) => setTimeout(() => resolve(fallback), TIMEOUT))]);
+
   const entries = await Promise.allSettled(
     bookmarks.map(async (b) => {
-      const url = await getFaviconUrl(b.url, b.icon, config);
+      const url = await raceWithTimeout(
+        getFaviconUrl(b.url, b.icon, config),
+        '/icons/default.svg'
+      );
       return { bookmarkUrl: b.url, faviconUrl: url };
     }),
   );
@@ -165,20 +173,23 @@ function broadcastSSE(eventData) {
 // ---------------------------------------------------------------------------
 
 async function startWatcher() {
+  let debounceTimer = null;
+
   try {
     const watcher = watch(config.bookmarksDir, { recursive: false });
     for await (const event of watcher) {
       if (event.filename && event.filename.endsWith('.md')) {
-        // Refresh favicons for the changed file
-        try {
+        // Debounce: wait 500ms after last change before broadcasting
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          broadcastSSE({ type: 'update', file: event.filename });
+
+          // Refresh favicons in the background (don't block SSE or page loads)
           const slug = event.filename.replace(/\.md$/, '');
-          const pageData = await loadPage(slug);
-          const bookmarks = flattenBookmarks(pageData);
-          await refreshFavicons(bookmarks, config);
-        } catch {
-          // File may have been deleted or be temporarily unreadable
-        }
-        broadcastSSE({ type: 'update', file: event.filename });
+          loadPage(slug)
+            .then((pageData) => refreshFavicons(flattenBookmarks(pageData), config))
+            .catch(() => {});
+        }, 500);
       }
     }
   } catch (err) {
