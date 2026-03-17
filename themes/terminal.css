@@ -29,6 +29,21 @@
   --radius-l: 2px;
 }
 
+/* Override .is-dark from main.css — must match the dark green tokens above
+   because .is-dark sets custom properties on body which would override :root */
+.is-dark {
+  --color-bg: oklch(8% 0.01 140);
+  --color-text: oklch(82% 0.2 140);
+  --color-primary: oklch(78% 0.22 140);
+  --color-surface: oklch(10% 0.01 140);
+  --color-border: oklch(38% 0.1 140);
+  --color-focus: oklch(82% 0.24 140);
+  --color-muted: oklch(55% 0.1 140);
+  --shadow-s: 0 0 4px oklch(65% 0.18 140 / 20%);
+  --shadow-m: 0 0 8px oklch(65% 0.18 140 / 25%);
+  --shadow-l: 0 0 16px oklch(65% 0.18 140 / 30%);
+}
+
 /* CRT scanline overlay + vignette */
 body::before {
   content: "";
