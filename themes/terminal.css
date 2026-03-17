@@ -8,7 +8,7 @@
 
 :root {
   /* Monochrome green phosphor palette — dark mode default */
-  --color-bg: oklch(8% 0.01 140);
+  --color-bg: oklch(15% 0.01 140);
   --color-text: oklch(82% 0.2 140);
   --color-primary: oklch(78% 0.22 140);
   --color-surface: oklch(10% 0.01 140);
@@ -107,13 +107,13 @@ body {
 
 /* Header */
 .c-header {
-  background-color: oklch(6% 0.01 140);
-  border-block-end-color: var(--color-border);
+  background-color: transparent;
+  border-block-end: 2px solid var(--color-border);
 }
 
 .c-header__searchbar {
-  background-color: oklch(8% 0.01 140);
-  border-block-start-color: var(--color-border);
+  background-color: transparent;
+  border-block-start: 2px solid var(--color-border);
 }
 
 /* Welcome */
