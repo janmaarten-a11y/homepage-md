@@ -54,6 +54,8 @@ export function hasIcon(name) {
  */
 export async function getIcon(name, { size = 20 } = {}) {
   if (!hasIcon(name)) return null;
+  // Guard against path traversal even though hasIcon validates against known names
+  if (name.includes('/') || name.includes('\\') || name.includes('..')) return null;
 
   if (cache.has(name)) {
     return applySize(cache.get(name), size);
@@ -74,12 +76,15 @@ export async function getIcon(name, { size = 20 } = {}) {
 }
 
 /**
- * Override width/height attributes on an SVG string.
+ * Override width/height attributes and add aria-hidden on an SVG string.
+ * All icons in this app are decorative — they appear alongside text labels
+ * or inside buttons with aria-label, so they should be hidden from AT.
  */
 function applySize(svg, size) {
   return svg
     .replace(/width="\d+"/, `width="${size}"`)
-    .replace(/height="\d+"/, `height="${size}"`);
+    .replace(/height="\d+"/, `height="${size}"`)
+    .replace('<svg', '<svg aria-hidden="true"');
 }
 
 /**
