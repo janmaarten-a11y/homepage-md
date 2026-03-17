@@ -35,34 +35,13 @@ function openDialog(dialog, opener, targetBtn) {
   if (!dialog) return;
   dialogOpeners.set(dialog, opener || document.activeElement);
   if (targetBtn) dialogTargetBtns.set(dialog, targetBtn);
+  // Remove dialog from tab order so Shift+Tab from close button
+  // goes to the browser chrome, not the dialog container
+  dialog.setAttribute('tabindex', '-1');
   dialog.showModal();
   const closeBtn = dialog.querySelector('.c-dialog__close');
   if (closeBtn) closeBtn.focus();
 }
-
-// Focus trap — prevent Tab/Shift+Tab from escaping to the dialog element
-document.addEventListener('keydown', (event) => {
-  if (event.key !== 'Tab') return;
-  const dialog = event.target.closest('dialog[open]');
-  if (!dialog) return;
-
-  const focusable = [...dialog.querySelectorAll(
-    'a[href], button:not([disabled]), input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-  )].filter((el) => el.offsetParent !== null);
-
-  if (focusable.length === 0) return;
-
-  const first = focusable[0];
-  const last = focusable[focusable.length - 1];
-
-  if (event.shiftKey && event.target === first) {
-    event.preventDefault();
-    last.focus();
-  } else if (!event.shiftKey && event.target === last) {
-    event.preventDefault();
-    first.focus();
-  }
-});
 
 function returnFocus(dialog) {
   const opener = dialogOpeners.get(dialog);
