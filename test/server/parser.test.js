@@ -154,4 +154,34 @@ describe('parseMarkdown', () => {
     // (subtitle only applies to headings, not bookmarks)
     assert.equal(result.categories[0].bookmarks[0].description, null);
   });
+
+  it('extracts a welcome message with title and description', () => {
+    const source = '# T\n\n> [!WELCOME] Hello!\n> This is the dashboard.\n\n## Cat\n';
+    const result = parseMarkdown(source);
+    assert.deepStrictEqual(result.welcome, { title: 'Hello!', description: 'This is the dashboard.' });
+  });
+
+  it('extracts a welcome message with title only', () => {
+    const source = '# T\n> [!WELCOME] Hello!\n## Cat\n';
+    const result = parseMarkdown(source);
+    assert.deepStrictEqual(result.welcome, { title: 'Hello!', description: null });
+  });
+
+  it('extracts a welcome message with description only', () => {
+    const source = '# T\n> [!WELCOME]\n> A description here.\n## Cat\n';
+    const result = parseMarkdown(source);
+    assert.deepStrictEqual(result.welcome, { title: null, description: 'A description here.' });
+  });
+
+  it('joins multi-line welcome descriptions', () => {
+    const source = '# T\n> [!WELCOME] Hi\n> Line one.\n> Line two.\n## Cat\n';
+    const result = parseMarkdown(source);
+    assert.deepStrictEqual(result.welcome, { title: 'Hi', description: 'Line one. Line two.' });
+  });
+
+  it('sets welcome to null when not present', () => {
+    const source = '# T\n## Cat\n- [Link](https://x.com)\n';
+    const result = parseMarkdown(source);
+    assert.strictEqual(result.welcome, null);
+  });
 });

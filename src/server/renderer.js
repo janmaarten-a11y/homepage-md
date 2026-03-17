@@ -339,7 +339,21 @@ ${links}
 }
 
 function renderMain(pageData, faviconUrls) {
-  return pageData.categories.map((category) => renderCategory(category, faviconUrls)).join('\n');
+  const welcome = pageData.welcome ? renderWelcome(pageData.welcome) : '';
+  const categories = pageData.categories.map((category) => renderCategory(category, faviconUrls)).join('\n');
+  return welcome + categories;
+}
+
+function renderWelcome(welcome) {
+  const title = welcome.title
+    ? `\n      <p class="c-welcome__title">${escapeHtml(welcome.title)}</p>`
+    : '';
+  const description = welcome.description
+    ? `\n      <p class="c-welcome__description">${escapeHtml(welcome.description)}</p>`
+    : '';
+  return `    <section class="c-welcome" aria-label="Welcome">
+      <span class="c-welcome__icon" aria-hidden="true">👋</span>${title}${description}
+    </section>\n`;
 }
 
 function renderCategory(category, faviconUrls) {
