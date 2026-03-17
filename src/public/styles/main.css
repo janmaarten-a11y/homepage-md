@@ -1484,7 +1484,10 @@
   }
 
   .is-list .c-bookmark__link {
-    display: contents;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    min-width: 0;
   }
 
   .is-list .c-bookmark__icon {
