@@ -249,9 +249,13 @@ body {
 /* List view — full border but collapse between adjacent items */
 .is-list .c-bookmark {
   border: 2px solid var(--color-border);
-  border-inline-start: 3px solid transparent;
+  border-inline-start: 3px solid var(--color-border);
   border-radius: 0;
   background: transparent;
+}
+
+.is-list .c-bookmark:hover {
+  border-inline-start-color: var(--color-primary);
 }
 
 .is-list .c-bookmark + .c-bookmark {
