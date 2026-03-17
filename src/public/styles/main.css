@@ -1580,8 +1580,8 @@
 
   /* Condensed + List — headings and subtitles inline */
   .is-condensed.is-list .c-section__header {
-    display: inline;
-    padding-block-end: var(--space-s);
+    display: block;
+    margin-block-end: var(--space-s);
   }
 
   .is-condensed.is-list .c-section__header h2,
