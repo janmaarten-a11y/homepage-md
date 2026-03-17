@@ -767,7 +767,7 @@ function applyView(prefs) {
   document.body.classList.toggle('is-condensed', prefs.density === 'condensed');
 
   // Layout — remove all, then add the active one
-  document.body.classList.remove('is-columns', 'is-list', 'is-compact', 'is-table');
+  document.body.classList.remove('is-columns', 'is-list', 'is-compact');
   if (prefs.layout !== 'grid') {
     document.body.classList.add(`is-${prefs.layout}`);
   }

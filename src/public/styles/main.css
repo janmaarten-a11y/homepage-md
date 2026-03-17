@@ -1445,12 +1445,19 @@
   }
 
   .is-list .c-bookmark {
+    flex-direction: row;
+    align-items: center;
     border-radius: 0;
     box-shadow: none;
     border-inline: none;
     border-block-start: none;
     border-block-end: 1px solid var(--color-border);
     padding: var(--space-s) var(--space-m);
+  }
+
+  .is-list .c-bookmark__header {
+    flex: 1;
+    min-width: 0;
   }
 
   .is-list .c-bookmark__link {
@@ -1466,9 +1473,14 @@
   }
 
   .is-list .c-bookmark__description {
+    display: inline;
     margin: 0;
     color: var(--color-muted);
     font-size: 0.875rem;
+
+    &::before {
+      content: " — ";
+    }
   }
 
   .is-list .c-bookmark__icon {
@@ -1506,60 +1518,6 @@
   .is-compact .c-category {
     padding-block: var(--space-m);
     padding-inline: var(--space-m);
-  }
-
-  /* -----------------------------------------------------------------------
-   * Table view — rows with columns for icon, title, URL, description
-   * ----------------------------------------------------------------------- */
-  .is-table .c-bookmark-list[role="list"] {
-    display: table;
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .is-table .c-bookmark {
-    display: table-row;
-    padding: 0;
-    background: none;
-    border: none;
-    border-radius: 0;
-    box-shadow: none;
-  }
-
-  .is-table .c-bookmark__header {
-    display: contents;
-  }
-
-  .is-table .c-bookmark__link {
-    display: table-cell;
-    padding: var(--space-s) var(--space-m);
-    border-block-end: 1px solid var(--color-border);
-    vertical-align: middle;
-  }
-
-  .is-table .c-bookmark__url {
-    display: none;
-  }
-
-  .is-table .c-bookmark__actions {
-    display: table-cell;
-    padding: var(--space-s) var(--space-m);
-    border-block-end: 1px solid var(--color-border);
-    vertical-align: middle;
-    white-space: nowrap;
-  }
-
-  .is-table .c-bookmark__description {
-    display: none;
-  }
-
-  .is-table .c-bookmark__icon {
-    inline-size: 1.25rem;
-    block-size: 1.25rem;
-  }
-
-  .is-table .c-bookmark__title {
-    font-size: 0.875rem;
   }
 
   /* Toolbar — toggle button groups (inside view popover) */
