@@ -71,9 +71,9 @@ body {
   text-shadow: 0 0 2px oklch(72% 0.16 140 / 40%);
 }
 
-/* Tint bookmark favicons to match green palette */
+/* Tint bookmark favicons to match green palette + phosphor glow */
 .c-bookmark__icon {
-  filter: grayscale(1) sepia(1) hue-rotate(70deg) saturate(5) brightness(0.85);
+  filter: grayscale(1) sepia(1) hue-rotate(70deg) saturate(5) brightness(0.85) drop-shadow(0 0 3px oklch(72% 0.2 140 / 50%));
 }
 
 /* Outlined cards with scanline-hinted backgrounds */
@@ -381,7 +381,7 @@ body {
 
 /* Darker icon tint for light mode */
 .is-light .c-bookmark__icon {
-  filter: grayscale(1) sepia(1) hue-rotate(70deg) saturate(3) brightness(0.5);
+  filter: grayscale(1) sepia(1) hue-rotate(70deg) saturate(3) brightness(0.5) drop-shadow(0 0 2px oklch(40% 0.15 140 / 40%));
 }
 
 .is-light .c-bookmark:hover {
