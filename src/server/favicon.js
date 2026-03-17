@@ -247,10 +247,20 @@ export async function refreshFavicons(bookmarks, config) {
     if (!domain || seen.has(domain)) continue;
     seen.add(domain);
 
+    // Skip domains that already have a cached or manual favicon
+    const manual = await checkManualOverride(domain, config.iconsDir);
+    if (manual) continue;
+    if (bookmark.icon) continue; // Inline override
+    const cached = await checkCache(domain, config.faviconCacheDir, config.faviconTtlDays);
+    if (cached) continue;
+
+    // Only fetch favicons for uncached domains
     tasks.push(getFaviconUrl(bookmark.url, bookmark.icon, config));
   }
 
-  await Promise.allSettled(tasks);
+  if (tasks.length > 0) {
+    await Promise.allSettled(tasks);
+  }
 }
 
 /**

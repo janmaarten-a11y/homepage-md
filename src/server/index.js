@@ -5,7 +5,7 @@ import { config } from './config.js';
 import { parseMarkdown } from './parser.js';
 import { renderPage } from './renderer.js';
 import { getFaviconUrl, refreshFavicons, extractDomain, cleanFaviconCache } from './favicon.js';
-import { addBookmark, removeBookmark, updateBookmark } from './writer.js';
+import { addBookmark, removeBookmark, updateBookmark, updateLocation } from './writer.js';
 import { isAuthenticated, sendUnauthorized } from './auth.js';
 import { fetchMetadata } from './metadata.js';
 import { fetchWeather, clearWeatherCache } from './weather.js';
@@ -100,9 +100,17 @@ function flattenBookmarks(pageData) {
  */
 async function resolveFavicons(bookmarks) {
   const map = {};
+  const TIMEOUT = 2000; // Don't block page render for more than 2s
+
+  const raceWithTimeout = (promise, fallback) =>
+    Promise.race([promise, new Promise((resolve) => setTimeout(() => resolve(fallback), TIMEOUT))]);
+
   const entries = await Promise.allSettled(
     bookmarks.map(async (b) => {
-      const url = await getFaviconUrl(b.url, b.icon, config);
+      const url = await raceWithTimeout(
+        getFaviconUrl(b.url, b.icon, config),
+        '/icons/default.svg'
+      );
       return { bookmarkUrl: b.url, faviconUrl: url };
     }),
   );
@@ -165,20 +173,23 @@ function broadcastSSE(eventData) {
 // ---------------------------------------------------------------------------
 
 async function startWatcher() {
+  let debounceTimer = null;
+
   try {
     const watcher = watch(config.bookmarksDir, { recursive: false });
     for await (const event of watcher) {
       if (event.filename && event.filename.endsWith('.md')) {
-        // Refresh favicons for the changed file
-        try {
+        // Debounce: wait 500ms after last change before broadcasting
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          broadcastSSE({ type: 'update', file: event.filename });
+
+          // Refresh favicons in the background (don't block SSE or page loads)
           const slug = event.filename.replace(/\.md$/, '');
-          const pageData = await loadPage(slug);
-          const bookmarks = flattenBookmarks(pageData);
-          await refreshFavicons(bookmarks, config);
-        } catch {
-          // File may have been deleted or be temporarily unreadable
-        }
-        broadcastSSE({ type: 'update', file: event.filename });
+          loadPage(slug)
+            .then((pageData) => refreshFavicons(flattenBookmarks(pageData), config))
+            .catch(() => {});
+        }, 500);
       }
     }
   } catch (err) {
@@ -472,6 +483,27 @@ async function handleRequest(req, res) {
       res.end(JSON.stringify(weather));
     } catch {
       sendJSON(res, 200, null);
+    }
+    return;
+  }
+
+  // API: update location — PUT /api/location/{slug}
+  const locationMatch = pathname.match(/^\/api\/location\/([a-zA-Z0-9_-]+)$/);
+  if (locationMatch && req.method === 'PUT') {
+    if (!isAuthenticated(req)) { sendUnauthorized(res); return; }
+    if (!hasCsrfHeader(req)) { sendJSON(res, 403, { error: 'Missing CSRF header' }); return; }
+    if (isRateLimited(req, RATE_LIMIT_MAX_WRITES)) { sendJSON(res, 429, { error: 'Too many requests' }); return; }
+
+    const slug = locationMatch[1];
+    const filePath = join(config.bookmarksDir, `${slug}.md`);
+    try {
+      const body = JSON.parse(await readBody(req));
+      const location = body.location?.trim() || null;
+      await updateLocation(filePath, location);
+      clearWeatherCache();
+      sendJSON(res, 200, { ok: true });
+    } catch (err) {
+      sendJSON(res, 500, { error: err.message });
     }
     return;
   }
