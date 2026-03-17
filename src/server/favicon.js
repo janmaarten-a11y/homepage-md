@@ -201,15 +201,15 @@ async function downloadAndCache(iconUrl, domain, cacheDir) {
  * @returns {Promise<string>} URL path to serve the favicon
  */
 export async function getFaviconUrl(url, inlineIcon, config) {
+  // Inline override takes priority — handles non-standard URLs like '#'
+  if (inlineIcon) return inlineIcon;
+
   const domain = extractDomain(url);
   if (!domain) return '/icons/default.svg';
 
   // 1. Manual override
   const manual = await checkManualOverride(domain, config.iconsDir);
   if (manual) return manual;
-
-  // 2. Inline override — use as-is if it's an external URL
-  if (inlineIcon) return inlineIcon;
 
   // 3. Local cache (not stale)
   const cached = await checkCache(domain, config.faviconCacheDir, config.faviconTtlDays);
