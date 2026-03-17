@@ -1518,8 +1518,6 @@
 
   .is-list .c-bookmark__description {
     display: inline;
-    flex: 1;
-    flex-basis: auto;
     margin: 0;
     padding: 0;
     color: var(--color-muted);
@@ -1540,9 +1538,10 @@
     border-radius: 0;
   }
 
-  /* Condensed + List — smaller icons, less padding */
+  /* Condensed + List — smaller icons, less padding, stable row height */
   .is-condensed.is-list .c-bookmark {
     padding: var(--space-xs) var(--space-m);
+    min-block-size: 2.5rem;
   }
 
   .is-condensed.is-list .c-bookmark__icon {
