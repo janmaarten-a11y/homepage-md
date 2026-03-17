@@ -520,15 +520,7 @@ if (editForm) {
         subcategory: categoryChanged ? (editSubcategoryVal || undefined) : undefined,
       });
       editDialog.close();
-
-      // Flash green check on the edit button before reloading
-      const editBtn = dialogTargetBtns.get(editDialog);
-      if (editBtn) {
-        const checkIcon = pageData.weatherIcons?.['check'];
-        if (checkIcon) editBtn.innerHTML = checkIcon;
-        editBtn.style.color = 'oklch(55% 0.2 145)';
-      }
-      setTimeout(() => window.location.reload(), 600);
+      window.location.reload();
     } catch (err) {
       showError(editError, `Failed to update bookmark: ${err.message}`);
     }
