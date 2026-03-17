@@ -1906,8 +1906,8 @@
 
   .c-header__title {
     font-size: 1.125rem;
-    flex: 1;
-    min-inline-size: 0;
+    flex: 1 1 0;
+    min-inline-size: min(10rem, 50%);
   }
 
   /* Drawers */
