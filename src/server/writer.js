@@ -5,11 +5,22 @@
  * Preserves unrecognized content (comments, notes, blank lines).
  */
 
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile, rename } from 'node:fs/promises';
+import { join, dirname } from 'node:path';
 
 const HEADING_RE = /^(#{1,3})\s+(.+)$/;
 const BOOKMARK_RE = /^-\s+\[([^\]]+)\]\(([^)]+)\)\s*$/;
 const METADATA_RE = /^\s+-\s+(description|icon):\s+(.+)$/;
+
+/**
+ * Write file atomically: write to a temp file then rename over the original.
+ * Prevents corruption if the process crashes mid-write.
+ */
+async function atomicWriteFile(filePath, content) {
+  const tmpPath = filePath + '.tmp';
+  await writeFile(tmpPath, content);
+  await rename(tmpPath, filePath);
+}
 
 /**
  * Serialize a bookmark and its metadata to Markdown lines.
@@ -144,7 +155,7 @@ export async function addBookmark(filePath, bookmark) {
   const newLines = bookmarkToLines(bookmark);
   lines.splice(insertAt, 0, ...newLines);
 
-  await writeFile(filePath, lines.join('\n'));
+  await atomicWriteFile(filePath, lines.join('\n'));
 }
 
 /**
@@ -163,7 +174,7 @@ export async function removeBookmark(filePath, url) {
   }
 
   lines.splice(range.start, range.end - range.start + 1);
-  await writeFile(filePath, lines.join('\n'));
+  await atomicWriteFile(filePath, lines.join('\n'));
 }
 
 /**
@@ -211,5 +222,5 @@ export async function updateBookmark(filePath, url, updates) {
   const newLines = bookmarkToLines(updated);
   lines.splice(range.start, range.end - range.start + 1, ...newLines);
 
-  await writeFile(filePath, lines.join('\n'));
+  await atomicWriteFile(filePath, lines.join('\n'));
 }
