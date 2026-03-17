@@ -1666,6 +1666,10 @@
     overflow: hidden;
   }
 
+  .c-toolbar__group[hidden] {
+    display: none;
+  }
+
   .c-toolbar__btn {
     display: inline-flex;
     align-items: center;
@@ -1715,6 +1719,10 @@
     inline-size: 100%;
     block-size: 1px;
     background-color: var(--color-border);
+  }
+
+  .c-toolbar__separator[hidden] {
+    display: none;
   }
 
   /* Small dialog variant (delete confirmation) */

@@ -1,0 +1,309 @@
+/*
+ * Terminal theme for homepage.md
+ *
+ * CRT-inspired monochrome green-on-black with scanline overlay,
+ * vignette effect, monospace typography, and outlined elements.
+ * Inspired by abandon.ie
+ */
+
+:root {
+  /* Monochrome green phosphor palette */
+  --color-bg: oklch(8% 0.01 145);
+  --color-text: oklch(80% 0.15 145);
+  --color-primary: oklch(75% 0.18 145);
+  --color-surface: oklch(10% 0.01 145);
+  --color-border: oklch(35% 0.08 145);
+  --color-focus: oklch(80% 0.2 145);
+  --color-muted: oklch(50% 0.08 145);
+
+  --shadow-s: 0 0 4px oklch(60% 0.15 145 / 20%);
+  --shadow-m: 0 0 8px oklch(60% 0.15 145 / 25%);
+  --shadow-l: 0 0 16px oklch(60% 0.15 145 / 30%);
+
+  /* Monospace everything */
+  --font-base: var(--font-mono);
+
+  /* Boxy terminal feel */
+  --radius-s: 0;
+  --radius-m: 0;
+  --radius-l: 2px;
+}
+
+/* CRT scanline overlay + vignette */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      oklch(0% 0 0 / 0%) 0px,
+      oklch(0% 0 0 / 0%) 2px,
+      oklch(0% 0 0 / 8%) 2px,
+      oklch(0% 0 0 / 8%) 4px
+    ),
+    radial-gradient(
+      ellipse at center,
+      oklch(0% 0 0 / 0%) 50%,
+      oklch(0% 0 0 / 40%) 100%
+    );
+}
+
+/* Phosphor glow on text */
+body {
+  text-shadow: 0 0 2px oklch(70% 0.12 145 / 40%);
+}
+
+/* Outlined cards instead of filled backgrounds */
+.c-bookmark {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  box-shadow: none;
+}
+
+.c-bookmark:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 6px oklch(60% 0.15 145 / 25%);
+}
+
+/* Header */
+.c-header {
+  background-color: oklch(6% 0.01 145);
+  border-block-end-color: var(--color-border);
+}
+
+.c-header__searchbar {
+  background-color: oklch(8% 0.01 145);
+  border-block-start-color: var(--color-border);
+}
+
+/* Welcome */
+.c-welcome {
+  background: transparent;
+  border: 1px solid var(--color-border);
+}
+
+/* Weather panel */
+.c-weather-panel {
+  background-color: oklch(6% 0.01 145);
+}
+
+/* Search input */
+.c-search__input {
+  background-color: transparent;
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.c-search__input:focus-visible {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 4px oklch(60% 0.15 145 / 30%);
+}
+
+/* Buttons — outlined style */
+.c-btn {
+  background-color: transparent;
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.c-btn:hover {
+  border-color: var(--color-primary);
+  background-color: transparent;
+  color: var(--color-primary);
+}
+
+.c-btn--primary {
+  background-color: transparent;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.c-btn--primary:hover {
+  background-color: oklch(75% 0.18 145 / 15%);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.c-btn--icon {
+  border-color: transparent;
+}
+
+.c-btn--icon:hover {
+  border-color: var(--color-border);
+}
+
+.c-btn--danger {
+  color: oklch(65% 0.15 25);
+  border-color: oklch(65% 0.15 25);
+}
+
+.c-btn--danger:hover {
+  background-color: oklch(65% 0.15 25 / 15%);
+  color: oklch(75% 0.15 25);
+}
+
+/* Dialog */
+.c-dialog {
+  background-color: oklch(8% 0.01 145);
+  border-color: var(--color-border);
+  box-shadow: 0 0 20px oklch(60% 0.15 145 / 15%);
+}
+
+.c-dialog::backdrop {
+  background-color: oklch(0% 0 0 / 70%);
+}
+
+.c-dialog__input {
+  background-color: transparent;
+  border-color: var(--color-border);
+}
+
+.c-dialog__error {
+  background-color: transparent;
+  border-color: oklch(65% 0.15 25);
+  color: oklch(75% 0.12 25);
+}
+
+/* Popover */
+.c-popover {
+  background-color: oklch(10% 0.01 145);
+  border-color: var(--color-border);
+  box-shadow: 0 0 12px oklch(60% 0.15 145 / 15%);
+}
+
+.c-popover__link:hover {
+  background-color: oklch(75% 0.18 145 / 10%);
+}
+
+/* Toolbar */
+.c-toolbar__btn {
+  background-color: transparent;
+  color: var(--color-muted);
+}
+
+.c-toolbar__btn:hover {
+  background-color: oklch(75% 0.18 145 / 10%);
+  color: var(--color-text);
+}
+
+.c-toolbar__btn[aria-pressed="true"] {
+  background-color: oklch(75% 0.18 145 / 20%);
+  color: var(--color-primary);
+}
+
+.c-toolbar__group {
+  background-color: transparent;
+  border-color: var(--color-border);
+}
+
+/* Header action buttons */
+.c-header__action-btn,
+.c-weather-btn,
+.c-speed-btn {
+  background-color: transparent;
+  border-color: var(--color-border);
+}
+
+.c-header__action-btn:hover,
+.c-weather-btn:hover,
+.c-speed-btn:hover {
+  border-color: var(--color-primary);
+  background-color: transparent;
+}
+
+/* Nav links */
+.c-nav__link:hover {
+  background-color: oklch(75% 0.18 145 / 10%);
+}
+
+/* Category borders */
+.c-category {
+  border-block-end-color: var(--color-border);
+}
+
+/* List view */
+.is-list .c-bookmark {
+  border-block-end-color: var(--color-border);
+  background: transparent;
+}
+
+.is-list .c-bookmark:hover {
+  border-inline-start-color: var(--color-primary);
+  box-shadow: none;
+}
+
+/* Footer */
+.c-footer {
+  border-block-start-color: var(--color-border);
+}
+
+/* AQI badges */
+.c-weather-panel__aqi[data-level="good"] {
+  background-color: transparent;
+  border: 1px solid oklch(60% 0.12 145);
+  color: oklch(70% 0.12 145);
+}
+
+.c-weather-panel__aqi[data-level="moderate"] {
+  background-color: transparent;
+  border: 1px solid oklch(70% 0.1 90);
+  color: oklch(75% 0.1 90);
+}
+
+/* NWS alerts — outlined */
+.c-weather-panel__nws-alert {
+  background-color: transparent;
+}
+
+.c-weather-panel__nws-alert[data-severity="extreme"] {
+  background-color: oklch(65% 0.15 25 / 10%);
+  color: oklch(75% 0.12 25);
+}
+
+.c-weather-panel__nws-alert[data-severity="severe"] {
+  background-color: oklch(65% 0.12 55 / 10%);
+  color: oklch(75% 0.1 55);
+}
+
+/* Tomorrow forecast */
+.c-weather-panel__tomorrow {
+  background-color: oklch(12% 0.01 145);
+}
+
+/* Alert list items */
+.c-weather-panel__alert-list li {
+  background-color: oklch(12% 0.01 145);
+}
+
+/* Combobox */
+.c-combobox__listbox {
+  background-color: oklch(10% 0.01 145);
+  border-color: var(--color-border);
+}
+
+.c-combobox__option:hover,
+.c-combobox__option[aria-selected="true"] {
+  background-color: oklch(75% 0.18 145 / 20%);
+  color: var(--color-primary);
+}
+
+/* Keyboard shortcuts */
+.c-shortcut-list kbd {
+  background-color: transparent;
+  border-color: var(--color-border);
+}
+
+/* Condensed columns */
+.is-condensed.is-columns .c-bookmark {
+  box-shadow: none;
+}
+
+/* Override motion shadow for terminal glow */
+@media (prefers-reduced-motion: no-preference) {
+  .c-bookmark:hover {
+    box-shadow: 0 0 6px oklch(60% 0.15 145 / 25%);
+  }
+}
