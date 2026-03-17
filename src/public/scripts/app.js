@@ -1024,6 +1024,16 @@ if (weatherBtn && weatherPanel) {
     }
   });
 
+  // Close on Escape
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !weatherPanel.hidden) {
+      weatherPanel.hidden = true;
+      weatherBtn.setAttribute('aria-expanded', 'false');
+      localStorage.setItem(weatherStorageKey, 'false');
+      weatherBtn.focus();
+    }
+  });
+
   // Fetch weather data
   const slug = getPageSlug();
   fetch(`/api/weather/${encodeURIComponent(slug)}`)
@@ -1085,7 +1095,11 @@ if (speedBtn && speedLabel) {
 
   function updateSpeedLabel(text, ariaLabel) {
     speedLabel.textContent = text;
-    speedBtn.setAttribute('aria-label', ariaLabel);
+    if (ariaLabel) {
+      speedBtn.setAttribute('aria-label', ariaLabel);
+    } else {
+      speedBtn.removeAttribute('aria-label');
+    }
   }
 
   function showSpeedResult(down, up) {

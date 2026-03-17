@@ -59,11 +59,11 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, defaultP
       <h1 class="c-header__title">${escapeHtml(title)}</h1>
 ${nav}
       <div class="c-header__actions">
-${hasLocation ? `        <button type="button" class="c-weather-btn js-weather-toggle" aria-expanded="false" aria-label="Loading weather\u2026" disabled>
+${hasLocation ? `        <button type="button" class="c-weather-btn js-weather-toggle" aria-expanded="false" aria-controls="js-weather-panel" aria-label="Loading weather\u2026" disabled>
           <span class="c-weather-btn__icon js-weather-icon" aria-hidden="true">\u2601\uFE0F</span>
           <span class="c-weather-btn__label js-weather-label">\u2022\u2022\u2022</span>
         </button>` : ''}
-        <button type="button" class="c-speed-btn js-speed-test" aria-label="Run speed test" aria-live="polite">
+        <button type="button" class="c-speed-btn js-speed-test" aria-live="polite">
           <span class="c-speed-btn__icon" aria-hidden="true">\uD83D\uDCF6</span>
           <span class="c-speed-btn__label js-speed-label">Speed test</span>
         </button>
@@ -79,7 +79,7 @@ ${search}
       <button type="button" class="c-header__add-btn c-btn c-btn--primary js-add-open">${iconPlusSmall} <span>Add link</span></button>
     </div>
   </header>
-${hasLocation ? `  <section class="c-weather-panel js-weather-panel" hidden aria-label="Weather forecast">
+${hasLocation ? `  <section class="c-weather-panel js-weather-panel" id="js-weather-panel" hidden aria-label="Weather forecast">
     <div class="c-weather-panel__current js-weather-current"></div>
     <div class="c-weather-panel__alerts js-weather-alerts"></div>
     <div class="c-weather-panel__forecast js-weather-forecast"></div>
