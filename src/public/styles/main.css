@@ -1472,7 +1472,6 @@
   .is-list .c-bookmark {
     flex-direction: row;
     align-items: center;
-    background: transparent;
     border-radius: 0;
     box-shadow: none;
     border-inline: none;
@@ -1566,7 +1565,7 @@
 
   /* List hover — background highlight on the whole row */
   .is-list .c-bookmark:hover {
-    background-color: var(--color-surface);
+    background-color: var(--color-bg);
   }
 
   /* List focus-visible — show title in link-hover style (blue + underline) */
