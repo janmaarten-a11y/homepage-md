@@ -895,10 +895,8 @@ function renderWeather(data) {
   weatherBtn.disabled = false;
   weatherBtn.setAttribute('aria-label', `Weather for ${locationName}: ${data.current.temp}${data.units.temp}, ${data.current.condition}. Activate to show forecast.`);
 
-  // Location-specific weather.gov link
-  const weatherGovUrl = data.location.latitude
-    ? `https://forecast.weather.gov/MapClick.php?lat=${data.location.latitude}&lon=${data.location.longitude}`
-    : 'https://www.weather.gov';
+  // Forecast link — national weather service based on country
+  const forecastUrl = getForecastUrl(data.location);
 
   // AQI stat
   const aqiHtml = data.aqi
@@ -931,25 +929,40 @@ ${data.alerts.map((a) => `      <li>${escapeText(a.text)}</li>`).join('\n')}
     ? nwsHtml + derivedHtml
     : `<p class="c-weather-panel__no-alerts">No notable weather changes expected.</p>`;
 
-  // Full moon hero
-  const fullMoonText = data.moon.daysToFullMoon === 0
-    ? 'Tonight!'
-    : `${escapeText(data.moon.nextFullMoon)}`;
-  const daysLabel = data.moon.daysToFullMoon === 0
-    ? ''
-    : `<span class="c-weather-panel__astro-sub">in ${data.moon.daysToFullMoon} days</span>`;
-
-  const moonHero = data.moon
-    ? `<div class="c-weather-panel__moon-hero">
+  // Moon hero — conditional display for full moon vs. upcoming
+  let moonHero = '';
+  if (data.moon) {
+    if (data.moon.isFullMoon) {
+      // It's a full moon now — celebrate it
+      moonHero = `<div class="c-weather-panel__moon-hero">
+        <p class="c-weather-panel__moon-label">\uD83C\uDF15 ${escapeText(data.moon.fullMoonName || 'Full Moon')} tonight!</p>
+        <p class="c-weather-panel__moon-date">${data.moon.emoji} ${data.moon.illumination}% illuminated</p>
+        <p class="c-weather-panel__astro-line">Next new moon \u2014 ${escapeText(data.moon.nextNewMoon)} (in ${data.moon.daysToNewMoon} days)</p>
+      </div>`;
+    } else {
+      const fullMoonText = `${escapeText(data.moon.nextFullMoon)}`;
+      const daysLabel = `<span class="c-weather-panel__astro-sub">in ${data.moon.daysToFullMoon} days</span>`;
+      moonHero = `<div class="c-weather-panel__moon-hero">
         <p class="c-weather-panel__moon-label">Next full moon \u2014 ${escapeText(data.moon.fullMoonName || 'Full Moon')}</p>
         <p class="c-weather-panel__moon-date">\uD83C\uDF15 ${fullMoonText} ${daysLabel}</p>
         <p class="c-weather-panel__astro-line">${data.moon.emoji} ${escapeText(data.moon.phase)}, ${data.moon.illumination}% illuminated</p>
-      </div>`
-    : '';
+      </div>`;
+    }
+  }
 
   // Sun times
   const sunLine = data.today.sunrise && data.today.sunset
     ? `<p class="c-weather-panel__astro-line">\u2600\uFE0F Sunrise ${data.today.sunrise} \u00B7 \uD83C\uDF05 Sunset ${data.today.sunset}</p>`
+    : '';
+
+  // Eclipse
+  const eclipseLine = data.eclipse
+    ? `<p class="c-weather-panel__astro-line">${data.eclipse.emoji} Next eclipse \u2014 <a href="${escapeText(data.eclipse.url)}" rel="noopener">${escapeText(data.eclipse.type)}, ${escapeText(data.eclipse.date)}</a></p>`
+    : '';
+
+  // Aurora
+  const auroraLine = data.aurora?.possible
+    ? `<p class="c-weather-panel__astro-line c-weather-panel__aurora">\uD83C\uDF0C Aurora possible${data.aurora.hoursAway > 0 ? ` in ~${data.aurora.hoursAway}h` : ''} (Kp ${data.aurora.kp}) \u2014 <a href="${escapeText(data.aurora.url)}" rel="noopener">Forecast</a></p>`
     : '';
 
   // Tomorrow
@@ -961,7 +974,7 @@ ${data.alerts.map((a) => `      <li>${escapeText(a.text)}</li>`).join('\n')}
   // Left column: heading + conditions + alerts
   weatherCurrent.innerHTML = `
     <div class="c-weather-panel__heading">
-      <h2 class="c-weather-panel__location">Forecast for <a href="${weatherGovUrl}" rel="noopener">${escapeText(locationName)}</a></h2>
+      <h2 class="c-weather-panel__location">Forecast for <a href="${forecastUrl}" rel="noopener">${escapeText(locationName)}</a></h2>
     </div>
     <div class="c-weather-panel__summary">
       <span class="c-weather-panel__temp">${data.current.temp}${data.units.temp}</span>
@@ -982,6 +995,8 @@ ${alertsHtml}`;
       <div class="c-weather-panel__astro-section">
 ${moonHero}
 ${sunLine}
+${eclipseLine}
+${auroraLine}
       </div>
 ${tomorrowHtml}
     </div>`;
@@ -994,6 +1009,47 @@ function aqiLevel(value) {
   if (value <= 200) return 'unhealthy';
   if (value <= 300) return 'very-unhealthy';
   return 'hazardous';
+}
+
+function getForecastUrl(location) {
+  const { latitude, longitude, countryCode, name } = location;
+  const ll = latitude && longitude;
+
+  const nationalServices = {
+    US: ll ? `https://forecast.weather.gov/MapClick.php?lat=${latitude}&lon=${longitude}` : 'https://www.weather.gov',
+    CA: 'https://weather.gc.ca',
+    GB: 'https://www.metoffice.gov.uk/weather/forecast',
+    FR: 'https://meteofrance.com',
+    DE: 'https://www.dwd.de/DE/wetter/vorhersage_aktuell/vorhersage_aktuell_node.html',
+    NO: ll ? `https://www.yr.no/en/forecast/daily-table/${latitude},${longitude}` : 'https://www.yr.no',
+    SE: 'https://www.smhi.se/vader',
+    FI: 'https://www.ilmatieteenlaitos.fi/saa',
+    DK: 'https://www.dmi.dk/vejrarkiv/',
+    NL: 'https://www.knmi.nl/nederland-nu/weer/verwachtingen',
+    JP: 'https://www.jma.go.jp/bosai/forecast/',
+    AU: 'https://www.bom.gov.au',
+    IE: 'https://www.met.ie/forecasts',
+    IS: 'https://vedur.is',
+    IT: 'https://www.meteoam.it',
+    ES: 'https://www.aemet.es',
+    PT: 'https://www.ipma.pt',
+    CN: 'https://weather.cma.cn',
+    IN: 'https://mausam.imd.gov.in',
+    IL: 'https://ims.gov.il',
+    HK: 'https://www.hko.gov.hk',
+    TW: 'https://www.cwa.gov.tw',
+    PH: 'https://www.pagasa.dost.gov.ph',
+    ID: 'https://www.bmkg.go.id',
+    MN: 'https://www.weather.gov.mn',
+    TR: 'https://www.mgm.gov.tr',
+  };
+
+  if (countryCode && nationalServices[countryCode]) {
+    return nationalServices[countryCode];
+  }
+
+  // Fallback: wttr.in works globally
+  return `https://wttr.in/${encodeURIComponent(name)}`;
 }
 
 function escapeText(str) {
@@ -1039,14 +1095,31 @@ if (weatherBtn && weatherPanel) {
   fetch(`/api/weather/${encodeURIComponent(slug)}`)
     .then((res) => res.json())
     .then((data) => {
+      if (!data) {
+        showWeatherError();
+        return;
+      }
       renderWeather(data);
       // Restore panel open state from localStorage
-      if (data && localStorage.getItem(weatherStorageKey) === 'true') {
+      if (localStorage.getItem(weatherStorageKey) === 'true') {
         weatherPanel.hidden = false;
         weatherBtn.setAttribute('aria-expanded', 'true');
       }
     })
-    .catch(() => {});
+    .catch(() => {
+      showWeatherError();
+    });
+
+  function showWeatherError() {
+    weatherIcon.textContent = '\u26A0\uFE0F';
+    weatherLabel.textContent = 'Unavailable';
+    weatherBtn.disabled = false;
+    weatherBtn.setAttribute('aria-label', 'Weather data unavailable. Activate to retry.');
+    // Click to retry
+    weatherBtn.addEventListener('click', () => {
+      window.location.reload();
+    }, { once: true });
+  }
 }
 
 // ---------------------------------------------------------------------------

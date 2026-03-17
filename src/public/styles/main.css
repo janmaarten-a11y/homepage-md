@@ -667,6 +667,11 @@
     color: var(--color-muted);
   }
 
+  .c-weather-panel__aurora {
+    color: var(--color-text);
+    font-weight: 500;
+  }
+
   .c-weather-panel__tomorrow {
     padding: var(--space-s) var(--space-m);
     background-color: var(--color-bg);

@@ -103,6 +103,7 @@ async function geocode(locationStr) {
         name: data.results[0].name,
         admin1: data.results[0].admin1 || null,
         country: data.results[0].country || null,
+        countryCode: data.results[0].country_code || null,
         timezone: data.results[0].timezone || 'auto',
       };
 
@@ -169,13 +170,15 @@ export async function fetchWeather(locationStr, locale) {
 
     const raw = await safeJsonResponse(res);
 
-    // Fetch air quality and NWS alerts in parallel (best-effort)
-    const [aqi, nwsAlerts] = await Promise.all([
+    // Fetch air quality, NWS alerts (US only), and aurora forecast in parallel
+    const isUS = geo.countryCode === 'US';
+    const [aqi, nwsAlerts, aurora] = await Promise.all([
       fetchAirQuality(geo, useImperial),
-      fetchNwsAlerts(geo),
+      isUS ? fetchNwsAlerts(geo) : Promise.resolve(null),
+      fetchAuroraForecast(geo.latitude),
     ]);
 
-    const result = processWeatherData(raw, geo, useImperial, aqi, nwsAlerts);
+    const result = processWeatherData(raw, geo, useImperial, aqi, nwsAlerts, aurora);
 
     forecastCache.set(cacheKey, { data: result, timestamp: Date.now() });
     return result;
@@ -189,7 +192,7 @@ export async function fetchWeather(locationStr, locale) {
 // Process raw API data into our output shape
 // ---------------------------------------------------------------------------
 
-function processWeatherData(raw, geo, useImperial, aqi, nwsAlerts) {
+function processWeatherData(raw, geo, useImperial, aqi, nwsAlerts, aurora) {
   const current = raw.current;
   const hourly = raw.hourly;
   const daily = raw.daily;
@@ -224,6 +227,7 @@ function processWeatherData(raw, geo, useImperial, aqi, nwsAlerts) {
       region: geo.admin1,
       latitude: geo.latitude,
       longitude: geo.longitude,
+      countryCode: geo.countryCode,
     },
     units: { temp: unitSymbol, wind: windUnitLabel },
     current: {
@@ -249,6 +253,8 @@ function processWeatherData(raw, geo, useImperial, aqi, nwsAlerts) {
       precipChance: daily.precipitation_probability_max[1],
     },
     moon: getMoonData(now),
+    eclipse: getNextEclipse(now),
+    aurora: aurora || null,
     alerts,
     nwsAlerts: nwsAlerts || [],
     aqi,
@@ -313,13 +319,27 @@ function getMoonData(date) {
   // Full moon name based on month
   const fullMoonName = getFullMoonName(nextFullMoon.getMonth());
 
+  // Is it currently a full moon? (within ±1 day of peak)
+  const isFullMoon = Math.round(daysToFull) <= 1 || Math.round(daysToFull) >= Math.round(SYNODIC_MONTH) - 1;
+
+  // Days until next new moon
+  let daysToNew = -daysIntoFullCycle;
+  if (daysToNew <= 0) daysToNew += SYNODIC_MONTH;
+  const nextNewMoon = new Date(date.getTime() + daysToNew * 24 * 60 * 60 * 1000);
+  const newMoonFormatted = nextNewMoon.toLocaleDateString('en-US', {
+    weekday: 'short', month: 'short', day: 'numeric',
+  });
+
   return {
     phase: MOON_PHASES[phaseIndex].name,
     emoji: MOON_PHASES[phaseIndex].emoji,
     illumination,
+    isFullMoon,
     nextFullMoon: fullMoonFormatted,
     fullMoonName,
     daysToFullMoon: Math.round(daysToFull),
+    nextNewMoon: newMoonFormatted,
+    daysToNewMoon: Math.round(daysToNew),
   };
 }
 
@@ -342,6 +362,127 @@ function getFullMoonName(month) {
     'Cold Moon',        // December
   ];
   return names[month] || 'Full Moon';
+}
+
+// ---------------------------------------------------------------------------
+// Eclipse data — static table of upcoming eclipses
+// ---------------------------------------------------------------------------
+
+/**
+ * Get the next upcoming eclipse from a pre-computed table.
+ * Data sourced from NASA eclipse projections.
+ */
+function getNextEclipse(now) {
+  // Notable eclipses through 2030 (date, type, description, NASA link ID)
+  const eclipses = [
+    { date: '2026-08-12', type: 'Total Solar', desc: 'Visible from Arctic, Greenland, Iceland, Spain', path: 'solar.html' },
+    { date: '2026-03-03', type: 'Total Lunar', desc: 'Visible from Americas, Europe, Africa', path: 'lunar.html' },
+    { date: '2026-08-28', type: 'Partial Lunar', desc: 'Visible from E Americas, Europe, Africa, Asia', path: 'lunar.html' },
+    { date: '2027-02-20', type: 'Annular Solar', desc: 'Visible from S America, Antarctica, Africa', path: 'solar.html' },
+    { date: '2027-07-18', type: 'Partial Lunar', desc: 'Visible from Americas, Europe, Africa', path: 'lunar.html' },
+    { date: '2027-08-02', type: 'Total Solar', desc: 'Visible from N Africa, Middle East, India', path: 'solar.html' },
+    { date: '2028-01-12', type: 'Partial Lunar', desc: 'Visible from Americas, Europe, Africa', path: 'lunar.html' },
+    { date: '2028-01-26', type: 'Annular Solar', desc: 'Visible from N America, S America', path: 'solar.html' },
+    { date: '2028-07-06', type: 'Total Lunar', desc: 'Visible from Americas, Europe, Africa', path: 'lunar.html' },
+    { date: '2028-07-22', type: 'Total Solar', desc: 'Visible from Australia, New Zealand', path: 'solar.html' },
+    { date: '2028-12-31', type: 'Total Lunar', desc: 'Visible from Europe, Africa, Asia, Australia', path: 'lunar.html' },
+    { date: '2029-06-12', type: 'Partial Solar', desc: 'Visible from Arctic, N Europe, N Asia', path: 'solar.html' },
+    { date: '2029-06-26', type: 'Total Lunar', desc: 'Visible from Americas, Europe, Africa', path: 'lunar.html' },
+    { date: '2029-12-05', type: 'Partial Solar', desc: 'Visible from S America, Antarctica', path: 'solar.html' },
+    { date: '2029-12-20', type: 'Total Lunar', desc: 'Visible from Americas, Europe, Africa, Asia', path: 'lunar.html' },
+    { date: '2030-06-01', type: 'Annular Solar', desc: 'Visible from N Africa, Europe, Asia', path: 'solar.html' },
+  ];
+
+  for (const e of eclipses) {
+    const eclipseDate = new Date(e.date + 'T00:00:00');
+    if (eclipseDate >= now) {
+      const daysAway = Math.round((eclipseDate - now) / (1000 * 60 * 60 * 24));
+      const formatted = eclipseDate.toLocaleDateString('en-US', {
+        weekday: 'short', month: 'short', day: 'numeric', year: 'numeric',
+      });
+      const emoji = e.type.includes('Solar') ? '\uD83C\uDF11' : '\uD83C\uDF15';
+      return {
+        type: e.type,
+        date: formatted,
+        daysAway,
+        description: e.desc,
+        emoji,
+        url: `https://eclipse.gsfc.nasa.gov/${e.path}`,
+      };
+    }
+  }
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// Aurora forecast — NOAA Space Weather Prediction Center Kp index
+// ---------------------------------------------------------------------------
+
+/**
+ * Minimum Kp index for aurora visibility at a given geographic latitude.
+ * Lower latitudes need higher Kp values.
+ */
+function minKpForLatitude(latitude) {
+  const absLat = Math.abs(latitude);
+  if (absLat >= 65) return 3;
+  if (absLat >= 60) return 4;
+  if (absLat >= 55) return 5;
+  if (absLat >= 50) return 6;
+  if (absLat >= 45) return 7;
+  if (absLat >= 40) return 8;
+  return 9; // Very unlikely below 40°
+}
+
+async function fetchAuroraForecast(latitude) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+
+  try {
+    const res = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json', {
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+    if (!res.ok) return null;
+
+    const data = await safeJsonResponse(res);
+    if (!Array.isArray(data) || data.length < 2) return null;
+
+    const minKp = minKpForLatitude(latitude);
+    const now = new Date();
+
+    // Find the peak Kp in the forecast (skip header row and observed values)
+    let peakKp = 0;
+    let peakTime = null;
+    let peakScale = null;
+
+    for (let i = 1; i < data.length; i++) {
+      const [timeTag, kp, observed, scale] = data[i];
+      if (observed === 'observed') continue;
+      const kpVal = parseFloat(kp);
+      if (kpVal > peakKp) {
+        peakKp = kpVal;
+        peakTime = timeTag;
+        peakScale = scale;
+      }
+    }
+
+    if (peakKp < minKp) return null;
+
+    // Aurora is possible — return the forecast
+    const peakDate = new Date(peakTime + 'Z');
+    const hoursAway = Math.max(0, Math.round((peakDate - now) / 3600000));
+
+    return {
+      kp: Math.round(peakKp * 10) / 10,
+      level: peakScale || (peakKp >= 5 ? `G${Math.min(Math.floor(peakKp) - 4, 5)}` : null),
+      hoursAway,
+      possible: true,
+      url: 'https://www.swpc.noaa.gov/products/aurora-30-minute-forecast',
+    };
+  } catch {
+    clearTimeout(timeout);
+    return null;
+  }
 }
 
 // ---------------------------------------------------------------------------
