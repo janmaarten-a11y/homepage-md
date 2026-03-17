@@ -351,8 +351,7 @@ function renderWelcome(welcome) {
   const description = welcome.description
     ? `\n      <p class="c-welcome__description">${escapeHtml(welcome.description)}</p>`
     : '';
-  return `    <section class="c-welcome" aria-label="Welcome">
-      <span class="c-welcome__icon" aria-hidden="true">👋</span>${title}${description}
+  return `    <section class="c-welcome" aria-label="Welcome">${title}${description}
     </section>\n`;
 }
 
