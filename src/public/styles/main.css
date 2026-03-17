@@ -1386,6 +1386,14 @@
     margin-inline-start: auto;
   }
 
+  .is-condensed .c-category > h2 {
+    font-size: 1.25rem;
+  }
+
+  .is-condensed .c-subcategory > h3 {
+    font-size: 1rem;
+  }
+
   /* Columns layout — single grid shared by direct bookmarks (via subgrid) and subcategories */
   .is-columns .c-category {
     display: grid;
