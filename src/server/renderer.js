@@ -73,17 +73,17 @@ ${toolbar}
         </div>
       </div>
     </div>
+${hasLocation ? `    <section class="c-weather-panel js-weather-panel" id="js-weather-panel" hidden aria-label="Weather forecast">
+      <div class="c-weather-panel__current js-weather-current"></div>
+      <div class="c-weather-panel__alerts js-weather-alerts"></div>
+      <div class="c-weather-panel__forecast js-weather-forecast"></div>
+    </section>` : ''}
     <div class="c-header__searchbar">
 ${tocPopover}
 ${search}
       <button type="button" class="c-header__add-btn c-btn c-btn--primary js-add-open">${iconPlusSmall} <span>Add link</span></button>
     </div>
   </header>
-${hasLocation ? `  <section class="c-weather-panel js-weather-panel" id="js-weather-panel" hidden aria-label="Weather forecast">
-    <div class="c-weather-panel__current js-weather-current"></div>
-    <div class="c-weather-panel__alerts js-weather-alerts"></div>
-    <div class="c-weather-panel__forecast js-weather-forecast"></div>
-  </section>` : ''}
   <aside class="c-drawer js-menu-drawer" id="js-menu-drawer" hidden>
     <nav class="c-drawer__nav" aria-label="Pages">
 ${pages.length > 1 ? pages.map((p) => {
