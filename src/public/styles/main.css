@@ -1477,6 +1477,7 @@
     border-inline: none;
     border-block-start: none;
     border-block-end: 1px solid var(--color-border);
+    border-inline-start: 3px solid transparent;
     padding: var(--space-s) var(--space-m);
   }
 
@@ -1563,9 +1564,9 @@
     border-radius: 0;
   }
 
-  /* List hover — background highlight on the whole row */
+  /* List hover */
   .is-list .c-bookmark:hover {
-    background-color: var(--color-bg);
+    border-inline-start: 3px solid var(--color-primary);
   }
 
   /* List focus-visible — show title in link-hover style (blue + underline) */
