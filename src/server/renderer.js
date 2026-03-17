@@ -213,12 +213,6 @@ function renderToolbar(themes = ['default']) {
           <button type="button" class="c-toolbar__btn js-density-btn" data-value="detailed" aria-pressed="true" title="Detailed view">${iconDetailed} <span class="c-toolbar__label">Detailed</span></button>
           <button type="button" class="c-toolbar__btn js-density-btn" data-value="condensed" aria-pressed="false" title="Condensed view">${iconCondensed} <span class="c-toolbar__label">Condensed</span></button>
         </div>
-        <div class="c-toolbar__separator" aria-hidden="true"></div>
-        <div class="c-toolbar__group" role="group" aria-label="Color mode">
-          <button type="button" class="c-toolbar__btn js-color-btn" data-value="system" aria-pressed="true" title="System theme">${iconSystem} <span class="c-toolbar__label">System</span></button>
-          <button type="button" class="c-toolbar__btn js-color-btn" data-value="light" aria-pressed="false" title="Light theme">${iconSun} <span class="c-toolbar__label">Light</span></button>
-          <button type="button" class="c-toolbar__btn js-color-btn" data-value="dark" aria-pressed="false" title="Dark theme">${iconMoon} <span class="c-toolbar__label">Dark</span></button>
-        </div>
 ${themes.length > 1 ? `        <div class="c-toolbar__separator" aria-hidden="true"></div>
         <div class="c-toolbar__group" role="group" aria-label="Theme">
 ${themes.map((t) => {
@@ -226,6 +220,12 @@ ${themes.map((t) => {
   return `          <button type="button" class="c-toolbar__btn js-theme-btn" data-value="${escapeAttr(t)}" aria-pressed="${t === 'default' ? 'true' : 'false'}">${escapeHtml(label)}</button>`;
 }).join('\n')}
         </div>` : ''}
+        <div class="c-toolbar__separator js-color-mode-separator" aria-hidden="true"></div>
+        <div class="c-toolbar__group js-color-mode-group" role="group" aria-label="Color mode">
+          <button type="button" class="c-toolbar__btn js-color-btn" data-value="system" aria-pressed="true">${iconSystem} <span class="c-toolbar__label">System</span></button>
+          <button type="button" class="c-toolbar__btn js-color-btn" data-value="light" aria-pressed="false">${iconSun} <span class="c-toolbar__label">Light</span></button>
+          <button type="button" class="c-toolbar__btn js-color-btn" data-value="dark" aria-pressed="false">${iconMoon} <span class="c-toolbar__label">Dark</span></button>
+        </div>
       </div>`;
 }
 
