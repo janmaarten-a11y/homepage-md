@@ -1478,23 +1478,21 @@
   .is-list .c-bookmark__header {
     flex: 1;
     align-items: center;
-    gap: var(--space-s);
     min-width: 0;
   }
 
   .is-list .c-bookmark__content {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-xs);
+    display: inline;
     min-width: 0;
     overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .is-list .c-bookmark__link {
     display: inline-flex;
     align-items: center;
     gap: var(--space-xs);
-    flex-shrink: 0;
   }
 
   .is-list .c-bookmark__description {
