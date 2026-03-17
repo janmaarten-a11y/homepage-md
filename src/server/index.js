@@ -451,7 +451,13 @@ async function handleRequest(req, res) {
     const slug = weatherMatch[1];
     const locale = req.headers['accept-language']?.split(',')[0] || '';
     const refresh = url.searchParams.has('refresh');
-    if (refresh) clearWeatherCache();
+    if (refresh) {
+      if (isRateLimited(req, RATE_LIMIT_MAX_FETCHES)) {
+        sendJSON(res, 429, { error: 'Too many requests' });
+        return;
+      }
+      clearWeatherCache();
+    }
     try {
       const pageData = await loadPage(slug);
       if (!pageData.location) {

@@ -525,16 +525,16 @@
 
   .c-weather-panel__aqi[data-level="unhealthy"] {
     background-color: oklch(75% 0.18 25);
-    color: oklch(98% 0 0);
+    color: oklch(25% 0.1 25);
   }
 
   .c-weather-panel__aqi[data-level="very-unhealthy"] {
-    background-color: oklch(50% 0.2 320);
+    background-color: oklch(40% 0.2 320);
     color: oklch(98% 0 0);
   }
 
   .c-weather-panel__aqi[data-level="hazardous"] {
-    background-color: oklch(35% 0.15 15);
+    background-color: oklch(30% 0.15 15);
     color: oklch(98% 0 0);
   }
 
