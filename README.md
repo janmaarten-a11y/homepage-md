@@ -76,6 +76,9 @@ Each `.md` file in the `bookmarks/` directory is a page. The grammar:
   - bang: !g https://google.com/search?q=%s
   - bang: !w https://en.wikipedia.org/w/index.php?search=%s
 
+> [!WELCOME] Welcome!
+> Your household dashboard for bookmarks and quick searches.
+
 ## Category Name
   - subtitle: A short description of this category
 
@@ -92,6 +95,7 @@ Each `.md` file in the `bookmarks/` directory is a page. The grammar:
 - `# Heading 1` — page title (one per file)
 - `- location:` — location for the weather widget (indented, under the title)
 - `- bang: !prefix url` — search bang shortcut; `%s` is replaced with the query (indented, under the title)
+- `> [!WELCOME] Title` — welcome banner with optional description on subsequent `>` lines
 - `## Heading 2` — category
 - `### Heading 3` — subcategory (within the parent category)
 - `- subtitle:` — description shown under a category or subcategory heading

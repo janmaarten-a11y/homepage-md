@@ -7,6 +7,7 @@
  * Output shape:
  * {
  *   title: string | null,
+ *   welcome: { title: string, description: string | null } | null,
  *   categories: [{
  *     name: string,
  *     id: string,
@@ -20,6 +21,8 @@
 const HEADING_RE = /^(#{1,3})\s+(.+)$/;
 const BOOKMARK_RE = /^-\s+\[([^\]]+)\]\(([^)]+)\)\s*$/;
 const METADATA_RE = /^\s+-\s+(description|icon|subtitle|location|bang):\s+(.+)$/;
+const WELCOME_RE = /^>\s*\[!WELCOME\]\s*(.*)$/i;
+const BLOCKQUOTE_RE = /^>\s?(.*)$/;
 
 function slugify(text) {
   return text
@@ -30,13 +33,35 @@ function slugify(text) {
 
 export function parseMarkdown(source) {
   const lines = source.split('\n');
-  const result = { title: null, location: null, bangs: [], categories: [] };
+  const result = { title: null, location: null, bangs: [], welcome: null, categories: [] };
 
   let currentCategory = null;
   let currentSubcategory = null;
   let currentBookmark = null;
+  let inWelcome = false;
 
   for (const line of lines) {
+    // Welcome block: > [!WELCOME] Title / > continuation lines
+    const welcomeMatch = line.match(WELCOME_RE);
+    if (welcomeMatch) {
+      result.welcome = { title: welcomeMatch[1].trim() || null, description: null };
+      inWelcome = true;
+      continue;
+    }
+    if (inWelcome) {
+      const bqMatch = line.match(BLOCKQUOTE_RE);
+      if (bqMatch) {
+        const text = bqMatch[1].trim();
+        if (text) {
+          result.welcome.description = result.welcome.description
+            ? result.welcome.description + ' ' + text
+            : text;
+        }
+        continue;
+      }
+      inWelcome = false;
+    }
+
     const headingMatch = line.match(HEADING_RE);
     if (headingMatch) {
       const [, hashes, text] = headingMatch;

@@ -383,4 +383,18 @@ describe('renderPage', () => {
     assert.ok(homeIdx < alphaIdx, 'default page should appear before alphabetically sorted pages');
     assert.ok(alphaIdx < zebraIdx, 'remaining pages should be alphabetically sorted');
   });
+
+  it('renders a welcome banner when welcome is present', () => {
+    const page = { ...MINIMAL_PAGE, welcome: { title: 'Hello!', description: 'Welcome aboard.' } };
+    const html = renderPage(page, DEFAULT_OPTIONS);
+    assert.ok(html.includes('c-welcome'));
+    assert.ok(html.includes('Hello!'));
+    assert.ok(html.includes('Welcome aboard.'));
+  });
+
+  it('does not render a welcome banner when welcome is null', () => {
+    const page = { ...MINIMAL_PAGE, welcome: null };
+    const html = renderPage(page, DEFAULT_OPTIONS);
+    assert.ok(!html.includes('c-welcome'));
+  });
 });
