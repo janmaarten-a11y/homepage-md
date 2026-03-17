@@ -136,8 +136,14 @@ try {
       const link = card.querySelector('.c-bookmark__link');
       if (link) {
         requestAnimationFrame(() => {
+          // Focus link first — triggers :focus-within so action buttons appear
           link.focus({ preventScroll: true });
           card.scrollIntoView({ block: 'nearest', behavior: 'instant' });
+          // After actions are visible, shift focus to the edit button
+          setTimeout(() => {
+            const editBtn = card.querySelector('.js-edit-open');
+            if (editBtn) editBtn.focus();
+          }, 50);
         });
       }
     }
