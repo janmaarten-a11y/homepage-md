@@ -97,10 +97,10 @@ ${pageData.categories.map((cat) => `      <a href="#${escapeAttr(cat.id)}" class
   </aside>
   <main id="main-content">
 ${main}
+    <p class="c-search-empty js-search-empty" hidden>No bookmarks match your search.</p>
   </main>
 ${footer}
   <button type="button" class="c-fab js-add-open">${iconPlus} <span class="c-fab__label">Add link</span></button>
-  <p class="c-search-empty js-search-empty" hidden>No bookmarks match your search.</p>
   <div class="u-visually-hidden" aria-live="polite" id="js-search-status"></div>
 ${addDialog}
   <dialog class="c-dialog js-edit-dialog">
@@ -225,9 +225,10 @@ function renderKeyboardHelp() {
       </div>
       <dl class="c-shortcut-list">
         <div class="c-shortcut-list__item"><dt><kbd>/</kbd></dt><dd>Focus search</dd></div>
+        <div class="c-shortcut-list__item"><dt><kbd>!</kbd></dt><dd>Search bangs (e.g. !g, !ddg, !w)</dd></div>
         <div class="c-shortcut-list__item"><dt><kbd>Esc</kbd></dt><dd>Clear search / close dialog</dd></div>
-        <div class="c-shortcut-list__item"><dt><kbd>→</kbd> <kbd>↓</kbd></dt><dd>Edit / Delete actions</dd></div>
-        <div class="c-shortcut-list__item"><dt><kbd>←</kbd> <kbd>↑</kbd></dt><dd>Return to bookmark</dd></div>
+        <div class="c-shortcut-list__item"><dt><kbd>\u2192</kbd> <kbd>\u2193</kbd></dt><dd>Edit / Delete actions</dd></div>
+        <div class="c-shortcut-list__item"><dt><kbd>\u2190</kbd> <kbd>\u2191</kbd></dt><dd>Return to bookmark</dd></div>
         <div class="c-shortcut-list__item"><dt><kbd>?</kbd></dt><dd>This help</dd></div>
       </dl>
     </div>
