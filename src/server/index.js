@@ -185,12 +185,12 @@ async function resolveCategoryIcons(pageData) {
   const map = {};
   for (const cat of pageData.categories) {
     if (cat.icon) {
-      const svg = await getIcon(cat.icon);
+      const svg = await getIcon(cat.icon, { size: 24 });
       if (svg) map[cat.id] = svg;
     }
     for (const sub of cat.subcategories) {
       if (sub.icon) {
-        const svg = await getIcon(sub.icon);
+        const svg = await getIcon(sub.icon, { size: 24 });
         if (svg) map[sub.id] = svg;
       }
     }

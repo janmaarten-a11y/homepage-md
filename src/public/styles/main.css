@@ -923,7 +923,7 @@
   }
 
   .c-category > h2 {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     margin-block-end: var(--space-m);
   }
 
@@ -952,7 +952,8 @@
   }
 
   .c-subcategory > h3 {
-    font-size: 1rem;
+    font-size: 1.2rem;
+    font-weight: normal;
     color: var(--color-muted);
     margin-block-end: var(--space-s);
   }
@@ -1399,7 +1400,8 @@
   }
 
   .is-columns .c-subcategory > h3 {
-    margin-block-end: var(--space-s);
+    margin-block-end: var(--space-m);
+    margin-block-start: var(--space-m);
   }
 
   .is-columns .c-subcategory > .c-subcategory__subtitle {
