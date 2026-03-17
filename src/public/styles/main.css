@@ -1472,6 +1472,7 @@
   .is-list .c-bookmark {
     flex-direction: row;
     align-items: center;
+    background: transparent;
     border-radius: 0;
     box-shadow: none;
     border-inline: none;
