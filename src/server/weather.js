@@ -21,6 +21,14 @@ export function clearWeatherCache() {
   forecastCache.clear();
 }
 
+// Maximum response body size for external API calls (500 KB)
+const MAX_RESPONSE_SIZE = 500_000;
+
+async function safeJsonResponse(res) {
+  const text = (await res.text()).substring(0, MAX_RESPONSE_SIZE);
+  return JSON.parse(text);
+}
+
 // ---------------------------------------------------------------------------
 // WMO Weather Codes → human-readable descriptions and icon names
 // https://www.noaa.gov/weather/codes
@@ -86,7 +94,7 @@ async function geocode(locationStr) {
       clearTimeout(timeout);
       if (!res.ok) continue;
 
-      const data = await res.json();
+      const data = await safeJsonResponse(res);
       if (!data.results || data.results.length === 0) continue;
 
       const result = {
@@ -159,7 +167,7 @@ export async function fetchWeather(locationStr, locale) {
     clearTimeout(timeout);
     if (!res.ok) return null;
 
-    const raw = await res.json();
+    const raw = await safeJsonResponse(res);
 
     // Fetch air quality and NWS alerts in parallel (best-effort)
     const [aqi, nwsAlerts] = await Promise.all([
@@ -377,7 +385,7 @@ async function fetchAirQuality(geo, useImperial) {
     clearTimeout(timeout);
     if (!res.ok) return null;
 
-    const data = await res.json();
+    const data = await safeJsonResponse(res);
     const value = data.current?.[aqiType];
     if (value == null) return null;
 
@@ -534,7 +542,7 @@ async function fetchNwsAlerts(geo) {
     clearTimeout(timeout);
     if (!res.ok) return null;
 
-    const data = await res.json();
+    const data = await safeJsonResponse(res);
     const features = data.features || [];
     if (features.length === 0) return null;
 
