@@ -12,7 +12,7 @@
   --color-text: oklch(82% 0.2 140);
   --color-primary: oklch(78% 0.22 140);
   --color-surface: oklch(10% 0.01 140);
-  --color-border: oklch(38% 0.1 140);
+  --color-border: oklch(55% 0.1 140);
   --color-focus: oklch(82% 0.24 140);
   --color-muted: oklch(55% 0.1 140);
 
@@ -248,7 +248,10 @@ body {
 
 /* List view */
 .is-list .c-bookmark {
-  border-block-end-color: var(--color-border);
+  border: none;
+  border-block-end: 1px solid var(--color-border);
+  border-inline-start: 3px solid transparent;
+  border-radius: 0;
   background: transparent;
 }
 
