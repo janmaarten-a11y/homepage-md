@@ -77,8 +77,10 @@ async function apiRequest(method, slug, body) {
 // ---------------------------------------------------------------------------
 
 const evtSource = new EventSource('/api/events');
+let suppressSSEReload = false;
 
 evtSource.addEventListener('message', (event) => {
+  if (suppressSSEReload) return;
   try {
     const data = JSON.parse(event.data);
     if (data.type === 'update') {
@@ -89,11 +91,45 @@ evtSource.addEventListener('message', (event) => {
   }
 });
 
+/**
+ * Reload the page after a CRUD operation, suppressing the SSE-triggered
+ * reload and optionally restoring focus to a specific bookmark.
+ */
+function reloadAfterEdit(focusUrl) {
+  suppressSSEReload = true;
+  if (focusUrl) {
+    try { sessionStorage.setItem('homepage-md-focus', focusUrl); } catch { /* ignore */ }
+  }
+  window.location.reload();
+}
+
 // ---------------------------------------------------------------------------
 // Page data — shared by search bangs and comboboxes
 // ---------------------------------------------------------------------------
 
 const pageData = JSON.parse(document.getElementById('js-page-data')?.textContent || '{}');
+
+// ---------------------------------------------------------------------------
+// Focus restoration — after a CRUD reload, focus the edited bookmark
+// ---------------------------------------------------------------------------
+
+try {
+  const focusUrl = sessionStorage.getItem('homepage-md-focus');
+  if (focusUrl) {
+    sessionStorage.removeItem('homepage-md-focus');
+    const card = document.querySelector(`.c-bookmark[data-url="${CSS.escape(focusUrl)}"]`);
+    if (card) {
+      const link = card.querySelector('.c-bookmark__link');
+      if (link) {
+        // Scroll into view and focus after the page settles
+        requestAnimationFrame(() => {
+          link.focus({ preventScroll: true });
+          card.scrollIntoView({ block: 'nearest', behavior: 'instant' });
+        });
+      }
+    }
+  }
+} catch { /* ignore */ }
 
 // ---------------------------------------------------------------------------
 // Search — filter bookmarks on the current page
@@ -408,8 +444,7 @@ if (addForm) {
       });
       addDialog.close();
       addForm.reset();
-      // SSE will trigger reload, but reload immediately for responsiveness
-      window.location.reload();
+      reloadAfterEdit(formData.get('url'));
     } catch (err) {
       showError(addError, `Failed to add bookmark: ${err.message}`);
     }
@@ -520,7 +555,7 @@ if (editForm) {
         subcategory: categoryChanged ? (editSubcategoryVal || undefined) : undefined,
       });
       editDialog.close();
-      window.location.reload();
+      reloadAfterEdit(editUrl.value || originalUrl);
     } catch (err) {
       showError(editError, `Failed to update bookmark: ${err.message}`);
     }
@@ -598,7 +633,7 @@ if (deleteConfirmBtn) {
     try {
       await apiRequest('DELETE', slug, { url });
       closeDialog(deleteDialog);
-      window.location.reload();
+      reloadAfterEdit();
     } catch (err) {
       showError(deleteError, `Failed to delete bookmark: ${err.message}`);
     }
@@ -1309,7 +1344,7 @@ if (weatherBtn && weatherPanel) {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error);
         locationDialog.close();
-        window.location.reload();
+        reloadAfterEdit();
       } catch (err) {
         // Show error inline (reuse dialog pattern)
         locationInput.setCustomValidity(err.message);
