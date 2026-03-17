@@ -29,10 +29,14 @@
   --radius-l: 2px;
 }
 
+.c-category h2 {
+  font-weight: normal;
+}
+
 /* Override .is-dark from main.css — must match the dark green tokens above
    because .is-dark sets custom properties on body which would override :root */
 .is-dark {
-  --color-bg: oklch(8% 0.01 140);
+  --color-bg: oklch(20% 0.01 140);
   --color-text: oklch(82% 0.2 140);
   --color-primary: oklch(78% 0.22 140);
   --color-surface: oklch(10% 0.01 140);
