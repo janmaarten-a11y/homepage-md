@@ -989,7 +989,11 @@ function renderWeather(data) {
     : data.location.name;
 
   // Update the button with current temp and icon
-  const icon = WEATHER_ICONS[data.current.icon] || '\uD83C\uDF24\uFE0F';
+  // Override icon for extreme temperatures
+  let icon = WEATHER_ICONS[data.current.icon] || '\uD83C\uDF24\uFE0F';
+  const tempF = data.units.temp === '\u00B0F' ? data.current.temp : data.current.temp * 9 / 5 + 32;
+  if (tempF <= 20) icon = '\uD83E\uDD76';       // 🥶 freezing
+  else if (tempF >= 95) icon = '\uD83E\uDD75';   // 🥵 burning
   weatherIcon.textContent = icon;
   weatherLabel.textContent = `${data.current.temp}${data.units.temp}`;
   weatherBtn.disabled = false;

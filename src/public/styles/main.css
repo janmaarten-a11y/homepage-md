@@ -266,6 +266,7 @@
     gap: var(--space-xs);
     white-space: nowrap;
     flex-shrink: 0;
+    min-block-size: 2.75rem;
   }
 
   /* TOC button wrapper */
@@ -759,9 +760,17 @@
     align-items: center;
   }
 
+  .c-search__icon {
+    position: absolute;
+    inset-inline-start: var(--space-s);
+    color: var(--color-muted);
+    pointer-events: none;
+    flex-shrink: 0;
+  }
+
   .c-search__input {
     padding-block: var(--space-s);
-    padding-inline: var(--space-s) var(--space-l);
+    padding-inline: calc(var(--space-s) + 16px + var(--space-xs)) var(--space-xl);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-m);
     background-color: var(--color-surface);
@@ -781,13 +790,19 @@
     border-color: var(--color-primary);
   }
 
-  .c-search__input:focus-visible + .c-search__shortcut {
+  .c-search__input:focus-visible + .c-search__shortcuts {
     display: none;
   }
 
-  .c-search__shortcut {
+  .c-search__shortcuts {
     position: absolute;
     inset-inline-end: var(--space-s);
+    display: flex;
+    gap: var(--space-xs);
+    pointer-events: none;
+  }
+
+  .c-search__shortcut {
     font-family: var(--font-mono);
     font-size: 0.75rem;
     padding-block: 0.0625rem;
@@ -795,7 +810,6 @@
     border: 1px solid var(--color-border);
     border-radius: var(--radius-s);
     color: var(--color-muted);
-    pointer-events: none;
     line-height: 1.4;
   }
 
