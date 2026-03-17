@@ -1465,17 +1465,27 @@
     flex-wrap: nowrap;
     min-width: 0;
     align-items: center;
+    gap: var(--space-xs);
   }
 
   .is-list .c-bookmark__link {
-    display: inline;
+    display: contents;
+  }
+
+  .is-list .c-bookmark__icon {
+    inline-size: 2rem;
+    block-size: 2rem;
+  }
+
+  .is-list .c-bookmark__title {
+    white-space: nowrap;
   }
 
   .is-list .c-bookmark__url {
     display: inline;
     color: var(--color-muted);
     font-size: 0.875rem;
-    margin-inline-start: var(--space-s);
+    white-space: nowrap;
   }
 
   .is-list .c-bookmark__description {
@@ -1487,15 +1497,21 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    min-width: 0;
 
     &::before {
       content: " — ";
     }
   }
 
-  .is-list .c-bookmark__icon {
-    inline-size: 1.25rem;
-    block-size: 1.25rem;
+  /* Condensed + List — smaller icons, less padding */
+  .is-condensed.is-list .c-bookmark {
+    padding: var(--space-xs) var(--space-m);
+  }
+
+  .is-condensed.is-list .c-bookmark__icon {
+    inline-size: 1.5rem;
+    block-size: 1.5rem;
   }
 
   /* Condensed + Columns — tighter columns, smaller cards for more density */
@@ -1522,17 +1538,6 @@
   .is-condensed.is-columns .c-category {
     padding-block: var(--space-m);
     padding-inline: var(--space-m);
-  }
-
-  /* Condensed + List — two-column list to reduce scrolling */
-  .is-condensed.is-list .c-bookmark-list[role="list"] {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0;
-  }
-
-  .is-condensed.is-list .c-bookmark {
-    border-inline-end: 1px solid var(--color-border);
   }
 
   /* Toolbar — toggle button groups (inside view popover) */
