@@ -125,7 +125,7 @@ When search is focused, type `!` to see available search bangs. Type a bang pref
 The **View** dropdown in the header offers two independent axes:
 
 - **Density**: Detailed (shows descriptions) / Condensed (hides descriptions, tighter padding)
-- **Layout**: Grid (card grid) / Columns (subcategories as horizontal columns)
+- **Layout**: Grid (card grid) / Columns (subcategories as horizontal columns) / List (full-width rows) / Compact (smaller cards, more visible) / Table (dense rows with actions)
 
 Preferences are saved per page in the browser's `localStorage`.
 

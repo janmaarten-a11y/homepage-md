@@ -765,7 +765,12 @@ function saveViewPrefs(prefs) {
 
 function applyView(prefs) {
   document.body.classList.toggle('is-condensed', prefs.density === 'condensed');
-  document.body.classList.toggle('is-columns', prefs.layout === 'columns');
+
+  // Layout — remove all, then add the active one
+  document.body.classList.remove('is-columns', 'is-list', 'is-compact', 'is-table');
+  if (prefs.layout !== 'grid') {
+    document.body.classList.add(`is-${prefs.layout}`);
+  }
 
   // Color mode
   document.body.classList.remove('is-light', 'is-dark');
