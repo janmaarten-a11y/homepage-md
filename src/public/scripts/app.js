@@ -90,6 +90,12 @@ evtSource.addEventListener('message', (event) => {
 });
 
 // ---------------------------------------------------------------------------
+// Page data — shared by search bangs and comboboxes
+// ---------------------------------------------------------------------------
+
+const pageData = JSON.parse(document.getElementById('js-page-data')?.textContent || '{}');
+
+// ---------------------------------------------------------------------------
 // Search — filter bookmarks on the current page
 // ---------------------------------------------------------------------------
 
@@ -791,7 +797,6 @@ for (const btn of document.querySelectorAll('.js-color-btn')) {
 // ARIA Combobox — filtered autocomplete for category/subcategory fields
 // ---------------------------------------------------------------------------
 
-const pageData = JSON.parse(document.getElementById('js-page-data')?.textContent || '{}');
 const allCategories = (pageData.categories || []).map((c) => ({ label: c, value: c }));
 const allSubcategoryPairs = (pageData.subcategories || []).map((s) => ({
   label: `${s.category} > ${s.subcategory}`,
