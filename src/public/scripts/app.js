@@ -892,18 +892,6 @@ function applyView(prefs) {
   for (const btn of document.querySelectorAll('.js-theme-btn')) {
     btn.setAttribute('aria-pressed', String(btn.dataset.value === prefs.theme));
   }
-
-  // Show color mode only for default theme — custom themes control their own colors
-  const colorModeGroup = document.querySelector('.js-color-mode-group');
-  const colorModeSeparator = document.querySelector('.js-color-mode-separator');
-  const isDefaultTheme = !prefs.theme || prefs.theme === 'default';
-  if (colorModeGroup) colorModeGroup.hidden = !isDefaultTheme;
-  if (colorModeSeparator) colorModeSeparator.hidden = !isDefaultTheme;
-
-  // Reset color mode when switching away from default
-  if (!isDefaultTheme) {
-    document.body.classList.remove('is-light', 'is-dark');
-  }
 }
 
 // Initialize

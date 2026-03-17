@@ -7,18 +7,18 @@
  */
 
 :root {
-  /* Monochrome green phosphor palette */
-  --color-bg: oklch(8% 0.01 145);
-  --color-text: oklch(80% 0.15 145);
-  --color-primary: oklch(75% 0.18 145);
-  --color-surface: oklch(10% 0.01 145);
-  --color-border: oklch(35% 0.08 145);
-  --color-focus: oklch(80% 0.2 145);
-  --color-muted: oklch(50% 0.08 145);
+  /* Monochrome green phosphor palette — dark mode default */
+  --color-bg: oklch(8% 0.01 140);
+  --color-text: oklch(82% 0.2 140);
+  --color-primary: oklch(78% 0.22 140);
+  --color-surface: oklch(10% 0.01 140);
+  --color-border: oklch(38% 0.1 140);
+  --color-focus: oklch(82% 0.24 140);
+  --color-muted: oklch(55% 0.1 140);
 
-  --shadow-s: 0 0 4px oklch(60% 0.15 145 / 20%);
-  --shadow-m: 0 0 8px oklch(60% 0.15 145 / 25%);
-  --shadow-l: 0 0 16px oklch(60% 0.15 145 / 30%);
+  --shadow-s: 0 0 4px oklch(65% 0.18 140 / 20%);
+  --shadow-m: 0 0 8px oklch(65% 0.18 140 / 25%);
+  --shadow-l: 0 0 16px oklch(65% 0.18 140 / 30%);
 
   /* Monospace everything */
   --font-base: var(--font-mono);
@@ -53,7 +53,7 @@ body::before {
 
 /* Phosphor glow on text */
 body {
-  text-shadow: 0 0 2px oklch(70% 0.12 145 / 40%);
+  text-shadow: 0 0 2px oklch(72% 0.16 140 / 40%);
 }
 
 /* Outlined cards with scanline-hinted backgrounds */
@@ -66,17 +66,17 @@ body {
 
 .c-bookmark:hover {
   border-color: var(--color-primary);
-  box-shadow: 0 0 6px oklch(60% 0.15 145 / 25%);
+  box-shadow: 0 0 6px oklch(65% 0.18 140 / 25%);
 }
 
 /* Header */
 .c-header {
-  background-color: oklch(6% 0.01 145);
+  background-color: oklch(6% 0.01 140);
   border-block-end-color: var(--color-border);
 }
 
 .c-header__searchbar {
-  background-color: oklch(8% 0.01 145);
+  background-color: oklch(8% 0.01 140);
   border-block-start-color: var(--color-border);
 }
 
@@ -88,7 +88,7 @@ body {
 
 /* Weather panel */
 .c-weather-panel {
-  background-color: oklch(6% 0.01 145);
+  background-color: oklch(6% 0.01 140);
 }
 
 /* Search input */
@@ -100,7 +100,7 @@ body {
 
 .c-search__input:focus-visible {
   border-color: var(--color-primary);
-  box-shadow: 0 0 4px oklch(60% 0.15 145 / 30%);
+  box-shadow: 0 0 4px oklch(65% 0.18 140 / 30%);
 }
 
 /* Buttons — outlined style */
@@ -123,7 +123,7 @@ body {
 }
 
 .c-btn--primary:hover {
-  background-color: oklch(75% 0.18 145 / 15%);
+  background-color: oklch(78% 0.22 140 / 15%);
   border-color: var(--color-primary);
   color: var(--color-primary);
 }
@@ -148,9 +148,9 @@ body {
 
 /* Dialog */
 .c-dialog {
-  background-color: oklch(8% 0.01 145);
+  background-color: oklch(8% 0.01 140);
   border-color: var(--color-border);
-  box-shadow: 0 0 20px oklch(60% 0.15 145 / 15%);
+  box-shadow: 0 0 20px oklch(65% 0.18 140 / 15%);
 }
 
 .c-dialog::backdrop {
@@ -170,13 +170,13 @@ body {
 
 /* Popover */
 .c-popover {
-  background-color: oklch(10% 0.01 145);
+  background-color: oklch(10% 0.01 140);
   border-color: var(--color-border);
-  box-shadow: 0 0 12px oklch(60% 0.15 145 / 15%);
+  box-shadow: 0 0 12px oklch(65% 0.18 140 / 15%);
 }
 
 .c-popover__link:hover {
-  background-color: oklch(75% 0.18 145 / 10%);
+  background-color: oklch(78% 0.22 140 / 10%);
 }
 
 /* Toolbar */
@@ -186,12 +186,12 @@ body {
 }
 
 .c-toolbar__btn:hover {
-  background-color: oklch(75% 0.18 145 / 10%);
+  background-color: oklch(78% 0.22 140 / 10%);
   color: var(--color-text);
 }
 
 .c-toolbar__btn[aria-pressed="true"] {
-  background-color: oklch(75% 0.18 145 / 20%);
+  background-color: oklch(78% 0.22 140 / 20%);
   color: var(--color-primary);
 }
 
@@ -217,7 +217,7 @@ body {
 
 /* Nav links */
 .c-nav__link:hover {
-  background-color: oklch(75% 0.18 145 / 10%);
+  background-color: oklch(78% 0.22 140 / 10%);
 }
 
 /* Category borders */
@@ -244,8 +244,8 @@ body {
 /* AQI badges */
 .c-weather-panel__aqi[data-level="good"] {
   background-color: transparent;
-  border: 1px solid oklch(60% 0.12 145);
-  color: oklch(70% 0.12 145);
+  border: 1px solid oklch(60% 0.15 140);
+  color: oklch(72% 0.16 140);
 }
 
 .c-weather-panel__aqi[data-level="moderate"] {
@@ -271,23 +271,23 @@ body {
 
 /* Tomorrow forecast */
 .c-weather-panel__tomorrow {
-  background-color: oklch(12% 0.01 145);
+  background-color: oklch(12% 0.01 140);
 }
 
 /* Alert list items */
 .c-weather-panel__alert-list li {
-  background-color: oklch(12% 0.01 145);
+  background-color: oklch(12% 0.01 140);
 }
 
 /* Combobox */
 .c-combobox__listbox {
-  background-color: oklch(10% 0.01 145);
+  background-color: oklch(10% 0.01 140);
   border-color: var(--color-border);
 }
 
 .c-combobox__option:hover,
 .c-combobox__option[aria-selected="true"] {
-  background-color: oklch(75% 0.18 145 / 20%);
+  background-color: oklch(78% 0.22 140 / 20%);
   color: var(--color-primary);
 }
 
@@ -305,168 +305,147 @@ body {
 /* Override motion shadow for terminal glow */
 @media (prefers-reduced-motion: no-preference) {
   .c-bookmark:hover {
-    box-shadow: 0 0 6px oklch(60% 0.15 145 / 25%);
+    box-shadow: 0 0 6px oklch(65% 0.18 140 / 25%);
   }
 }
 
 /* ---------------------------------------------------------------------------
  * Light mode variant — bright green on light gray with scanline cards
- * Activates via prefers-color-scheme since this theme controls its own colors
+ * Activates via .is-light class from the Color mode toggle
  * ------------------------------------------------------------------------- */
-@media (prefers-color-scheme: light) {
-  :root {
-    --color-bg: oklch(94% 0.005 145);
-    --color-text: oklch(20% 0.08 145);
-    --color-primary: oklch(40% 0.15 145);
-    --color-surface: oklch(97% 0.003 145 / 85%);
-    --color-border: oklch(70% 0.06 145);
-    --color-focus: oklch(40% 0.18 145);
-    --color-muted: oklch(45% 0.06 145);
+.is-light {
+  --color-bg: oklch(94% 0.005 140);
+  --color-text: oklch(20% 0.1 140);
+  --color-primary: oklch(40% 0.18 140);
+  --color-surface: oklch(97% 0.003 140 / 85%);
+  --color-border: oklch(70% 0.06 140);
+  --color-focus: oklch(40% 0.22 140);
+  --color-muted: oklch(45% 0.06 140);
 
-    --shadow-s: 0 1px 3px oklch(30% 0.05 145 / 12%);
-    --shadow-m: 0 4px 12px oklch(30% 0.05 145 / 15%);
-    --shadow-l: 0 8px 24px oklch(30% 0.05 145 / 20%);
-  }
+  --shadow-s: 0 1px 3px oklch(30% 0.05 140 / 12%);
+  --shadow-m: 0 4px 12px oklch(30% 0.05 140 / 15%);
+  --shadow-l: 0 8px 24px oklch(30% 0.05 140 / 20%);
 
-  body {
-    text-shadow: none;
-  }
+  text-shadow: none;
+}
 
-  /* Lighter scanlines + softer vignette */
-  body::before {
-    background:
-      repeating-linear-gradient(
-        to bottom,
-        oklch(0% 0 0 / 0%) 0px,
-        oklch(0% 0 0 / 0%) 2px,
-        oklch(0% 0 0 / 3%) 2px,
-        oklch(0% 0 0 / 3%) 4px
-      ),
-      radial-gradient(
-        ellipse at center,
-        oklch(0% 0 0 / 0%) 60%,
-        oklch(0% 0 0 / 15%) 100%
-      );
-  }
+/* Lighter scanlines + softer vignette */
+.is-light::before {
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      oklch(0% 0 0 / 0%) 0px,
+      oklch(0% 0 0 / 0%) 2px,
+      oklch(0% 0 0 / 3%) 2px,
+      oklch(0% 0 0 / 3%) 4px
+    ),
+    radial-gradient(
+      ellipse at center,
+      oklch(0% 0 0 / 0%) 60%,
+      oklch(0% 0 0 / 15%) 100%
+    );
+}
 
-  /* Semi-transparent bookmark cards with subtle scanlines */
-  .c-bookmark {
-    background:
-      repeating-linear-gradient(
-        to bottom,
-        oklch(40% 0.08 145 / 3%) 0px,
-        oklch(40% 0.08 145 / 3%) 1px,
-        transparent 1px,
-        transparent 3px
-      ),
-      oklch(97% 0.003 145 / 70%);
-  }
+/* Semi-transparent bookmark cards with subtle scanlines */
+.is-light .c-bookmark {
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      oklch(40% 0.1 140 / 3%) 0px,
+      oklch(40% 0.1 140 / 3%) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    oklch(97% 0.003 140 / 70%);
+}
 
-  .c-bookmark:hover {
-    box-shadow: 0 0 8px oklch(40% 0.12 145 / 20%);
-  }
+.is-light .c-bookmark:hover {
+  box-shadow: 0 0 8px oklch(40% 0.15 140 / 20%);
+}
 
-  /* Header */
-  .c-header {
-    background-color: oklch(92% 0.005 145 / 95%);
-  }
+.is-light .c-header {
+  background-color: oklch(92% 0.005 140 / 95%);
+}
 
-  .c-header__searchbar {
-    background-color: oklch(94% 0.005 145);
-  }
+.is-light .c-header__searchbar {
+  background-color: oklch(94% 0.005 140);
+}
 
-  /* Welcome */
-  .c-welcome {
-    background: oklch(97% 0.003 145 / 70%);
-  }
+.is-light .c-welcome {
+  background: oklch(97% 0.003 140 / 70%);
+}
 
-  /* Weather panel */
-  .c-weather-panel {
-    background-color: oklch(92% 0.005 145 / 95%);
-  }
+.is-light .c-weather-panel {
+  background-color: oklch(92% 0.005 140 / 95%);
+}
 
-  /* Search input */
-  .c-search__input {
-    background-color: oklch(98% 0.002 145 / 80%);
-  }
+.is-light .c-search__input {
+  background-color: oklch(98% 0.002 140 / 80%);
+}
 
-  /* Buttons */
-  .c-btn {
-    color: var(--color-text);
-  }
+.is-light .c-btn--primary {
+  color: oklch(98% 0 0);
+  background-color: var(--color-primary);
+}
 
-  .c-btn--primary {
-    color: oklch(98% 0 0);
-    background-color: var(--color-primary);
-  }
+.is-light .c-btn--primary:hover {
+  background-color: oklch(35% 0.18 140);
+  color: oklch(98% 0 0);
+}
 
-  .c-btn--primary:hover {
-    background-color: oklch(35% 0.15 145);
-    color: oklch(98% 0 0);
-  }
+.is-light .c-dialog {
+  background-color: oklch(96% 0.003 140 / 98%);
+  box-shadow: 0 0 20px oklch(30% 0.1 140 / 15%);
+}
 
-  /* Dialog */
-  .c-dialog {
-    background-color: oklch(96% 0.003 145 / 98%);
-    box-shadow: 0 0 20px oklch(30% 0.08 145 / 15%);
-  }
+.is-light .c-dialog::backdrop {
+  background-color: oklch(0% 0 0 / 40%);
+}
 
-  .c-dialog::backdrop {
-    background-color: oklch(0% 0 0 / 40%);
-  }
+.is-light .c-dialog__input {
+  background-color: oklch(98% 0.002 140 / 80%);
+}
 
-  .c-dialog__input {
-    background-color: oklch(98% 0.002 145 / 80%);
-  }
+.is-light .c-popover {
+  background-color: oklch(96% 0.003 140 / 98%);
+  box-shadow: 0 0 12px oklch(30% 0.1 140 / 12%);
+}
 
-  /* Popover */
-  .c-popover {
-    background-color: oklch(96% 0.003 145 / 98%);
-    box-shadow: 0 0 12px oklch(30% 0.08 145 / 12%);
-  }
+.is-light .c-toolbar__btn {
+  background-color: oklch(97% 0.003 140 / 80%);
+}
 
-  /* Toolbar */
-  .c-toolbar__btn {
-    background-color: oklch(97% 0.003 145 / 80%);
-  }
+.is-light .c-toolbar__btn[aria-pressed="true"] {
+  background-color: var(--color-primary);
+  color: oklch(98% 0 0);
+}
 
-  .c-toolbar__btn[aria-pressed="true"] {
-    background-color: var(--color-primary);
-    color: oklch(98% 0 0);
-  }
+.is-light .c-header__action-btn,
+.is-light .c-weather-btn,
+.is-light .c-speed-btn {
+  background-color: oklch(97% 0.003 140 / 80%);
+}
 
-  /* Header buttons */
-  .c-header__action-btn,
-  .c-weather-btn,
-  .c-speed-btn {
-    background-color: oklch(97% 0.003 145 / 80%);
-  }
+.is-light .c-weather-panel__tomorrow {
+  background-color: oklch(92% 0.005 140 / 80%);
+}
 
-  /* Tomorrow forecast + alert list */
-  .c-weather-panel__tomorrow {
-    background-color: oklch(92% 0.005 145 / 80%);
-  }
+.is-light .c-weather-panel__alert-list li {
+  background-color: oklch(92% 0.005 140 / 80%);
+}
 
-  .c-weather-panel__alert-list li {
-    background-color: oklch(92% 0.005 145 / 80%);
-  }
+.is-light .c-combobox__listbox {
+  background-color: oklch(96% 0.003 140 / 98%);
+}
 
-  /* Combobox */
-  .c-combobox__listbox {
-    background-color: oklch(96% 0.003 145 / 98%);
-  }
+.is-light .c-shortcut-list kbd {
+  background-color: oklch(97% 0.003 140 / 80%);
+}
 
-  /* Keyboard shortcuts */
-  .c-shortcut-list kbd {
-    background-color: oklch(97% 0.003 145 / 80%);
-  }
+.is-light .is-list .c-bookmark {
+  background: transparent;
+}
 
-  /* List view */
-  .is-list .c-bookmark {
-    background: transparent;
-  }
-
-  .is-list .c-bookmark:hover {
-    box-shadow: none;
-  }
+.is-light .is-list .c-bookmark:hover {
+  box-shadow: none;
 }
