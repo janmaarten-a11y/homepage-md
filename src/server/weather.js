@@ -103,6 +103,7 @@ async function geocode(locationStr) {
         name: data.results[0].name,
         admin1: data.results[0].admin1 || null,
         country: data.results[0].country || null,
+        countryCode: data.results[0].country_code || null,
         timezone: data.results[0].timezone || 'auto',
       };
 
@@ -169,10 +170,11 @@ export async function fetchWeather(locationStr, locale) {
 
     const raw = await safeJsonResponse(res);
 
-    // Fetch air quality, NWS alerts, and aurora forecast in parallel (best-effort)
+    // Fetch air quality, NWS alerts (US only), and aurora forecast in parallel
+    const isUS = geo.countryCode === 'US';
     const [aqi, nwsAlerts, aurora] = await Promise.all([
       fetchAirQuality(geo, useImperial),
-      fetchNwsAlerts(geo),
+      isUS ? fetchNwsAlerts(geo) : Promise.resolve(null),
       fetchAuroraForecast(geo.latitude),
     ]);
 
@@ -225,6 +227,7 @@ function processWeatherData(raw, geo, useImperial, aqi, nwsAlerts, aurora) {
       region: geo.admin1,
       latitude: geo.latitude,
       longitude: geo.longitude,
+      countryCode: geo.countryCode,
     },
     units: { temp: unitSymbol, wind: windUnitLabel },
     current: {

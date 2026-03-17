@@ -895,10 +895,8 @@ function renderWeather(data) {
   weatherBtn.disabled = false;
   weatherBtn.setAttribute('aria-label', `Weather for ${locationName}: ${data.current.temp}${data.units.temp}, ${data.current.condition}. Activate to show forecast.`);
 
-  // Location-specific weather.gov link
-  const weatherGovUrl = data.location.latitude
-    ? `https://forecast.weather.gov/MapClick.php?lat=${data.location.latitude}&lon=${data.location.longitude}`
-    : 'https://www.weather.gov';
+  // Forecast link — national weather service based on country
+  const forecastUrl = getForecastUrl(data.location);
 
   // AQI stat
   const aqiHtml = data.aqi
@@ -976,7 +974,7 @@ ${data.alerts.map((a) => `      <li>${escapeText(a.text)}</li>`).join('\n')}
   // Left column: heading + conditions + alerts
   weatherCurrent.innerHTML = `
     <div class="c-weather-panel__heading">
-      <h2 class="c-weather-panel__location">Forecast for <a href="${weatherGovUrl}" rel="noopener">${escapeText(locationName)}</a></h2>
+      <h2 class="c-weather-panel__location">Forecast for <a href="${forecastUrl}" rel="noopener">${escapeText(locationName)}</a></h2>
     </div>
     <div class="c-weather-panel__summary">
       <span class="c-weather-panel__temp">${data.current.temp}${data.units.temp}</span>
@@ -1011,6 +1009,47 @@ function aqiLevel(value) {
   if (value <= 200) return 'unhealthy';
   if (value <= 300) return 'very-unhealthy';
   return 'hazardous';
+}
+
+function getForecastUrl(location) {
+  const { latitude, longitude, countryCode, name } = location;
+  const ll = latitude && longitude;
+
+  const nationalServices = {
+    US: ll ? `https://forecast.weather.gov/MapClick.php?lat=${latitude}&lon=${longitude}` : 'https://www.weather.gov',
+    CA: 'https://weather.gc.ca',
+    GB: 'https://www.metoffice.gov.uk/weather/forecast',
+    FR: 'https://meteofrance.com',
+    DE: 'https://www.dwd.de/DE/wetter/vorhersage_aktuell/vorhersage_aktuell_node.html',
+    NO: ll ? `https://www.yr.no/en/forecast/daily-table/${latitude},${longitude}` : 'https://www.yr.no',
+    SE: 'https://www.smhi.se/vader',
+    FI: 'https://www.ilmatieteenlaitos.fi/saa',
+    DK: 'https://www.dmi.dk/vejrarkiv/',
+    NL: 'https://www.knmi.nl/nederland-nu/weer/verwachtingen',
+    JP: 'https://www.jma.go.jp/bosai/forecast/',
+    AU: 'https://www.bom.gov.au',
+    IE: 'https://www.met.ie/forecasts',
+    IS: 'https://vedur.is',
+    IT: 'https://www.meteoam.it',
+    ES: 'https://www.aemet.es',
+    PT: 'https://www.ipma.pt',
+    CN: 'https://weather.cma.cn',
+    IN: 'https://mausam.imd.gov.in',
+    IL: 'https://ims.gov.il',
+    HK: 'https://www.hko.gov.hk',
+    TW: 'https://www.cwa.gov.tw',
+    PH: 'https://www.pagasa.dost.gov.ph',
+    ID: 'https://www.bmkg.go.id',
+    MN: 'https://www.weather.gov.mn',
+    TR: 'https://www.mgm.gov.tr',
+  };
+
+  if (countryCode && nationalServices[countryCode]) {
+    return nationalServices[countryCode];
+  }
+
+  // Fallback: wttr.in works globally
+  return `https://wttr.in/${encodeURIComponent(name)}`;
 }
 
 function escapeText(str) {
