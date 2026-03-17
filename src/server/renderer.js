@@ -167,7 +167,6 @@ function renderSearch() {
       </div>
     </search>`;
 }
-}
 
 function renderToolbar() {
   // Inline SVG icons (16×16, currentColor)
