@@ -191,7 +191,6 @@ function renderToolbar() {
   const iconGrid = _uiIcons['grid-2x2'] || '&#9638;';
   const iconColumns = _uiIcons['columns-3'] || '&#9638;';
   const iconList = _uiIcons['list'] || '&#9776;';
-  const iconCompact = _uiIcons['layout-list'] || '&#9638;';
   const iconDetailed = _uiIcons['list-chevrons-up-down'] || '&#9776;';
   const iconCondensed = _uiIcons['list-chevrons-down-up'] || '&#9776;';
   const iconSun = _uiIcons['sun'] || '&#9728;';
@@ -203,7 +202,6 @@ function renderToolbar() {
           <button type="button" class="c-toolbar__btn js-layout-btn" data-value="grid" aria-pressed="true" title="Grid layout">${iconGrid} <span class="c-toolbar__label">Grid</span></button>
           <button type="button" class="c-toolbar__btn js-layout-btn" data-value="columns" aria-pressed="false" title="Columns layout">${iconColumns} <span class="c-toolbar__label">Columns</span></button>
           <button type="button" class="c-toolbar__btn js-layout-btn" data-value="list" aria-pressed="false" title="List layout">${iconList} <span class="c-toolbar__label">List</span></button>
-          <button type="button" class="c-toolbar__btn js-layout-btn" data-value="compact" aria-pressed="false" title="Tight grid">${iconCompact} <span class="c-toolbar__label">Tight</span></button>
         </div>
         <div class="c-toolbar__separator" aria-hidden="true"></div>
         <div class="c-toolbar__group" role="group" aria-label="Density">

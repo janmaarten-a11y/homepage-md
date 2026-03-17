@@ -1458,11 +1458,11 @@
   .is-list .c-bookmark__header {
     flex: 1;
     min-width: 0;
+    align-items: center;
   }
 
   .is-list .c-bookmark__link {
-    flex: 1;
-    min-width: 0;
+    display: inline;
   }
 
   .is-list .c-bookmark__url {
@@ -1488,34 +1488,28 @@
     block-size: 1.25rem;
   }
 
-  /* -----------------------------------------------------------------------
-   * Compact grid — smaller cards, tighter spacing, more items visible
-   * ----------------------------------------------------------------------- */
-  .is-compact .c-bookmark-list[role="list"] {
-    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+  /* Condensed + Columns — tighter columns, smaller cards for more density */
+  .is-condensed.is-columns .c-category {
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
     gap: var(--space-s);
   }
 
-  .is-compact .c-bookmark {
+  .is-condensed.is-columns .c-bookmark {
     padding: var(--space-s);
     border-radius: var(--radius-m);
     box-shadow: none;
   }
 
-  .is-compact .c-bookmark__icon {
+  .is-condensed.is-columns .c-bookmark__icon {
     inline-size: 1.25rem;
     block-size: 1.25rem;
   }
 
-  .is-compact .c-bookmark__description {
-    display: none;
-  }
-
-  .is-compact .c-bookmark__title {
+  .is-condensed.is-columns .c-bookmark__title {
     font-size: 0.875rem;
   }
 
-  .is-compact .c-category {
+  .is-condensed.is-columns .c-category {
     padding-block: var(--space-m);
     padding-inline: var(--space-m);
   }
