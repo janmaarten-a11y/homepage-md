@@ -1494,7 +1494,6 @@
 
   .is-list .c-bookmark__title {
     white-space: nowrap;
-    margin-inline-end: var(--space-s);
   }
 
   .is-list .c-bookmark__url {
@@ -1502,6 +1501,11 @@
     color: var(--color-muted);
     font-size: 0.875rem;
     white-space: nowrap;
+
+    &::before {
+      content: " · ";
+      color: var(--color-muted);
+    }
   }
 
   .is-list .c-bookmark__description {
