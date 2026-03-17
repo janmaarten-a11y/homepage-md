@@ -188,7 +188,7 @@ function renderSearch() {
 }
 
 function renderToolbar() {
-  const iconGrid = _uiIcons['grid-2x2'] || '&#9638;';
+  const iconRows = _uiIcons['rows-3'] || '&#9638;';
   const iconColumns = _uiIcons['columns-3'] || '&#9638;';
   const iconList = _uiIcons['list'] || '&#9776;';
   const iconDetailed = _uiIcons['list-chevrons-up-down'] || '&#9776;';
@@ -199,7 +199,7 @@ function renderToolbar() {
 
   return `      <div class="c-toolbar" role="toolbar" aria-label="View options">
         <div class="c-toolbar__group" role="group" aria-label="Layout">
-          <button type="button" class="c-toolbar__btn js-layout-btn" data-value="grid" aria-pressed="true" title="Rows layout">${iconGrid} <span class="c-toolbar__label">Rows</span></button>
+          <button type="button" class="c-toolbar__btn js-layout-btn" data-value="grid" aria-pressed="true" title="Rows layout">${iconRows} <span class="c-toolbar__label">Rows</span></button>
           <button type="button" class="c-toolbar__btn js-layout-btn" data-value="columns" aria-pressed="false" title="Columns layout">${iconColumns} <span class="c-toolbar__label">Columns</span></button>
           <button type="button" class="c-toolbar__btn js-layout-btn" data-value="list" aria-pressed="false" title="List layout">${iconList} <span class="c-toolbar__label">List</span></button>
         </div>
