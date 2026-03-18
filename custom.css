@@ -1,30 +1,54 @@
 /* HomepageMD — User Overrides
  *
- * This file loads after main.css. Override any design token below
- * to personalize your dashboard. Only uncomment what you want to change.
+ * This file loads after main.css and the active theme stylesheet.
+ * Override any design token below to personalize your dashboard.
+ * Only uncomment what you want to change.
  *
  * Available custom properties:
  *
- *   --color-bg          Page background
- *   --color-text        Default text color
- *   --color-primary     Links and accents
- *   --color-surface     Card / section backgrounds
- *   --color-border      Borders and dividers
- *   --color-focus       Focus ring color
+ *   Colors
+ *   --color-bg              Page background
+ *   --color-text            Default text color
+ *   --color-primary         Links and accents
+ *   --color-primary-hover   Darker primary for hover states
+ *   --color-danger          Danger / delete button color
+ *   --color-surface         Card / section backgrounds
+ *   --color-border          Borders and dividers
+ *   --color-focus           Focus ring color
+ *   --color-muted           Secondary text color
  *
+ *   Spacing
  *   --space-xs          0.25rem
  *   --space-s           0.5rem
  *   --space-m           1rem
- *   --space-l           2rem
- *   --space-xl          4rem
+ *   --space-l           1.5rem
+ *   --space-xl          3rem
  *
+ *   Border radius
  *   --radius-s          Small border radius
  *   --radius-m          Medium border radius
+ *   --radius-l          Large border radius
  *
+ *   Shadows
+ *   --shadow-s          Subtle shadow
+ *   --shadow-m          Medium shadow
+ *   --shadow-l          Large shadow
+ *
+ *   Typography
  *   --font-base         Base font stack
  *   --font-mono         Monospace font stack
  *
- * Dark mode: wrap overrides in @media (prefers-color-scheme: dark) { :root { … } }
+ *   Tooltips (scoped to .c-tooltip)
+ *   --tooltip-bg        Tooltip background
+ *   --tooltip-fg        Tooltip text color
+ *
+ * Color mode overrides:
+ *   Wrap in @media (prefers-color-scheme: dark) { :root { … } }
+ *   Or use .is-light / .is-dark selectors for manual mode overrides.
+ *
+ * Themes:
+ *   Place CSS files in the themes/ directory — they load between
+ *   main.css and custom.css, so your overrides here always win.
  */
 
 /* Example:
