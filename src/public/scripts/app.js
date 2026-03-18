@@ -1318,7 +1318,7 @@ function renderWeather(data) {
   weatherIcon.innerHTML = wi(btnIconName, '\u2601\uFE0F');
   weatherLabel.textContent = `${data.current.temp}${data.units.temp}`;
   weatherBtn.disabled = false;
-  weatherBtn.setAttribute('aria-label', `Weather for ${locationName}: ${data.current.temp}${data.units.temp}, ${data.current.condition}. Activate to show forecast.`);
+  weatherBtn.setAttribute('aria-label', `Weather for ${locationName}: ${data.current.temp}${data.units.temp}, ${data.current.condition}`);
 
   // Forecast link — national weather service based on country
   const forecastUrl = getForecastUrl(data.location);

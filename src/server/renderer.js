@@ -66,7 +66,7 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, category
       <h1 class="c-header__title">${escapeHtml(title)}</h1>
 ${nav}
       <div class="c-header__actions">
-${hasLocation ? `        <button type="button" class="c-weather-btn js-weather-toggle" aria-expanded="false" aria-controls="js-weather-panel" aria-label="Loading weather\u2026" data-tooltip="Weather forecast" data-tooltip-type="description" data-tooltip-direction="s" disabled>
+${hasLocation ? `        <button type="button" class="c-weather-btn js-weather-toggle" aria-expanded="false" aria-controls="js-weather-panel" aria-label="Loading weather\u2026" data-tooltip="Show full forecast" data-tooltip-type="description" data-tooltip-direction="s" disabled>
           <span class="c-weather-btn__icon js-weather-icon" aria-hidden="true">${weatherIcons['cloud'] || '\u2601\uFE0F'}</span>
           <span class="c-weather-btn__label js-weather-label">\u2022\u2022\u2022</span>
         </button>` : ''}
