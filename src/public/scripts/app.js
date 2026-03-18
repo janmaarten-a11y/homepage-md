@@ -1457,31 +1457,37 @@ function escapeText(str) {
 if (weatherBtn && weatherPanel) {
   const weatherStorageKey = `homepage-md-weather-${getPageSlug()}`;
 
+  function closeWeatherPanel() {
+    weatherPanel.hidden = true;
+    weatherBtn.setAttribute('aria-expanded', 'false');
+    localStorage.setItem(weatherStorageKey, 'false');
+  }
+
   // Toggle panel
   weatherBtn.addEventListener('click', () => {
     const isOpen = !weatherPanel.hidden;
-    weatherPanel.hidden = isOpen;
-    weatherBtn.setAttribute('aria-expanded', String(!isOpen));
-    localStorage.setItem(weatherStorageKey, String(!isOpen));
-  });
-
-  // Close on focusin outside
-  document.addEventListener('focusin', (event) => {
-    if (!weatherPanel.hidden) {
-      if (!weatherPanel.contains(event.target) && !weatherBtn.contains(event.target)) {
-        weatherPanel.hidden = true;
-        weatherBtn.setAttribute('aria-expanded', 'false');
-        localStorage.setItem(weatherStorageKey, 'false');
-      }
+    if (isOpen) {
+      closeWeatherPanel();
+    } else {
+      weatherPanel.hidden = false;
+      weatherBtn.setAttribute('aria-expanded', 'true');
+      localStorage.setItem(weatherStorageKey, 'true');
     }
   });
+
+  // Close button inside panel
+  const weatherCloseBtn = document.querySelector('.js-weather-close');
+  if (weatherCloseBtn) {
+    weatherCloseBtn.addEventListener('click', () => {
+      closeWeatherPanel();
+      weatherBtn.focus();
+    });
+  }
 
   // Close on Escape
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && !weatherPanel.hidden) {
-      weatherPanel.hidden = true;
-      weatherBtn.setAttribute('aria-expanded', 'false');
-      localStorage.setItem(weatherStorageKey, 'false');
+      closeWeatherPanel();
       weatherBtn.focus();
     }
   });
@@ -1501,6 +1507,19 @@ if (weatherBtn && weatherPanel) {
         weatherPanel.hidden = false;
         weatherBtn.setAttribute('aria-expanded', 'true');
       }
+      // After location save, open panel and focus the location link
+      try {
+        if (sessionStorage.getItem('homepage-md-focus-weather-location') === 'true') {
+          sessionStorage.removeItem('homepage-md-focus-weather-location');
+          weatherPanel.hidden = false;
+          weatherBtn.setAttribute('aria-expanded', 'true');
+          localStorage.setItem(weatherStorageKey, 'true');
+          requestAnimationFrame(() => {
+            const locationLink = weatherPanel.querySelector('.c-weather-panel__location a');
+            if (locationLink) locationLink.focus();
+          });
+        }
+      } catch { /* ignore */ }
     })
     .catch(() => {
       showWeatherError();
@@ -1523,7 +1542,7 @@ if (weatherBtn && weatherPanel) {
   const locationCancel = document.querySelector('.js-location-cancel');
 
   if (locationDialog && locationForm && locationInput) {
-    // Open dialog when pencil button is clicked (delegated since it's injected)
+    // Open dialog when edit-location button is clicked (delegated since it's injected)
     weatherPanel.addEventListener('click', (event) => {
       const editBtn = event.target.closest('.js-location-edit');
       if (!editBtn) return;
@@ -1549,6 +1568,8 @@ if (weatherBtn && weatherPanel) {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error);
         locationDialog.close();
+        // Flag to focus location link after reload so user sees the change
+        try { sessionStorage.setItem('homepage-md-focus-weather-location', 'true'); } catch { /* ignore */ }
         reloadAfterEdit();
       } catch (err) {
         // Show error inline (reuse dialog pattern)
