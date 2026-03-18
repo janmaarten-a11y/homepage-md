@@ -1,6 +1,6 @@
-# HomepageMD
+# homepage.md
 
-**Your bookmarks, in Markdown. Your homepage, everywhere.**
+**A Markdown-powered homepage for your household and every device.**
 
 A household bookmark dashboard that reads Markdown files and renders them as a clean, accessible, searchable web page. Runs as a small Node.js server — designed for a home server (Synology NAS), accessible locally and remotely via Tailscale.
 
@@ -15,8 +15,9 @@ A household bookmark dashboard that reads Markdown files and renders them as a c
 - **Multiple pages** — each `.md` file in `bookmarks/` becomes a page in the top navigation
 - **Categories and subcategories** — organize bookmarks with headings and optional subtitles
 - **Favicon resolution** — automatic icons via local cache, direct fetch, DuckDuckGo fallback, or manual overrides
-- **View modes** — Grid or Columns layout × Detailed or Condensed density, saved per page
-- **Dark mode** — automatic via `prefers-color-scheme`, or toggle manually
+- **View modes** — Rows, Columns, or List layout × Detailed or Condensed density, saved per page with an option to apply to all pages
+- **Themes** — switchable themes via the View options toolbar; ships with Default and Terminal (CRT-inspired green-on-black)
+- **Dark mode** — automatic via `prefers-color-scheme`, or toggle manually between System, Light, and Dark
 - **Live updates** — Server-Sent Events push changes to all open browsers when files change
 - **Keyboard accessible** — every feature is reachable by keyboard, with shortcuts for common actions
 - **Category jump links** — table of contents for quick access to sections
@@ -62,6 +63,7 @@ All configuration is via environment variables. Copy `.env.example` to `.env` an
 | `ICONS_DIR` | `./icons` | Path to manual favicon overrides |
 | `FAVICON_CACHE_DIR` | `./favicon-cache` | Path to the favicon cache |
 | `CUSTOM_CSS_PATH` | `./custom.css` | Path to the user CSS overrides file |
+| `THEMES_DIR` | `./themes` | Path to the themes directory |
 | `FOOTER_PATH` | `./footer.md` | Path to the footer Markdown file |
 | `AUTH_TOKEN` | *(none)* | Shared passphrase for write endpoints (disabled by default) |
 | `FAVICON_TTL_DAYS` | `7` | Days before a cached favicon is re-fetched |
@@ -114,20 +116,23 @@ Each `.md` file in the `bookmarks/` directory is a page. The grammar:
 | `/` | Focus the search field |
 | `?` | Open the keyboard shortcuts dialog |
 | `Escape` | Clear search, close dialogs, or return focus to the page |
-| `→` / `↓` | From a bookmark link, move to Edit → Delete |
-| `←` / `↑` | Reverse: Delete → Edit → Link |
+| `→` / `↓` | From a bookmark link, move to Edit → Copy URL |
+| `←` / `↑` | Reverse: Copy URL → Edit → Link |
 | `Tab` | Move to the next bookmark (skips edit/delete buttons) |
 
 When search is focused, type `!` to see available search bangs. Type a bang prefix followed by a query (e.g., `!g climate change`) and press `Enter` to search in a new tab.
 
 ## View modes
 
-The **View** dropdown in the header offers two independent axes:
+The **View** dropdown in the header offers:
 
+- **Layout**: Rows (card grid) / Columns (subcategories as horizontal columns) / List (full-width inline rows)
 - **Density**: Detailed (shows descriptions) / Condensed (hides descriptions, tighter padding)
-- **Layout**: Grid (card grid) / Columns (subcategories as horizontal columns) / List (full-width rows)
+- **Theme**: Default / Terminal (or any custom theme in `themes/`)
+- **Color mode**: System / Light / Dark
+- **Apply to all pages**: Promotes the current settings as the global default
 
-Preferences are saved per page in the browser's `localStorage`.
+Preferences are saved per page in the browser's `localStorage`. The "Apply to all pages" button saves the current page's settings as the default for all pages and clears per-page overrides.
 
 ## API
 
@@ -176,7 +181,22 @@ Edit `custom.css` in the project root to override design tokens:
 }
 ```
 
-Available tokens: `--color-bg`, `--color-text`, `--color-primary`, `--color-surface`, `--color-border`, `--color-focus`, `--color-muted`, `--space-*`, `--radius-*`, `--shadow-*`, `--font-base`, `--font-mono`. See `custom.css` for the full list.
+Available tokens: `--color-bg`, `--color-text`, `--color-primary`, `--color-primary-hover`, `--color-danger`, `--color-surface`, `--color-border`, `--color-focus`, `--color-muted`, `--space-*`, `--radius-*`, `--shadow-*`, `--font-base`, `--font-mono`. Tooltip colors (`--tooltip-bg`, `--tooltip-fg`) are scoped to `.c-tooltip`. See `custom.css` for the full list.
+
+## Themes
+
+Themes are CSS files in the `themes/` directory. The server discovers them at startup and lists them in the View options toolbar.
+
+To create a theme:
+
+1. Create a new `.css` file in `themes/` (e.g., `themes/ocean.css`)
+2. Override design tokens (`:root { --color-bg: ...; }`) and/or component styles
+3. For light/dark mode support, add `.is-light` and `.is-dark` selectors
+4. Restart the server — the theme appears in the toolbar automatically
+
+The built-in Terminal theme (`themes/terminal.css`) is a full example: CRT-inspired green-on-black with scanlines, monospace typography, and outlined elements.
+
+`custom.css` loads after the active theme, so user overrides always win.
 
 ## Project structure
 
@@ -198,9 +218,12 @@ homepage-md/
       styles/
         main.css          # App styles (cascade layers, Piccalilli reset)
       scripts/
-        app.js            # Client: search, keyboard nav, view modes, CRUD, weather, speed test
+        app.js            # Client: search, keyboard nav, view modes, CRUD, weather, speed test, tooltips
   bookmarks/
     homepage.md           # Default bookmarks file (household example)
+  themes/
+    default.css           # Default theme (empty — uses main.css tokens)
+    terminal.css          # CRT-inspired terminal theme
   icons/                  # Manual favicon overrides
   favicon-cache/          # Auto-fetched cached icons (Docker volume)
   custom.css              # User style overrides
@@ -267,8 +290,8 @@ Sync only the `bookmarks/` and `icons/` directories to family devices via Sync.c
 
 HomepageMD is designed to work well for everyone, including people who use screen readers, keyboard-only navigation, or other assistive technologies.
 
-- **Keyboard accessible** — every feature works without a mouse. A single tab stop per bookmark keeps navigation fast; arrow keys reveal edit and delete actions. Press `/` to jump to search and `?` for the full shortcut list.
-- **Screen reader friendly** — headings, sections, and lists are structured so screen readers can navigate and announce content clearly. Search results are announced as they update.
+- **Keyboard accessible** — every feature works without a mouse. A single tab stop per bookmark keeps navigation fast; arrow keys reveal edit and copy actions. Press `/` to jump to search and `?` for the full shortcut list.
+- **Screen reader friendly** — headings, sections, and lists are structured so screen readers can navigate and announce content clearly. Search results and status messages are announced via live regions. Tooltips use `aria-describedby` to supplement button labels.
 - **Skip to content** — a skip link appears on focus so keyboard users can bypass the header.
 - **Focus indicators** — all interactive elements have visible focus outlines.
 - **Reduced motion** — animations are suppressed when the operating system preference is set.
