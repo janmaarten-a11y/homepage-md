@@ -329,8 +329,8 @@
   }
 
   .c-popover__link:hover {
-    background-color: var(--color-bg);
-    border-inline-start: 3px solid var(--color-primary);
+    color: var(--color-primary);
+    font-weight: 700;
   }
 
   /* Weather button */
