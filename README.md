@@ -6,26 +6,39 @@ A household bookmark dashboard that reads Markdown files and renders them as a c
 
 ## Features
 
+### Core
+
 - **Markdown as source of truth** — edit `.md` files in any text editor, or use the built-in web UI
 - **Add, edit, delete** bookmarks through the dashboard — changes write back to Markdown
-- **Real-time search** — filter bookmarks instantly by title, description, or URL (press `/` to focus)
-- **Search bangs** — type `!g climate change` to search Google, `!w cats` for Wikipedia, and more — configurable per page
+- **Multiple pages** — each `.md` file in `bookmarks/` becomes a page in the top navigation
+- **Categories, subcategories, and tags** — organize bookmarks with headings, subtitles, and filterable tags
+- **Real-time search** — filter bookmarks instantly by title, description, URL, or tag (press `/` to focus)
+- **Search engine shortcuts** — type `!g climate change` to search Google, `!w cats` for Wikipedia, and more — configurable per page
+- **Favicon resolution** — automatic icons via local cache, direct fetch, DuckDuckGo fallback, or manual overrides
+- **Live updates** — Server-Sent Events push changes to all open browsers when files change
+
+### Dashboard
+
 - **Weather** — local conditions, forecast, air quality, moon phase, sunrise/sunset, aurora forecast, and weather alerts
 - **Speed test** — one-click download and upload speed measurement via Cloudflare
-- **Multiple pages** — each `.md` file in `bookmarks/` becomes a page in the top navigation
-- **Categories and subcategories** — organize bookmarks with headings and optional subtitles
-- **Favicon resolution** — automatic icons via local cache, direct fetch, DuckDuckGo fallback, or manual overrides
+
+### Customization
+
 - **View modes** — Rows, Columns, or List layout × Detailed or Condensed density, saved per page with an option to apply to all pages
-- **Themes** — switchable themes via the View options toolbar; ships with Default and Terminal (CRT-inspired green-on-black)
-- **Dark mode** — automatic via `prefers-color-scheme`, or toggle manually between System, Light, and Dark
-- **Live updates** — Server-Sent Events push changes to all open browsers when files change
-- **Keyboard accessible** — every feature is reachable by keyboard, with shortcuts for common actions
-- **Category jump links** — table of contents for quick access to sections
-- **Footer** — editable Markdown footer displayed on every page
-- **Docker-ready** — single container, Synology-friendly
-- **Customizable** — override any design token via `custom.css`
-- **Optional auth** — `AUTH_TOKEN` env var protects write endpoints; per-page `access: open` bypass for shared pages
-- **No framework** — vanilla Node.js and one dependency: [Lucide](https://lucide.dev) for category icons
+- **Themes** — switchable via the toolbar; ships with Default and Terminal (CRT-inspired green-on-black)
+- **Color modes** — System, Light, or Dark — automatic via `prefers-color-scheme` or manual toggle
+- **Custom CSS** — override any design token via `custom.css`, which loads after themes and always wins
+
+### Access & security
+
+- **Optional auth** — set `AUTH_TOKEN` to require a passphrase for editing; pages stay readable without logging in
+- **Per-page bypass** — mark a page `access: open` to allow anyone to edit it, even when auth is enabled
+
+### Technical
+
+- **No framework** — vanilla Node.js, ES modules, one dependency: [Lucide](https://lucide.dev) for icons
+- **Docker-ready** — single container, works on any NAS or server
+- **Keyboard accessible** — every feature reachable by keyboard, with shortcuts for common actions
 
 ## Quick start
 
