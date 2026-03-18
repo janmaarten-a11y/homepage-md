@@ -80,7 +80,7 @@ ${hasLocation ? `        <button type="button" class="c-weather-btn js-weather-t
 ${toolbar}
       </div>
     </div>
-${hasLocation ? `    <section class="c-weather-panel js-weather-panel" id="js-weather-panel" hidden aria-label="Weather forecast">
+${hasLocation ? `    <section class="c-weather-panel js-weather-panel" id="js-weather-panel" hidden>
       <button type="button" class="c-btn c-btn--icon c-weather-panel__close js-weather-close" aria-label="Close" data-tooltip="Close" data-tooltip-type="description" data-tooltip-direction="w">&times;</button>
       <div class="c-weather-panel__current js-weather-current"></div>
       <div class="c-weather-panel__alerts js-weather-alerts"></div>

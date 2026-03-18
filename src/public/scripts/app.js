@@ -1517,6 +1517,20 @@ if (weatherBtn && weatherPanel) {
           requestAnimationFrame(() => {
             const locationLink = weatherPanel.querySelector('.c-weather-panel__location a');
             if (locationLink) locationLink.focus();
+            // Swap edit-location icon to check briefly
+            const editBtn = weatherPanel.querySelector('.js-location-edit');
+            if (editBtn) {
+              const checkIcon = wi('map-pin-check');
+              if (checkIcon) {
+                const origHTML = editBtn.innerHTML;
+                editBtn.innerHTML = checkIcon;
+                editBtn.style.color = 'oklch(55% 0.2 145)';
+                setTimeout(() => {
+                  editBtn.innerHTML = origHTML;
+                  editBtn.style.color = '';
+                }, 2000);
+              }
+            }
           });
         }
       } catch { /* ignore */ }
