@@ -1364,7 +1364,7 @@ ${data.alerts.map((a) => `      <li>${escapeText(a.text)}</li>`).join('\n')}
     ${data.tomorrow.high}\u00B0 / ${data.tomorrow.low}\u00B0${data.tomorrow.precipChance > 0 ? `, ${data.tomorrow.precipChance}% precip` : ''}
   </div>`;
 
-  const editLocationIcon = wi('pencil', '&#9998;');
+  const editLocationIcon = wi('map-pin-pen', '&#9998;');
 
   // Left column: heading + conditions + alerts
   weatherCurrent.innerHTML = `
