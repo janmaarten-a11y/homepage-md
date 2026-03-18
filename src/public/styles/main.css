@@ -189,6 +189,7 @@
     gap: var(--space-m);
     padding-block: var(--space-l);
     padding-inline: var(--space-l);
+    position: relative;
   }
 
   .c-header__title {
@@ -416,12 +417,42 @@
     padding-inline: var(--space-l);
     border-block-end: 1px solid var(--color-border);
     background-color: var(--color-surface);
+    position: relative;
 
   & svg {
     display: inline-block;
     vertical-align: middle;
     flex-shrink: 0;
   }
+  }
+
+  .c-weather-panel__close {
+    position: absolute;
+    inset-block-start: var(--space-s);
+    inset-inline-end: var(--space-s);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xs);
+    min-block-size: 2rem;
+    min-inline-size: 2rem;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+    color: var(--color-muted);
+    border-radius: var(--radius-m);
+    cursor: pointer;
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+
+  .c-weather-panel__close:hover {
+    color: var(--color-text);
+    background-color: var(--color-bg);
+  }
+
+  .c-weather-panel__close:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: -2px;
   }
 
   @media (min-width: 48rem) {
@@ -1770,6 +1801,94 @@
     margin: 0;
     font-size: 1rem;
   }
+
+  /* Tooltip */
+  .c-tooltip {
+    position: fixed;
+    z-index: 1000;
+    max-inline-size: 15rem;
+    padding: var(--space-xs) var(--space-s);
+    border-radius: var(--radius-s);
+    background-color: oklch(20% 0.01 260);
+    color: oklch(97% 0.005 260);
+    font-size: 0.875rem;
+    line-height: 1.4;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 80ms ease-in;
+  }
+
+  .c-tooltip.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .c-tooltip::after {
+    content: "";
+    position: absolute;
+    border: 5px solid transparent;
+  }
+
+  .c-tooltip[data-direction="s"]::after {
+    inset-block-start: -10px;
+    inset-inline-start: 50%;
+    transform: translateX(-50%);
+    border-block-end-color: oklch(20% 0.01 260);
+  }
+
+  .c-tooltip[data-direction="n"]::after {
+    inset-block-end: -10px;
+    inset-inline-start: 50%;
+    transform: translateX(-50%);
+    border-block-start-color: oklch(20% 0.01 260);
+  }
+
+  .c-tooltip[data-direction="e"]::after {
+    inset-inline-start: -10px;
+    inset-block-start: 50%;
+    transform: translateY(-50%);
+    border-inline-end-color: oklch(20% 0.01 260);
+  }
+
+  .c-tooltip[data-direction="w"]::after {
+    inset-inline-end: -10px;
+    inset-block-start: 50%;
+    transform: translateY(-50%);
+    border-inline-start-color: oklch(20% 0.01 260);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .c-tooltip {
+      background-color: oklch(85% 0.005 260);
+      color: oklch(15% 0.01 260);
+    }
+
+    .c-tooltip[data-direction="s"]::after { border-block-end-color: oklch(85% 0.005 260); }
+    .c-tooltip[data-direction="n"]::after { border-block-start-color: oklch(85% 0.005 260); }
+    .c-tooltip[data-direction="e"]::after { border-inline-end-color: oklch(85% 0.005 260); }
+    .c-tooltip[data-direction="w"]::after { border-inline-start-color: oklch(85% 0.005 260); }
+  }
+
+  .is-light .c-tooltip {
+    background-color: oklch(20% 0.01 260);
+    color: oklch(97% 0.005 260);
+  }
+
+  .is-light .c-tooltip[data-direction="s"]::after { border-block-end-color: oklch(20% 0.01 260); }
+  .is-light .c-tooltip[data-direction="n"]::after { border-block-start-color: oklch(20% 0.01 260); }
+  .is-light .c-tooltip[data-direction="e"]::after { border-inline-end-color: oklch(20% 0.01 260); }
+  .is-light .c-tooltip[data-direction="w"]::after { border-inline-start-color: oklch(20% 0.01 260); }
+
+  .is-dark .c-tooltip {
+    background-color: oklch(85% 0.005 260);
+    color: oklch(15% 0.01 260);
+  }
+
+  .is-dark .c-tooltip[data-direction="s"]::after { border-block-end-color: oklch(85% 0.005 260); }
+  .is-dark .c-tooltip[data-direction="n"]::after { border-block-start-color: oklch(85% 0.005 260); }
+  .is-dark .c-tooltip[data-direction="e"]::after { border-inline-end-color: oklch(85% 0.005 260); }
+  .is-dark .c-tooltip[data-direction="w"]::after { border-inline-start-color: oklch(85% 0.005 260); }
 
   /* Color mode classes */
   .is-light {

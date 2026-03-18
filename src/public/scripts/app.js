@@ -27,6 +27,159 @@ function clearError(errorEl) {
   errorEl.hidden = true;
 }
 
+// ---------------------------------------------------------------------------
+// Tooltips — Primer-style accessible tooltips
+// ---------------------------------------------------------------------------
+
+const tooltipEl = (() => {
+  const el = document.createElement('span');
+  el.className = 'c-tooltip';
+  el.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(el);
+  return el;
+})();
+
+let tooltipTimeout = null;
+let tooltipTrigger = null;
+
+function positionTooltip(trigger, direction) {
+  const rect = trigger.getBoundingClientRect();
+  const gap = 8;
+
+  // Position based on preferred direction, then flip if out of viewport
+  const placements = {
+    s: () => ({ top: rect.bottom + gap, left: rect.left + rect.width / 2 }),
+    n: () => ({ top: rect.top - gap, left: rect.left + rect.width / 2 }),
+    e: () => ({ top: rect.top + rect.height / 2, left: rect.right + gap }),
+    w: () => ({ top: rect.top + rect.height / 2, left: rect.left - gap }),
+  };
+
+  // Try preferred, then opposite, then the other axis
+  const fallbacks = { s: ['s', 'n', 'e', 'w'], n: ['n', 's', 'e', 'w'], e: ['e', 'w', 's', 'n'], w: ['w', 'e', 's', 'n'] };
+  const attempts = fallbacks[direction] || fallbacks.s;
+
+  for (const dir of attempts) {
+    const pos = placements[dir]();
+    tooltipEl.style.top = '0';
+    tooltipEl.style.left = '0';
+    tooltipEl.dataset.direction = dir;
+
+    // Measure tooltip
+    tooltipEl.style.visibility = 'hidden';
+    tooltipEl.classList.add('is-visible');
+    const ttRect = tooltipEl.getBoundingClientRect();
+    tooltipEl.classList.remove('is-visible');
+    tooltipEl.style.visibility = '';
+
+    let top, left;
+    if (dir === 's' || dir === 'n') {
+      left = pos.left - ttRect.width / 2;
+      top = dir === 's' ? pos.top : pos.top - ttRect.height;
+    } else {
+      top = pos.top - ttRect.height / 2;
+      left = dir === 'e' ? pos.left : pos.left - ttRect.width;
+    }
+
+    // Clamp to viewport
+    const vw = document.documentElement.clientWidth;
+    const vh = document.documentElement.clientHeight;
+    if (top >= 0 && top + ttRect.height <= vh && left >= 0 && left + ttRect.width <= vw) {
+      tooltipEl.style.top = `${top}px`;
+      tooltipEl.style.left = `${left}px`;
+      return;
+    }
+  }
+
+  // Last resort: clamp to viewport with preferred direction
+  const pos = placements[direction]();
+  const ttRect2 = tooltipEl.getBoundingClientRect();
+  const vw = document.documentElement.clientWidth;
+  const vh = document.documentElement.clientHeight;
+  tooltipEl.dataset.direction = direction;
+  tooltipEl.style.top = `${Math.max(0, Math.min(pos.top - (direction === 'n' ? ttRect2.height : 0), vh - ttRect2.height))}px`;
+  tooltipEl.style.left = `${Math.max(0, Math.min(pos.left - ttRect2.width / 2, vw - ttRect2.width))}px`;
+}
+
+function showTooltip(trigger) {
+  const text = trigger.getAttribute('data-tooltip');
+  if (!text) return;
+  const type = trigger.getAttribute('data-tooltip-type') || 'label';
+  const direction = trigger.getAttribute('data-tooltip-direction') || 's';
+
+  tooltipEl.textContent = text;
+
+  // Wire up ARIA — role="tooltip" only for description type (per Primer spec)
+  const id = 'js-tooltip';
+  tooltipEl.id = id;
+  if (type === 'label') {
+    trigger.setAttribute('aria-labelledby', id);
+    tooltipEl.removeAttribute('role');
+  } else {
+    trigger.setAttribute('aria-describedby', id);
+    tooltipEl.setAttribute('role', 'tooltip');
+  }
+
+  tooltipTrigger = trigger;
+  positionTooltip(trigger, direction);
+  tooltipEl.classList.add('is-visible');
+}
+
+function hideTooltip() {
+  if (tooltipTimeout) { clearTimeout(tooltipTimeout); tooltipTimeout = null; }
+  tooltipEl.classList.remove('is-visible');
+
+  if (tooltipTrigger) {
+    tooltipTrigger.removeAttribute('aria-labelledby');
+    tooltipTrigger.removeAttribute('aria-describedby');
+    tooltipTrigger = null;
+  }
+}
+
+// Delegated event listeners
+document.addEventListener('mouseenter', (e) => {
+  const trigger = e.target.closest('[data-tooltip]');
+  if (!trigger) return;
+  hideTooltip();
+  tooltipTimeout = setTimeout(() => showTooltip(trigger), 50);
+}, true);
+
+document.addEventListener('mouseleave', (e) => {
+  const trigger = e.target.closest('[data-tooltip]');
+  if (!trigger) return;
+  hideTooltip();
+}, true);
+
+document.addEventListener('focusin', (e) => {
+  const trigger = e.target.closest('[data-tooltip]');
+  if (!trigger) return;
+  // Only show on :focus-visible
+  try { if (!trigger.matches(':focus-visible')) return; } catch { /* ignore */ }
+  hideTooltip();
+  showTooltip(trigger);
+});
+
+document.addEventListener('focusout', (e) => {
+  const trigger = e.target.closest('[data-tooltip]');
+  if (!trigger) return;
+  hideTooltip();
+});
+
+// Escape dismisses tooltip without moving focus
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && tooltipTrigger) {
+    hideTooltip();
+  }
+});
+
+// Keep tooltip visible when hovering over the tooltip itself
+tooltipEl.addEventListener('mouseenter', () => {
+  if (tooltipTimeout) { clearTimeout(tooltipTimeout); tooltipTimeout = null; }
+});
+tooltipEl.addEventListener('mouseleave', () => {
+  hideTooltip();
+});
+
+// ---------------------------------------------------------------------------
 // Track which element opened each dialog so we can return focus
 const dialogOpeners = new WeakMap();
 const dialogTargetBtns = new WeakMap();
@@ -604,17 +757,20 @@ document.addEventListener('click', (event) => {
   navigator.clipboard.writeText(url).then(() => {
     const origLabel = copyBtn.getAttribute('aria-label');
     const origHTML = copyBtn.innerHTML;
+    const origTooltip = copyBtn.getAttribute('data-tooltip');
 
     // Swap to check icon + green color
     const checkIcon = pageData.weatherIcons?.['clipboard-check'];
     if (checkIcon) copyBtn.innerHTML = checkIcon;
     copyBtn.style.color = 'oklch(55% 0.2 145)';
     copyBtn.setAttribute('aria-label', 'Copied!');
+    copyBtn.setAttribute('data-tooltip', 'Copied!');
 
     setTimeout(() => {
       copyBtn.innerHTML = origHTML;
       copyBtn.style.color = '';
       copyBtn.setAttribute('aria-label', origLabel);
+      copyBtn.setAttribute('data-tooltip', origTooltip);
       if (document.activeElement === copyBtn || document.activeElement === document.body) {
         copyBtn.focus();
       }
@@ -1230,13 +1386,13 @@ ${data.alerts.map((a) => `      <li>${escapeText(a.text)}</li>`).join('\n')}
     ${data.tomorrow.high}\u00B0 / ${data.tomorrow.low}\u00B0${data.tomorrow.precipChance > 0 ? `, ${data.tomorrow.precipChance}% precip` : ''}
   </div>`;
 
-  const editLocationIcon = wi('pencil', '&#9998;');
+  const editLocationIcon = wi('map-pin-pen', '&#9998;');
 
   // Left column: heading + conditions + alerts
   weatherCurrent.innerHTML = `
     <div class="c-weather-panel__heading">
       <h2 class="c-weather-panel__location">Forecast for <a href="${forecastUrl}" rel="noopener">${escapeText(locationName)}</a></h2>
-      <button type="button" class="c-btn c-btn--icon c-weather-panel__edit-btn js-location-edit" aria-label="Edit location">${editLocationIcon}</button>
+      <button type="button" class="c-btn c-btn--icon c-weather-panel__edit-btn js-location-edit" aria-label="Edit location" data-tooltip="Edit location" data-tooltip-type="description" data-tooltip-direction="s">${editLocationIcon}</button>
     </div>
     <div class="c-weather-panel__summary">
       <span class="c-weather-panel__temp">${data.current.temp}${data.units.temp}</span>
@@ -1323,31 +1479,37 @@ function escapeText(str) {
 if (weatherBtn && weatherPanel) {
   const weatherStorageKey = `homepage-md-weather-${getPageSlug()}`;
 
+  function closeWeatherPanel() {
+    weatherPanel.hidden = true;
+    weatherBtn.setAttribute('aria-expanded', 'false');
+    localStorage.setItem(weatherStorageKey, 'false');
+  }
+
   // Toggle panel
   weatherBtn.addEventListener('click', () => {
     const isOpen = !weatherPanel.hidden;
-    weatherPanel.hidden = isOpen;
-    weatherBtn.setAttribute('aria-expanded', String(!isOpen));
-    localStorage.setItem(weatherStorageKey, String(!isOpen));
-  });
-
-  // Close on focusin outside
-  document.addEventListener('focusin', (event) => {
-    if (!weatherPanel.hidden) {
-      if (!weatherPanel.contains(event.target) && !weatherBtn.contains(event.target)) {
-        weatherPanel.hidden = true;
-        weatherBtn.setAttribute('aria-expanded', 'false');
-        localStorage.setItem(weatherStorageKey, 'false');
-      }
+    if (isOpen) {
+      closeWeatherPanel();
+    } else {
+      weatherPanel.hidden = false;
+      weatherBtn.setAttribute('aria-expanded', 'true');
+      localStorage.setItem(weatherStorageKey, 'true');
     }
   });
+
+  // Close button inside panel
+  const weatherCloseBtn = document.querySelector('.js-weather-close');
+  if (weatherCloseBtn) {
+    weatherCloseBtn.addEventListener('click', () => {
+      closeWeatherPanel();
+      weatherBtn.focus();
+    });
+  }
 
   // Close on Escape
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && !weatherPanel.hidden) {
-      weatherPanel.hidden = true;
-      weatherBtn.setAttribute('aria-expanded', 'false');
-      localStorage.setItem(weatherStorageKey, 'false');
+      closeWeatherPanel();
       weatherBtn.focus();
     }
   });
@@ -1367,6 +1529,33 @@ if (weatherBtn && weatherPanel) {
         weatherPanel.hidden = false;
         weatherBtn.setAttribute('aria-expanded', 'true');
       }
+      // After location save, open panel and focus the location link
+      try {
+        if (sessionStorage.getItem('homepage-md-focus-weather-location') === 'true') {
+          sessionStorage.removeItem('homepage-md-focus-weather-location');
+          weatherPanel.hidden = false;
+          weatherBtn.setAttribute('aria-expanded', 'true');
+          localStorage.setItem(weatherStorageKey, 'true');
+          requestAnimationFrame(() => {
+            const locationLink = weatherPanel.querySelector('.c-weather-panel__location a');
+            if (locationLink) locationLink.focus();
+            // Swap edit-location icon to check briefly
+            const editBtn = weatherPanel.querySelector('.js-location-edit');
+            if (editBtn) {
+              const checkIcon = wi('map-pin-check');
+              if (checkIcon) {
+                const origHTML = editBtn.innerHTML;
+                editBtn.innerHTML = checkIcon;
+                editBtn.style.color = 'oklch(55% 0.2 145)';
+                setTimeout(() => {
+                  editBtn.innerHTML = origHTML;
+                  editBtn.style.color = '';
+                }, 2000);
+              }
+            }
+          });
+        }
+      } catch { /* ignore */ }
     })
     .catch(() => {
       showWeatherError();
@@ -1389,7 +1578,7 @@ if (weatherBtn && weatherPanel) {
   const locationCancel = document.querySelector('.js-location-cancel');
 
   if (locationDialog && locationForm && locationInput) {
-    // Open dialog when pencil button is clicked (delegated since it's injected)
+    // Open dialog when edit-location button is clicked (delegated since it's injected)
     weatherPanel.addEventListener('click', (event) => {
       const editBtn = event.target.closest('.js-location-edit');
       if (!editBtn) return;
@@ -1415,7 +1604,41 @@ if (weatherBtn && weatherPanel) {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error);
         locationDialog.close();
-        reloadAfterEdit();
+
+        // Suppress SSE reload from the file change
+        try { sessionStorage.setItem(SSE_SUPPRESS_KEY, String(Date.now())); } catch { /* ignore */ }
+
+        // Re-fetch weather for the new location without a full page reload
+        try {
+          const weatherRes = await fetch(`/api/weather/${encodeURIComponent(getPageSlug())}`);
+          const weatherData = await weatherRes.json();
+          if (weatherData) {
+            renderWeather(weatherData);
+            weatherPanel.hidden = false;
+            weatherBtn.setAttribute('aria-expanded', 'true');
+            localStorage.setItem(weatherStorageKey, 'true');
+            // Focus the location link so user sees the change
+            requestAnimationFrame(() => {
+              const locationLink = weatherPanel.querySelector('.c-weather-panel__location a');
+              if (locationLink) locationLink.focus();
+              // Swap icon to map-pin-check briefly
+              const editBtn = weatherPanel.querySelector('.js-location-edit');
+              if (editBtn) {
+                const checkIcon = wi('map-pin-check');
+                if (checkIcon) {
+                  const origHTML = editBtn.innerHTML;
+                  editBtn.innerHTML = checkIcon;
+                  editBtn.style.color = 'oklch(55% 0.2 145)';
+                  setTimeout(() => { editBtn.innerHTML = origHTML; editBtn.style.color = ''; }, 2000);
+                }
+              }
+            });
+          }
+        } catch {
+          // Fallback: reload if re-fetch fails
+          try { sessionStorage.setItem('homepage-md-focus-weather-location', 'true'); } catch { /* ignore */ }
+          reloadAfterEdit();
+        }
       } catch (err) {
         // Show error inline (reuse dialog pattern)
         locationInput.setCustomValidity(err.message);
