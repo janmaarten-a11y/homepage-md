@@ -1,6 +1,6 @@
 # homepage.md
 
-**Your bookmarks, in Markdown. Your homepage, everywhere.**
+**A Markdown-powered homepage for your household and every device.**
 
 A household bookmark dashboard that reads Markdown files and renders them as a clean, accessible, searchable web page. Runs as a small Node.js server — designed for a home server (Synology NAS), accessible locally and remotely via Tailscale.
 
