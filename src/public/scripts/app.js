@@ -1260,6 +1260,7 @@ function initCombobox(input, listbox, options, { onSelect } = {}) {
       const selected = items[activeIndex];
       if (selected) selectOption(selected.dataset.value || selected.textContent);
     } else if (event.key === 'Escape') {
+      event.stopPropagation();
       listbox.hidden = true;
       input.setAttribute('aria-expanded', 'false');
     }
@@ -1329,7 +1330,12 @@ function initTagsCombobox(input, listbox, allTags) {
 
   function selectTag(tag) {
     const parts = input.value.split(',').map((t) => t.trim()).filter(Boolean);
-    parts[parts.length - 1] = tag;
+    // Replace the last partial tag with the selected one
+    if (parts.length > 0 && !allTags.includes(parts[parts.length - 1])) {
+      parts[parts.length - 1] = tag;
+    } else {
+      parts.push(tag);
+    }
     input.value = parts.join(', ') + ', ';
     listbox.hidden = true;
     input.setAttribute('aria-expanded', 'false');
@@ -1352,7 +1358,7 @@ function initTagsCombobox(input, listbox, allTags) {
   }
 
   input.addEventListener('input', () => renderOptions());
-  input.addEventListener('focus', () => renderOptions());
+  input.addEventListener('focus', () => { if (input.value.trim()) renderOptions(); });
 
   input.addEventListener('keydown', (event) => {
     const items = listbox.querySelectorAll('[role="option"]');
@@ -1369,6 +1375,7 @@ function initTagsCombobox(input, listbox, allTags) {
       const selected = items[activeIndex];
       if (selected) selectTag(selected.dataset.value);
     } else if (event.key === 'Escape') {
+      event.stopPropagation();
       listbox.hidden = true;
       input.setAttribute('aria-expanded', 'false');
     }

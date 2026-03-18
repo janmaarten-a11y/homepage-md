@@ -21,7 +21,7 @@ const WEATHER_ICON_NAMES = [
 
 /** Lucide icon names used in the server-rendered UI. */
 const UI_ICON_NAMES_20 = ['menu', 'settings', 'table-of-contents', 'bookmark-plus', 'tags'];
-const UI_ICON_NAMES_16 = ['rows-3', 'columns-3', 'list', 'list-chevrons-up-down', 'list-chevrons-down-up', 'sun', 'moon', 'monitor', 'palette'];
+const UI_ICON_NAMES_16 = ['rows-3', 'columns-3', 'list', 'list-chevrons-up-down', 'list-chevrons-down-up', 'sun', 'moon', 'monitor', 'palette', 'circle-x'];
 const UI_ICON_NAMES_14 = ['pencil', 'trash-2', 'copy'];
 const UI_ICON_NAMES_24 = ['plus'];
 

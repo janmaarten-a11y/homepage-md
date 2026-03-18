@@ -57,6 +57,7 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, category
 
   const iconMenu = uiIcons['menu'] || '&#9776;';
   const iconSettings = uiIcons['settings'] || '&#9881;';
+  const iconClose = uiIcons['circle-x'] || '&times;';
   const iconPlus = uiIcons['plus'] || '+';
   const iconAddLink = uiIcons['bookmark-plus'] || '+';
 
@@ -95,7 +96,7 @@ ${toolbar}
       </div>
     </div>
 ${hasLocation ? `    <section class="c-weather-panel js-weather-panel" id="js-weather-panel" hidden>
-      <button type="button" class="c-btn c-btn--icon c-weather-panel__close js-weather-close" aria-label="Close" data-tooltip="Close" data-tooltip-type="description" data-tooltip-direction="w">&times;</button>
+      <button type="button" class="c-btn c-btn--icon c-weather-panel__close js-weather-close" aria-label="Close" data-tooltip="Close" data-tooltip-type="description" data-tooltip-direction="w">${iconClose}</button>
       <div class="c-weather-panel__current js-weather-current"></div>
       <div class="c-weather-panel__alerts js-weather-alerts"></div>
       <div class="c-weather-panel__forecast js-weather-forecast"></div>
@@ -130,7 +131,7 @@ ${addDialog}
     <form method="dialog" class="c-dialog__form js-edit-form">
       <div class="c-dialog__header">
         <h2 class="c-dialog__title">Edit Bookmark</h2>
-        <button type="button" class="c-btn c-btn--icon c-dialog__close js-edit-cancel" aria-label="Close" data-tooltip="Close" data-tooltip-type="description" data-tooltip-direction="w">&times;</button>
+        <button type="button" class="c-btn c-btn--icon c-dialog__close js-edit-cancel" aria-label="Close" data-tooltip="Close" data-tooltip-type="description" data-tooltip-direction="w">${_uiIcons['circle-x'] || '&times;'}</button>
       </div>
       <div class="c-dialog__error js-edit-error" role="alert" hidden></div>
       <input type="hidden" name="originalUrl" class="js-edit-original-url">
@@ -163,16 +164,16 @@ ${addDialog}
           <span class="c-combobox__hint js-combobox-hint" hidden></span>
         </div>
       </label>
-      <label class="c-dialog__label">
-        Icon URL <span class="c-dialog__hint">(optional)</span>
-        <input type="url" name="icon" class="c-dialog__input js-edit-icon" placeholder="https://…">
-      </label>
       <label class="c-dialog__label" id="edit-tags-label">
         Tags <span class="c-dialog__hint">(comma-separated, optional)</span>
         <div class="c-combobox">
           <input type="text" name="tags" class="c-dialog__input c-combobox__input js-edit-tags" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="js-edit-tags-listbox" aria-labelledby="edit-tags-label" autocomplete="off">
           <ul class="c-combobox__listbox js-edit-tags-listbox" id="js-edit-tags-listbox" role="listbox" hidden></ul>
         </div>
+      </label>
+      <label class="c-dialog__label">
+        Icon URL <span class="c-dialog__hint">(optional)</span>
+        <input type="url" name="icon" class="c-dialog__input js-edit-icon" placeholder="https://\u2026">
       </label>
       <div class="c-dialog__actions c-dialog__actions--split">
         <button type="button" class="c-btn c-btn--danger js-edit-delete">Delete</button>
@@ -186,7 +187,7 @@ ${hasLocation ? `  <dialog class="c-dialog c-dialog--small js-location-dialog">
     <form method="dialog" class="c-dialog__form js-location-form">
       <div class="c-dialog__header">
         <h2 class="c-dialog__title">Edit Location</h2>
-        <button type="button" class="c-btn c-btn--icon c-dialog__close js-location-cancel" aria-label="Close" data-tooltip="Close" data-tooltip-type="description" data-tooltip-direction="w">&times;</button>
+        <button type="button" class="c-btn c-btn--icon c-dialog__close js-location-cancel" aria-label="Close" data-tooltip="Close" data-tooltip-type="description" data-tooltip-direction="w">${_uiIcons['circle-x'] || '&times;'}</button>
       </div>
       <label class="c-dialog__label">
         Location <span class="c-dialog__hint">(city, state or zip code)</span>
@@ -260,7 +261,7 @@ function renderDeleteDialog() {
     <form method="dialog" class="c-dialog__form">
       <div class="c-dialog__header">
         <h2 class="c-dialog__title">Delete Bookmark</h2>
-        <button type="button" class="c-btn c-btn--icon c-dialog__close js-delete-cancel" aria-label="Close" data-tooltip="Close" data-tooltip-type="description" data-tooltip-direction="w">&times;</button>
+        <button type="button" class="c-btn c-btn--icon c-dialog__close js-delete-cancel" aria-label="Close" data-tooltip="Close" data-tooltip-type="description" data-tooltip-direction="w">${_uiIcons['circle-x'] || '&times;'}</button>
       </div>
       <div class="c-dialog__error js-delete-error" role="alert" hidden></div>
       <p class="c-dialog__message js-delete-message">Are you sure?</p>
@@ -278,7 +279,7 @@ function renderKeyboardHelp() {
     <div class="c-dialog__form">
       <div class="c-dialog__header">
         <h2 class="c-dialog__title">Keyboard Shortcuts</h2>
-        <button type="button" class="c-btn c-btn--icon c-dialog__close js-keyboard-help-close" aria-label="Close" data-tooltip="Close" data-tooltip-type="description" data-tooltip-direction="w">&times;</button>
+        <button type="button" class="c-btn c-btn--icon c-dialog__close js-keyboard-help-close" aria-label="Close" data-tooltip="Close" data-tooltip-type="description" data-tooltip-direction="w">${_uiIcons['circle-x'] || '&times;'}</button>
       </div>
       <dl class="c-shortcut-list">
         <div class="c-shortcut-list__item"><dt><kbd>/</kbd></dt><dd>Focus search</dd></div>
@@ -315,7 +316,7 @@ function renderTagsPopover(tags, uiIcons = {}) {
   const iconTags = uiIcons['tags'] || '&#128196;';
 
   const buttons = tags
-    .map((tag) => `        <button type="button" class="c-popover__link js-tag-filter" data-tag="${escapeAttr(tag)}">${escapeHtml(tag)}</button>`)
+    .map((tag) => `        <button type="button" class="c-popover__link js-tag-filter" data-tag="${escapeAttr(tag)}">#${escapeHtml(tag)}</button>`)
     .join('\n');
 
   return `      <div class="c-header__tags">
@@ -331,7 +332,7 @@ function renderAddDialog(categories, currentSlug) {
     <form method="dialog" class="c-dialog__form js-add-form">
       <div class="c-dialog__header">
         <h2 class="c-dialog__title">Add Link</h2>
-        <button type="button" class="c-btn c-btn--icon c-dialog__close js-add-cancel" aria-label="Close" data-tooltip="Close" data-tooltip-type="description" data-tooltip-direction="w">&times;</button>
+        <button type="button" class="c-btn c-btn--icon c-dialog__close js-add-cancel" aria-label="Close" data-tooltip="Close" data-tooltip-type="description" data-tooltip-direction="w">${_uiIcons['circle-x'] || '&times;'}</button>
       </div>
       <input type="hidden" name="page" value="${escapeAttr(currentSlug)}">
       <div class="c-dialog__error js-add-error" role="alert" hidden></div>
@@ -364,16 +365,18 @@ function renderAddDialog(categories, currentSlug) {
           <span class="c-combobox__hint js-combobox-hint" hidden></span>
         </div>
       </label>
-      <label class="c-dialog__label">
-        Icon URL <span class="c-dialog__hint">(optional)</span>
-        <input type="url" name="icon" class="c-dialog__input js-add-icon" placeholder="https://…">
-      </label>      <label class="c-dialog__label" id="add-tags-label">
+      <label class="c-dialog__label" id="add-tags-label">
         Tags <span class="c-dialog__hint">(comma-separated, optional)</span>
         <div class="c-combobox">
           <input type="text" name="tags" class="c-dialog__input c-combobox__input js-add-tags" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="js-add-tags-listbox" aria-labelledby="add-tags-label" autocomplete="off" placeholder="tailscale, admin">
           <ul class="c-combobox__listbox js-add-tags-listbox" id="js-add-tags-listbox" role="listbox" hidden></ul>
         </div>
-      </label>      <div class="c-dialog__actions">
+      </label>
+      <label class="c-dialog__label">
+        Icon URL <span class="c-dialog__hint">(optional)</span>
+        <input type="url" name="icon" class="c-dialog__input js-add-icon" placeholder="https://\u2026">
+      </label>
+      <div class="c-dialog__actions">
         <button type="submit" class="c-btn c-btn--primary">Add Link</button>
       </div>
     </form>
@@ -550,7 +553,7 @@ function renderLoginDialog() {
     <form method="dialog" class="c-dialog__form js-login-form">
       <div class="c-dialog__header">
         <h2 class="c-dialog__title">Log In</h2>
-        <button type="button" class="c-btn c-btn--icon c-dialog__close js-login-cancel" aria-label="Close" data-tooltip="Close" data-tooltip-type="description" data-tooltip-direction="w">&times;</button>
+        <button type="button" class="c-btn c-btn--icon c-dialog__close js-login-cancel" aria-label="Close" data-tooltip="Close" data-tooltip-type="description" data-tooltip-direction="w">${_uiIcons['circle-x'] || '&times;'}</button>
       </div>
       <div class="c-dialog__error js-login-error" role="alert" hidden></div>
       <p class="c-dialog__message">Enter the passphrase to make edits to this site.</p>
