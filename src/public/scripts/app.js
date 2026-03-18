@@ -842,14 +842,13 @@ for (const link of document.querySelectorAll('.js-drawer-category')) {
 const slug = getPageSlug();
 
 function getViewPrefs() {
-  const defaults = { density: 'detailed', layout: 'grid', colorMode: 'system', theme: 'default' };
   try {
     const stored = localStorage.getItem(`homepage-md-view-${slug}`);
-    if (stored) return { ...defaults, ...JSON.parse(stored) };
+    if (stored) return JSON.parse(stored);
     const global = localStorage.getItem('homepage-md-view');
-    if (global) return { ...defaults, ...JSON.parse(global) };
+    if (global) return JSON.parse(global);
   } catch { /* ignore */ }
-  return defaults;
+  return { density: 'detailed', layout: 'grid', colorMode: 'system', theme: 'default' };
 }
 
 function saveViewPrefs(prefs) {
