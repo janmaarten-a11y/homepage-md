@@ -303,6 +303,12 @@ try {
         const editBtn = card.querySelector('.js-edit-open');
         if (editBtn) editBtn.focus();
       });
+      // Remove the class when focus leaves this bookmark
+      card.addEventListener('focusout', (e) => {
+        if (!card.contains(e.relatedTarget)) {
+          card.classList.remove('is-focus-restore');
+        }
+      }, { once: false });
     }
   }
 } catch { /* ignore */ }
@@ -1402,7 +1408,7 @@ ${data.alerts.map((a) => `      <li>${escapeText(a.text)}</li>`).join('\n')}
   weatherCurrent.innerHTML = `
     <div class="c-weather-panel__heading">
       <h2 class="c-weather-panel__location">Forecast for <a href="${forecastUrl}" rel="noopener">${escapeText(locationName)}</a></h2>
-      <button type="button" class="c-btn c-btn--icon c-weather-panel__edit-btn js-location-edit" aria-label="Edit location" data-tooltip="Edit location" data-tooltip-type="description" data-tooltip-direction="s">${editLocationIcon}</button>
+${pageData.authenticated ? `      <button type="button" class="c-btn c-btn--icon c-weather-panel__edit-btn js-location-edit" aria-label="Edit location" data-tooltip="Edit location" data-tooltip-type="description" data-tooltip-direction="s">${editLocationIcon}</button>` : ''}
     </div>
     <div class="c-weather-panel__summary">
       <span class="c-weather-panel__temp">${data.current.temp}${data.units.temp}</span>
@@ -1745,4 +1751,57 @@ if (speedBtn && speedLabel) {
     const elapsed = (performance.now() - start) / 1000;
     return formatSpeed((bytes * 8) / elapsed / 1_000_000);
   }
+}
+
+// ---------------------------------------------------------------------------
+// Auth — login dialog + logout
+// ---------------------------------------------------------------------------
+
+const loginDialog = document.querySelector('.js-login-dialog');
+const loginForm = document.querySelector('.js-login-form');
+const loginError = document.querySelector('.js-login-error');
+const loginCancel = document.querySelector('.js-login-cancel');
+const loginOpen = document.querySelector('.js-login-open');
+const logoutBtn = document.querySelector('.js-logout');
+
+if (loginDialog && loginForm) {
+  if (loginOpen) {
+    loginOpen.addEventListener('click', () => openDialog(loginDialog, loginOpen));
+  }
+  if (loginCancel) {
+    loginCancel.addEventListener('click', () => closeDialog(loginDialog));
+  }
+
+  loginForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    clearError(loginError);
+    const token = loginForm.querySelector('.js-login-token')?.value?.trim();
+    if (!token) return;
+
+    try {
+      const res = await fetch('/api/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'HomepageMD' },
+        body: JSON.stringify({ token }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Login failed');
+      loginDialog.close();
+      window.location.reload();
+    } catch (err) {
+      showError(loginError, err.message);
+    }
+  });
+}
+
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', async () => {
+    try {
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'HomepageMD' },
+      });
+    } catch { /* ignore */ }
+    window.location.reload();
+  });
 }

@@ -24,7 +24,7 @@ A household bookmark dashboard that reads Markdown files and renders them as a c
 - **Footer** — editable Markdown footer displayed on every page
 - **Docker-ready** — single container, Synology-friendly
 - **Customizable** — override any design token via `custom.css`
-- **Optional auth** — `AUTH_TOKEN` env var protects write endpoints
+- **Optional auth** — `AUTH_TOKEN` env var protects write endpoints; per-page `access: open` bypass for shared pages
 - **No framework** — vanilla Node.js and one dependency: [Lucide](https://lucide.dev) for category icons
 
 ## Quick start
@@ -66,6 +66,7 @@ All configuration is via environment variables. Copy `.env.example` to `.env` an
 | `THEMES_DIR` | `./themes` | Path to the themes directory |
 | `FOOTER_PATH` | `./footer.md` | Path to the footer Markdown file |
 | `AUTH_TOKEN` | *(none)* | Shared passphrase for write endpoints (disabled by default) |
+| `AUTH_COOKIE_DAYS` | `30` | Days the login cookie remains valid |
 | `FAVICON_TTL_DAYS` | `7` | Days before a cached favicon is re-fetched |
 
 ## Data format
@@ -75,6 +76,7 @@ Each `.md` file in the `bookmarks/` directory is a page. The grammar:
 ```markdown
 # Page Title
   - location: City, State
+  - access: open
   - bang: !g https://google.com/search?q=%s
   - bang: !w https://en.wikipedia.org/w/index.php?search=%s
 
@@ -98,6 +100,7 @@ Each `.md` file in the `bookmarks/` directory is a page. The grammar:
 
 - `# Heading 1` — page title (one per file)
 - `- location:` — location for the weather widget (indented, under the title)
+- `- access: open` — allows anyone to edit this page without logging in (indented, under the title)
 - `- bang: !prefix url` — search bang shortcut; `%s` is replaced with the query (indented, under the title)
 - `> [!WELCOME] Title` — welcome banner with optional description on subsequent `>` lines
 - `## Heading 2` — category
@@ -134,9 +137,29 @@ The **View** dropdown in the header offers:
 
 Preferences are saved per page in the browser's `localStorage`. The "Apply to all pages" button saves the current page's settings as the default for all pages and clears per-page overrides.
 
+## Authentication
+
+When `AUTH_TOKEN` is set, homepage.md operates in a **read-open, write-gated** mode:
+
+- **Without logging in** — visitors can browse bookmarks, use search, view weather, and run speed tests. Edit controls (Add Link, Edit, Copy URL, Edit Location) are hidden.
+- **After logging in** — a "Log in to edit" link in the footer opens a passphrase dialog. On success, a cookie is set and edit controls appear. A "Log out" link replaces it.
+
+The login cookie is HttpOnly and SameSite=Lax. Its lifetime is controlled by `AUTH_COOKIE_DAYS` (default: 30 days).
+
+### Per-page bypass
+
+To allow anyone to edit a specific page without logging in, add `access: open` under the page title:
+
+```markdown
+# Kids' Bookmarks
+  - access: open
+```
+
+Pages with `access: open` show edit controls for all visitors and skip auth on write endpoints. All other pages remain protected.
+
 ## API
 
-All write endpoints are protected by `AUTH_TOKEN` when configured.
+All write endpoints are protected by `AUTH_TOKEN` when configured. Pages with `access: open` bypass auth for writes.
 
 | Method | Endpoint | Description |
 |---|---|---|
@@ -267,11 +290,11 @@ npm test       # Run all tests (Node.js built-in test runner)
 
 ### Remote access via Tailscale
 
-Install the [Tailscale package for Synology](https://tailscale.com/kb/1131/synology). Access HomepageMD from any device on your tailnet.
+Install the [Tailscale package for Synology](https://tailscale.com/kb/1131/synology). Access homepage.md from any device on your tailnet.
 
 ### Public sharing via Tailscale Funnel (advanced)
 
-[Tailscale Funnel](https://tailscale.com/kb/1223/funnel) can expose HomepageMD to the public internet without port forwarding or a reverse proxy:
+[Tailscale Funnel](https://tailscale.com/kb/1223/funnel) can expose homepage.md to the public internet without port forwarding or a reverse proxy:
 
 ```bash
 # On your Synology (with Tailscale installed)
@@ -280,7 +303,7 @@ tailscale funnel 2525
 
 This creates a public URL like `https://your-synology.ts.net` that anyone can access. Combined with `AUTH_TOKEN`, you can allow public read access while protecting write endpoints. Funnel handles HTTPS termination automatically.
 
-**Note:** Without Funnel, HomepageMD is only accessible within your tailnet. URL sharing only works with recipients who are on the same tailnet or have Tailscale node sharing configured.
+**Note:** Without Funnel, homepage.md is only accessible within your tailnet. URL sharing only works with recipients who are on the same tailnet or have Tailscale node sharing configured.
 
 ### Sync
 
@@ -288,7 +311,7 @@ Sync only the `bookmarks/` and `icons/` directories to family devices via Sync.c
 
 ## Accessibility
 
-HomepageMD is designed to work well for everyone, including people who use screen readers, keyboard-only navigation, or other assistive technologies.
+homepage.md is designed to work well for everyone, including people who use screen readers, keyboard-only navigation, or other assistive technologies.
 
 - **Keyboard accessible** — every feature works without a mouse. A single tab stop per bookmark keeps navigation fast; arrow keys reveal edit and copy actions. Press `/` to jump to search and `?` for the full shortcut list.
 - **Screen reader friendly** — headings, sections, and lists are structured so screen readers can navigate and announce content clearly. Search results and status messages are announced via live regions. Tooltips use `aria-describedby` to supplement button labels.

@@ -7,6 +7,8 @@
 
 /** Module-level UI icons set per renderPage call. */
 let _uiIcons = {};
+/** Whether the current user can edit (auth disabled or authenticated). */
+let _canEdit = true;
 
 /**
  * Render a full HTML page for a set of parsed bookmark data.
@@ -18,10 +20,12 @@ let _uiIcons = {};
  * @param {object} options.faviconUrls - Map of bookmark URL → resolved favicon path
  * @returns {string} Complete HTML document
  */
-export function renderPage(pageData, { pages, currentSlug, faviconUrls, categoryIcons = {}, weatherIcons = {}, uiIcons = {}, defaultPage, footerContent, themes = ['default'], activeTheme = 'default' }) {
+export function renderPage(pageData, { pages, currentSlug, faviconUrls, categoryIcons = {}, weatherIcons = {}, uiIcons = {}, defaultPage, footerContent, themes = ['default'], activeTheme = 'default', authRequired = false, authenticated = true }) {
   _uiIcons = uiIcons;
   const title = pageData.title || 'homepage.md';
   const hasLocation = !!pageData.location;
+  const canEdit = !authRequired || authenticated;
+  _canEdit = canEdit;
   const nav = renderNav(pages, currentSlug, defaultPage);
   const tocPopover = renderTocPopover(pageData.categories, uiIcons);
   const main = renderMain(pageData, faviconUrls, categoryIcons);
@@ -32,10 +36,11 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, category
 
   const search = renderSearch();
   const toolbar = renderToolbar(themes);
-  const addDialog = renderAddDialog(categories, currentSlug);
-  const deleteDialog = renderDeleteDialog();
+  const addDialog = canEdit ? renderAddDialog(categories, currentSlug) : '';
+  const deleteDialog = canEdit ? renderDeleteDialog() : '';
   const keyboardHelp = renderKeyboardHelp();
-  const footer = renderFooter(footerContent);
+  const loginDialog = authRequired ? renderLoginDialog() : '';
+  const footer = renderFooter(footerContent, authRequired, authenticated);
 
   const themeLink = activeTheme && activeTheme !== 'default'
     ? `\n  <link rel="stylesheet" href="/themes/${encodeURIComponent(activeTheme)}.css" id="js-theme-link">`
@@ -89,7 +94,7 @@ ${hasLocation ? `    <section class="c-weather-panel js-weather-panel" id="js-we
     <div class="c-header__searchbar">
 ${tocPopover}
 ${search}
-      <button type="button" class="c-header__add-btn c-btn c-btn--primary js-add-open">${iconAddLink} <span>Add link</span></button>
+${canEdit ? `      <button type="button" class="c-header__add-btn c-btn c-btn--primary js-add-open">${iconAddLink} <span>Add link</span></button>` : ''}
     </div>
   </header>
   <aside class="c-drawer js-menu-drawer" id="js-menu-drawer" hidden>
@@ -108,7 +113,7 @@ ${main}
     <p class="c-search-empty js-search-empty" hidden>No bookmarks match your search.</p>
   </main>
 ${footer}
-  <button type="button" class="c-fab js-add-open">${iconPlus} <span class="c-fab__label">Add link</span></button>
+${canEdit ? `  <button type="button" class="c-fab js-add-open">${iconPlus} <span class="c-fab__label">Add link</span></button>` : ''}
   <div class="u-visually-hidden" aria-live="polite" id="js-search-status"></div>
 ${addDialog}
   <dialog class="c-dialog js-edit-dialog">
@@ -175,7 +180,8 @@ ${hasLocation ? `  <dialog class="c-dialog c-dialog--small js-location-dialog">
       </div>
     </form>
   </dialog>` : ''}
-  <script id="js-page-data" type="application/json">${JSON.stringify({ categories, subcategories: subcategoryPairs, bangs: pageData.bangs || [], weatherIcons, themes })}</script>
+  <script id="js-page-data" type="application/json">${JSON.stringify({ categories, subcategories: subcategoryPairs, bangs: pageData.bangs || [], weatherIcons, themes, authRequired, authenticated: canEdit })}</script>
+${loginDialog}
   <script src="/scripts/app.js" type="module"></script>
 </body>
 </html>`;
@@ -449,18 +455,16 @@ function renderBookmark(bookmark, faviconUrls, categoryName, subcategoryName) {
                   <span class="c-bookmark__url">${escapeHtml(displayUrl)}</span>
                 </a>${description}
               </div>
-              <div class="c-bookmark__actions">
+${_canEdit ? `              <div class="c-bookmark__actions">
                 <button type="button" class="c-btn c-btn--icon js-edit-open" aria-label="Edit ${escapeAttr(bookmark.title)}" tabindex="-1" data-tooltip="Edit" data-tooltip-type="description" data-tooltip-direction="s">${ICON_EDIT}</button>
                 <button type="button" class="c-btn c-btn--icon js-copy-url" aria-label="Copy URL for ${escapeAttr(bookmark.title)}" tabindex="-1" data-tooltip="Copy link" data-tooltip-type="description" data-tooltip-direction="s">${ICON_COPY}</button>
-              </div>
+              </div>` : ''}
             </div>
           </li>`;
 }
 
-function renderFooter(content) {
-  if (!content) return '';
-
-  const lines = content.split('\n').filter((line) => line.trim());
+function renderFooter(content, authRequired = false, authenticated = true) {
+  const lines = content ? content.split('\n').filter((line) => line.trim()) : [];
   const html = lines.map((line) => {
     // Parse inline markdown links: [text](url)
     const parts = [];
@@ -480,9 +484,40 @@ function renderFooter(content) {
     return `    <p>${parts.join('')}</p>`;
   });
 
+  // Auth links in footer
+  let authHtml = '';
+  if (authRequired && authenticated) {
+    authHtml = '    <div class="c-footer__auth"><button type="button" class="c-footer__logout js-logout">Log out</button></div>';
+  } else if (authRequired && !authenticated) {
+    authHtml = '    <div class="c-footer__auth"><button type="button" class="c-footer__login js-login-open">Log in to edit</button></div>';
+  }
+
+  if (!html.length && !authHtml) return '';
+
   return `  <footer class="c-footer" role="contentinfo">
-${html.join('\n')}
+${html.length ? `    <div class="c-footer__content">\n${html.join('\n')}\n    </div>` : ''}
+${authHtml}
   </footer>`;
+}
+
+function renderLoginDialog() {
+  return `  <dialog class="c-dialog c-dialog--small js-login-dialog">
+    <form method="dialog" class="c-dialog__form js-login-form">
+      <div class="c-dialog__header">
+        <h2 class="c-dialog__title">Log In</h2>
+        <button type="button" class="c-btn c-btn--icon c-dialog__close js-login-cancel" aria-label="Close" data-tooltip="Close" data-tooltip-type="description" data-tooltip-direction="w">&times;</button>
+      </div>
+      <div class="c-dialog__error js-login-error" role="alert" hidden></div>
+      <p class="c-dialog__message">Enter the passphrase to make edits to this site.</p>
+      <label class="c-dialog__label">
+        Passphrase
+        <input type="password" name="token" class="c-dialog__input js-login-token" required autocomplete="current-password">
+      </label>
+      <div class="c-dialog__actions">
+        <button type="submit" class="c-btn c-btn--primary">Log in</button>
+      </div>
+    </form>
+  </dialog>`;
 }
 
 function escapeHtml(text) {

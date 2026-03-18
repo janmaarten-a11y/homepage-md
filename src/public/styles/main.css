@@ -1375,11 +1375,21 @@
 
   /* Footer */
   .c-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-s) var(--space-l);
     padding-block: var(--space-l);
     padding-inline: var(--space-l);
     border-block-start: 1px solid var(--color-border);
     color: var(--color-muted);
     font-size: 0.875rem;
+  }
+
+  .c-footer__content {
+    flex: 1;
+    min-inline-size: 0;
   }
 
   .c-footer p {
@@ -1392,6 +1402,33 @@
 
   .c-footer a:hover {
     color: var(--color-text);
+  }
+
+  .c-footer__auth {
+    flex-shrink: 0;
+  }
+
+  .c-footer__login,
+  .c-footer__logout {
+    background: none;
+    border: none;
+    color: var(--color-muted);
+    font: inherit;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+  }
+
+  .c-footer__login:hover,
+  .c-footer__logout:hover {
+    color: var(--color-text);
+  }
+
+  .c-footer__login:focus-visible,
+  .c-footer__logout:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+    border-radius: var(--radius-s);
   }
 
   /* Keyboard shortcut help */
@@ -1442,6 +1479,19 @@
 
   .is-condensed .c-bookmark__actions {
     margin-inline-start: auto;
+  }
+
+  .is-condensed .c-bookmark {
+    position: relative;
+  }
+
+  .is-condensed .c-bookmark__actions {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-end: var(--space-s);
+    transform: translateY(-50%);
+    background-color: var(--color-surface);
+    padding-inline-start: var(--space-xs);
   }
 
   .is-condensed .c-category h2 {

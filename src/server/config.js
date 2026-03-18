@@ -8,6 +8,7 @@ const config = {
   footerPath: process.env.FOOTER_PATH || './footer.md',
   themesDir: process.env.THEMES_DIR || './themes',
   authToken: process.env.AUTH_TOKEN || null,
+  authCookieDays: parseInt(process.env.AUTH_COOKIE_DAYS || '30', 10),
   faviconTtlDays: parseInt(process.env.FAVICON_TTL_DAYS || '7', 10),
 };
 
