@@ -2,7 +2,7 @@
 
 **A Markdown-powered homepage for your household and every device.**
 
-A household bookmark dashboard that reads Markdown files and renders them as a clean, accessible, searchable web page. Runs as a small Node.js server — designed for a home server (Synology NAS), accessible locally and remotely via Tailscale.
+A household bookmark dashboard that reads Markdown files and renders them as a clean, accessible, searchable web page. Runs as a small Node.js server — designed for a home server, a NAS, or anywhere you can run Docker or Node.js.
 
 ## Features
 
@@ -280,47 +280,48 @@ npm test       # Run all tests (Node.js built-in test runner)
 
 ## Deployment
 
-### Synology NAS
+### Docker (recommended)
 
-1. Install **Container Manager** from Synology Package Center
-2. Clone this repo or copy it to your NAS
-3. Copy `.env.example` to `.env` and configure
-4. Run `docker compose up -d`
-5. Access at `http://your-synology:2525`
-
-### Remote access via Tailscale
-
-Install the [Tailscale package for Synology](https://tailscale.com/kb/1131/synology). Access homepage.md from any device on your tailnet.
-
-### Public sharing via Tailscale Funnel (advanced)
-
-[Tailscale Funnel](https://tailscale.com/kb/1223/funnel) can expose homepage.md to the public internet without port forwarding or a reverse proxy:
+homepage.md ships with a `Dockerfile` and `docker-compose.yml`. On any machine with Docker:
 
 ```bash
-# On your Synology (with Tailscale installed)
-tailscale funnel 2525
+git clone https://github.com/janmaarten-a11y/homepage-md.git
+cd homepage-md
+cp .env.example .env    # edit to customize
+docker compose up -d
 ```
 
-This creates a public URL like `https://your-synology.ts.net` that anyone can access. Combined with `AUTH_TOKEN`, you can allow public read access while protecting write endpoints. Funnel handles HTTPS termination automatically.
+Access at `http://your-server:2525`.
 
-**Note:** Without Funnel, homepage.md is only accessible within your tailnet. URL sharing only works with recipients who are on the same tailnet or have Tailscale node sharing configured.
+To persist data across container rebuilds, mount `bookmarks/`, `icons/`, `favicon-cache/`, and `custom.css` as volumes.
+
+### Node.js
+
+On any machine with Node.js 22+:
+
+```bash
+git clone https://github.com/janmaarten-a11y/homepage-md.git
+cd homepage-md
+npm install
+cp .env.example .env
+npm start
+```
+
+### NAS devices
+
+Most NAS devices (Synology, QNAP, Unraid, etc.) support Docker via their package managers. Clone the repo to your NAS, configure `.env`, and run `docker compose up -d`.
+
+### Remote access
+
+For access outside your local network, use a VPN (e.g., Tailscale, WireGuard) or a reverse proxy with HTTPS. When exposing to the internet, set `AUTH_TOKEN` to protect write endpoints.
 
 ### Sync
 
-Sync only the `bookmarks/` and `icons/` directories to family devices via Sync.com, Syncthing, or similar. Edits sync to the server, and the dashboard updates live via SSE.
+Sync the `bookmarks/` and `icons/` directories to other devices via Syncthing, Dropbox, or similar. Edits sync to the server, and the dashboard updates live via SSE.
 
 ## Accessibility
 
-homepage.md is designed to work well for everyone, including people who use screen readers, keyboard-only navigation, or other assistive technologies.
-
-- **Keyboard accessible** — every feature works without a mouse. A single tab stop per bookmark keeps navigation fast; arrow keys reveal edit and copy actions. Press `/` to jump to search and `?` for the full shortcut list.
-- **Screen reader friendly** — headings, sections, and lists are structured so screen readers can navigate and announce content clearly. Search results and status messages are announced via live regions. Tooltips use `aria-describedby` to supplement button labels.
-- **Skip to content** — a skip link appears on focus so keyboard users can bypass the header.
-- **Focus indicators** — all interactive elements have visible focus outlines.
-- **Reduced motion** — animations are suppressed when the operating system preference is set.
-- **Dark mode** — respects the system color scheme preference.
-- **Target sizes** — buttons and links meet minimum touch and pointer target sizes.
-- **Reviewed against WCAG 2.2** — built with Level AA conformance as the goal.
+**homepage.md** is a personal project, but is designed to work well for everyone including people who use screen readers, keyboard-only navigation, or other assistive technologies. In addition to skip links, respecting reduced motion, and clear focus indicators, a lot of work has gone into keyboard accessibility. Every feature works without a mouse. A single tab stop per bookmark keeps navigation fast; arrow keys reveal edit and copy actions. Press `/` to jump to search and `?` for the full shortcut list.
 
 ## Roadmap
 
