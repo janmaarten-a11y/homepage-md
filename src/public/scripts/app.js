@@ -1713,7 +1713,7 @@ if (speedBtn && speedLabel) {
 
   function showSpeedResult(down, up) {
     speedLabel.textContent = `\u2193 ${down} \u2191 ${up}`;
-    speedBtn.setAttribute('aria-label', `Speed test result: ${down} megabits per second download, ${up} megabits per second upload. Activate to test again.`);
+    speedBtn.setAttribute('aria-label', `Speed test: ${down} Mbps down, ${up} Mbps up`);
   }
 
   function formatSpeed(mbps) {
