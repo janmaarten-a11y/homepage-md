@@ -89,9 +89,9 @@ Each `.md` file in the `bookmarks/` directory is a page. The grammar:
 ```markdown
 # Page Title
   - location: City, State
-  - access: open
+  - access: open    # if you want anyone to be able to write it
   - bang: !g https://google.com/search?q=%s
-  - bang: !w https://en.wikipedia.org/w/index.php?search=%s
+  - bang: !w https://en.wikipedia.org/w/index.php?search=%s 
 
 > [!WELCOME] Welcome!
 > Your household dashboard for bookmarks and quick searches.
@@ -106,6 +106,7 @@ Each `.md` file in the `bookmarks/` directory is a page. The grammar:
 
 - [Bookmark Title](https://example.com)
   - description: A short description (max 160 chars)
+  - tags: tailscale, admin
   - icon: https://example.com/custom-icon.png
 ```
 
@@ -122,6 +123,7 @@ Each `.md` file in the `bookmarks/` directory is a page. The grammar:
 - `- subtitle:` — description shown under a category or subcategory heading
 - `- [Title](URL)` — bookmark
 - `- description: text` — description (indented, under a bookmark)
+- `- tags: a, b, c` — comma-separated tags for filtering and organization (indented, under a bookmark)
 - `- icon: url` — custom icon override (indented, under a bookmark)
 - Everything else is silently ignored — add comments, notes, or blank lines freely
 
