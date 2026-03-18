@@ -1370,7 +1370,7 @@ ${data.alerts.map((a) => `      <li>${escapeText(a.text)}</li>`).join('\n')}
   weatherCurrent.innerHTML = `
     <div class="c-weather-panel__heading">
       <h2 class="c-weather-panel__location">Forecast for <a href="${forecastUrl}" rel="noopener">${escapeText(locationName)}</a></h2>
-      <button type="button" class="c-btn c-btn--icon c-weather-panel__edit-btn js-location-edit" aria-label="Edit location">${editLocationIcon}</button>
+      <button type="button" class="c-btn c-btn--icon c-weather-panel__edit-btn js-location-edit" aria-label="Edit location" data-tooltip="Edit location" data-tooltip-type="description" data-tooltip-direction="s">${editLocationIcon}</button>
     </div>
     <div class="c-weather-panel__summary">
       <span class="c-weather-panel__temp">${data.current.temp}${data.units.temp}</span>
