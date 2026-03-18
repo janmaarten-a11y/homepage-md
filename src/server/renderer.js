@@ -75,9 +75,9 @@ ${hasLocation ? `        <button type="button" class="c-weather-btn js-weather-t
           <span class="c-speed-btn__label js-speed-label">Speed test</span>
         </button>
         <button type="button" class="c-header__action-btn js-view-toggle" aria-expanded="false" aria-controls="js-view-popover" aria-label="View options" data-tooltip="View options" data-tooltip-type="description" data-tooltip-direction="s">${iconSettings}</button>
-        <div class="c-popover js-view-popover" id="js-view-popover" hidden>
+      </div>
+      <div class="c-popover js-view-popover" id="js-view-popover" hidden>
 ${toolbar}
-        </div>
       </div>
     </div>
 ${hasLocation ? `    <section class="c-weather-panel js-weather-panel" id="js-weather-panel" hidden aria-label="Weather forecast">

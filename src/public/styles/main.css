@@ -189,6 +189,7 @@
     gap: var(--space-m);
     padding-block: var(--space-l);
     padding-inline: var(--space-l);
+    position: relative;
   }
 
   .c-header__title {
