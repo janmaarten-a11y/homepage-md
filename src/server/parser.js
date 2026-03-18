@@ -21,7 +21,7 @@
 
 const HEADING_RE = /^(#{1,3})\s+(.+)$/;
 const BOOKMARK_RE = /^-\s+\[([^\]]+)\]\(([^)]+)\)\s*$/;
-const METADATA_RE = /^\s+-\s+(description|icon|subtitle|location|bang):\s+(.+)$/;
+const METADATA_RE = /^\s+-\s+(description|icon|subtitle|location|bang|access):\s+(.+)$/;
 const WELCOME_RE = /^>\s*\[!WELCOME\]\s*(.*)$/i;
 const BLOCKQUOTE_RE = /^>\s?(.*)$/;
 
@@ -34,7 +34,7 @@ function slugify(text) {
 
 export function parseMarkdown(source) {
   const lines = source.split('\n');
-  const result = { title: null, location: null, bangs: [], welcome: null, categories: [] };
+  const result = { title: null, location: null, access: null, bangs: [], welcome: null, categories: [] };
 
   let currentCategory = null;
   let currentSubcategory = null;
@@ -135,6 +135,12 @@ export function parseMarkdown(source) {
         if (bangMatch) {
           result.bangs.push({ prefix: bangMatch[1], url: bangMatch[2] });
         }
+        continue;
+      }
+
+      // access: page-level access control (e.g. "open")
+      if (key === 'access' && !currentBookmark && !currentCategory) {
+        result.access = value.trim().toLowerCase();
         continue;
       }
 

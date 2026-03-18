@@ -485,16 +485,18 @@ function renderFooter(content, authRequired = false, authenticated = true) {
   });
 
   // Auth links in footer
+  let authHtml = '';
   if (authRequired && authenticated) {
-    html.push('    <p class="c-footer__auth"><button type="button" class="c-footer__logout js-logout">Log out</button></p>');
+    authHtml = '    <div class="c-footer__auth"><button type="button" class="c-footer__logout js-logout">Log out</button></div>';
   } else if (authRequired && !authenticated) {
-    html.push('    <p class="c-footer__auth"><button type="button" class="c-footer__login js-login-open">Log in to edit</button></p>');
+    authHtml = '    <div class="c-footer__auth"><button type="button" class="c-footer__login js-login-open">Log in to edit</button></div>';
   }
 
-  if (!html.length) return '';
+  if (!html.length && !authHtml) return '';
 
   return `  <footer class="c-footer" role="contentinfo">
-${html.join('\n')}
+${html.length ? `    <div class="c-footer__content">\n${html.join('\n')}\n    </div>` : ''}
+${authHtml}
   </footer>`;
 }
 

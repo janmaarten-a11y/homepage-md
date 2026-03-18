@@ -395,9 +395,18 @@ function sanitizeCategoryName(name) {
 // ---------------------------------------------------------------------------
 
 async function handleApiBookmark(req, res, slug) {
+  // Check auth — pages with access: open bypass auth
   if (!isAuthenticated(req)) {
-    sendUnauthorized(res);
-    return;
+    try {
+      const pageData = await loadPage(slug);
+      if (pageData.access !== 'open') {
+        sendUnauthorized(res);
+        return;
+      }
+    } catch {
+      sendUnauthorized(res);
+      return;
+    }
   }
 
   if (!hasCsrfHeader(req)) {
@@ -606,12 +615,18 @@ async function handleRequest(req, res) {
   // API: update location — PUT /api/location/{slug}
   const locationMatch = pathname.match(/^\/api\/location\/([a-zA-Z0-9_-]+)$/);
   if (locationMatch && req.method === 'PUT') {
-    if (!isAuthenticated(req)) { sendUnauthorized(res); return; }
+    const locSlug = locationMatch[1];
+    // Check auth — pages with access: open bypass auth
+    if (!isAuthenticated(req)) {
+      try {
+        const pd = await loadPage(locSlug);
+        if (pd.access !== 'open') { sendUnauthorized(res); return; }
+      } catch { sendUnauthorized(res); return; }
+    }
     if (!hasCsrfHeader(req)) { sendJSON(res, 403, { error: 'Missing CSRF header' }); return; }
     if (isRateLimited(req, RATE_LIMIT_MAX_WRITES)) { sendJSON(res, 429, { error: 'Too many requests' }); return; }
 
-    const slug = locationMatch[1];
-    const filePath = join(config.bookmarksDir, `${slug}.md`);
+    const filePath = join(config.bookmarksDir, `${locSlug}.md`);
     try {
       const body = JSON.parse(await readBody(req));
       const location = body.location?.trim() || null;
@@ -755,7 +770,11 @@ async function handleRequest(req, res) {
       const themeMatch = cookieHeader.match(/(?:^|;\s*)homepage-md-theme=([^;]+)/);
       const activeTheme = themeMatch ? decodeURIComponent(themeMatch[1]) : 'default';
 
-      const html = renderPage(pageData, { pages, currentSlug: slug, faviconUrls, categoryIcons, weatherIcons, uiIcons, defaultPage: config.defaultPage, footerContent, themes, activeTheme, authRequired: isAuthRequired(), authenticated: isAuthenticated(req) });
+      // Determine if this page allows editing
+      const pageIsOpen = pageData.access === 'open';
+      const authed = isAuthenticated(req);
+
+      const html = renderPage(pageData, { pages, currentSlug: slug, faviconUrls, categoryIcons, weatherIcons, uiIcons, defaultPage: config.defaultPage, footerContent, themes, activeTheme, authRequired: isAuthRequired(), authenticated: authed || pageIsOpen });
 
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       res.end(html);

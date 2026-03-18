@@ -303,6 +303,12 @@ try {
         const editBtn = card.querySelector('.js-edit-open');
         if (editBtn) editBtn.focus();
       });
+      // Remove the class when focus leaves this bookmark
+      card.addEventListener('focusout', (e) => {
+        if (!card.contains(e.relatedTarget)) {
+          card.classList.remove('is-focus-restore');
+        }
+      }, { once: false });
     }
   }
 } catch { /* ignore */ }
