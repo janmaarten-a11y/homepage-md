@@ -41,6 +41,8 @@
       --color-bg: oklch(18% 0.015 260);
       --color-text: oklch(92% 0.005 260);
       --color-primary: oklch(72% 0.14 260);
+      --color-primary-hover: oklch(64% 0.14 260);
+      --color-danger: oklch(65% 0.2 25);
       --color-surface: oklch(22% 0.015 260);
       --color-border: oklch(30% 0.015 260);
       --color-focus: oklch(72% 0.18 260);
@@ -1162,8 +1164,8 @@
   }
 
   .c-btn--primary:hover {
-    background-color: oklch(40% 0.16 260);
-    border-color: oklch(40% 0.16 260);
+    background-color: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
   }
 
   .c-btn--small {
@@ -1194,12 +1196,12 @@
   }
 
   .c-btn--danger {
-    color: oklch(55% 0.2 25);
-    border-color: oklch(55% 0.2 25);
+    color: var(--color-danger);
+    border-color: var(--color-danger);
   }
 
   .c-btn--danger:hover {
-    background-color: oklch(55% 0.2 25);
+    background-color: var(--color-danger);
     color: var(--color-bg);
   }
 
@@ -1804,13 +1806,16 @@
 
   /* Tooltip */
   .c-tooltip {
+    --tooltip-bg: oklch(20% 0.01 260);
+    --tooltip-fg: oklch(97% 0.005 260);
+
     position: fixed;
     z-index: 1000;
     max-inline-size: 15rem;
     padding: var(--space-xs) var(--space-s);
     border-radius: var(--radius-s);
-    background-color: oklch(20% 0.01 260);
-    color: oklch(97% 0.005 260);
+    background-color: var(--tooltip-bg);
+    color: var(--tooltip-fg);
     font-size: 0.875rem;
     line-height: 1.4;
     white-space: nowrap;
@@ -1834,67 +1839,54 @@
     inset-block-start: -10px;
     inset-inline-start: 50%;
     transform: translateX(-50%);
-    border-block-end-color: oklch(20% 0.01 260);
+    border-block-end-color: var(--tooltip-bg);
   }
 
   .c-tooltip[data-direction="n"]::after {
     inset-block-end: -10px;
     inset-inline-start: 50%;
     transform: translateX(-50%);
-    border-block-start-color: oklch(20% 0.01 260);
+    border-block-start-color: var(--tooltip-bg);
   }
 
   .c-tooltip[data-direction="e"]::after {
     inset-inline-start: -10px;
     inset-block-start: 50%;
     transform: translateY(-50%);
-    border-inline-end-color: oklch(20% 0.01 260);
+    border-inline-end-color: var(--tooltip-bg);
   }
 
   .c-tooltip[data-direction="w"]::after {
     inset-inline-end: -10px;
     inset-block-start: 50%;
     transform: translateY(-50%);
-    border-inline-start-color: oklch(20% 0.01 260);
+    border-inline-start-color: var(--tooltip-bg);
   }
 
   @media (prefers-color-scheme: dark) {
     .c-tooltip {
-      background-color: oklch(85% 0.005 260);
-      color: oklch(15% 0.01 260);
+      --tooltip-bg: oklch(85% 0.005 260);
+      --tooltip-fg: oklch(15% 0.01 260);
     }
-
-    .c-tooltip[data-direction="s"]::after { border-block-end-color: oklch(85% 0.005 260); }
-    .c-tooltip[data-direction="n"]::after { border-block-start-color: oklch(85% 0.005 260); }
-    .c-tooltip[data-direction="e"]::after { border-inline-end-color: oklch(85% 0.005 260); }
-    .c-tooltip[data-direction="w"]::after { border-inline-start-color: oklch(85% 0.005 260); }
   }
 
   .is-light .c-tooltip {
-    background-color: oklch(20% 0.01 260);
-    color: oklch(97% 0.005 260);
+    --tooltip-bg: oklch(20% 0.01 260);
+    --tooltip-fg: oklch(97% 0.005 260);
   }
-
-  .is-light .c-tooltip[data-direction="s"]::after { border-block-end-color: oklch(20% 0.01 260); }
-  .is-light .c-tooltip[data-direction="n"]::after { border-block-start-color: oklch(20% 0.01 260); }
-  .is-light .c-tooltip[data-direction="e"]::after { border-inline-end-color: oklch(20% 0.01 260); }
-  .is-light .c-tooltip[data-direction="w"]::after { border-inline-start-color: oklch(20% 0.01 260); }
 
   .is-dark .c-tooltip {
-    background-color: oklch(85% 0.005 260);
-    color: oklch(15% 0.01 260);
+    --tooltip-bg: oklch(85% 0.005 260);
+    --tooltip-fg: oklch(15% 0.01 260);
   }
-
-  .is-dark .c-tooltip[data-direction="s"]::after { border-block-end-color: oklch(85% 0.005 260); }
-  .is-dark .c-tooltip[data-direction="n"]::after { border-block-start-color: oklch(85% 0.005 260); }
-  .is-dark .c-tooltip[data-direction="e"]::after { border-inline-end-color: oklch(85% 0.005 260); }
-  .is-dark .c-tooltip[data-direction="w"]::after { border-inline-start-color: oklch(85% 0.005 260); }
 
   /* Color mode classes */
   .is-light {
     --color-bg: oklch(97% 0.005 260);
     --color-text: oklch(20% 0.01 260);
     --color-primary: oklch(48% 0.16 260);
+    --color-primary-hover: oklch(40% 0.16 260);
+    --color-danger: oklch(55% 0.2 25);
     --color-surface: oklch(100% 0 0);
     --color-border: oklch(88% 0.005 260);
     --color-focus: oklch(48% 0.2 260);
@@ -1908,6 +1900,8 @@
     --color-bg: oklch(18% 0.015 260);
     --color-text: oklch(92% 0.005 260);
     --color-primary: oklch(72% 0.14 260);
+    --color-primary-hover: oklch(64% 0.14 260);
+    --color-danger: oklch(65% 0.2 25);
     --color-surface: oklch(22% 0.015 260);
     --color-border: oklch(30% 0.015 260);
     --color-focus: oklch(72% 0.18 260);
@@ -2149,7 +2143,7 @@
   }
 
   .c-fab:hover {
-    background-color: oklch(40% 0.16 260);
+    background-color: var(--color-primary-hover);
   }
 
   /* Hide desktop Add button on mobile */
