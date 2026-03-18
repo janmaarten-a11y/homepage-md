@@ -63,6 +63,7 @@ All configuration is via environment variables. Copy `.env.example` to `.env` an
 | `ICONS_DIR` | `./icons` | Path to manual favicon overrides |
 | `FAVICON_CACHE_DIR` | `./favicon-cache` | Path to the favicon cache |
 | `CUSTOM_CSS_PATH` | `./custom.css` | Path to the user CSS overrides file |
+| `THEMES_DIR` | `./themes` | Path to the themes directory |
 | `FOOTER_PATH` | `./footer.md` | Path to the footer Markdown file |
 | `AUTH_TOKEN` | *(none)* | Shared passphrase for write endpoints (disabled by default) |
 | `FAVICON_TTL_DAYS` | `7` | Days before a cached favicon is re-fetched |
