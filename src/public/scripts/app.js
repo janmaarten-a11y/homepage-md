@@ -1582,9 +1582,41 @@ if (weatherBtn && weatherPanel) {
         const data = await res.json();
         if (!res.ok) throw new Error(data.error);
         locationDialog.close();
-        // Flag to focus location link after reload so user sees the change
-        try { sessionStorage.setItem('homepage-md-focus-weather-location', 'true'); } catch { /* ignore */ }
-        reloadAfterEdit();
+
+        // Suppress SSE reload from the file change
+        try { sessionStorage.setItem(SSE_SUPPRESS_KEY, String(Date.now())); } catch { /* ignore */ }
+
+        // Re-fetch weather for the new location without a full page reload
+        try {
+          const weatherRes = await fetch(`/api/weather/${encodeURIComponent(getPageSlug())}`);
+          const weatherData = await weatherRes.json();
+          if (weatherData) {
+            renderWeather(weatherData);
+            weatherPanel.hidden = false;
+            weatherBtn.setAttribute('aria-expanded', 'true');
+            localStorage.setItem(weatherStorageKey, 'true');
+            // Focus the location link so user sees the change
+            requestAnimationFrame(() => {
+              const locationLink = weatherPanel.querySelector('.c-weather-panel__location a');
+              if (locationLink) locationLink.focus();
+              // Swap icon to map-pin-check briefly
+              const editBtn = weatherPanel.querySelector('.js-location-edit');
+              if (editBtn) {
+                const checkIcon = wi('map-pin-check');
+                if (checkIcon) {
+                  const origHTML = editBtn.innerHTML;
+                  editBtn.innerHTML = checkIcon;
+                  editBtn.style.color = 'oklch(55% 0.2 145)';
+                  setTimeout(() => { editBtn.innerHTML = origHTML; editBtn.style.color = ''; }, 2000);
+                }
+              }
+            });
+          }
+        } catch {
+          // Fallback: reload if re-fetch fails
+          try { sessionStorage.setItem('homepage-md-focus-weather-location', 'true'); } catch { /* ignore */ }
+          reloadAfterEdit();
+        }
       } catch (err) {
         // Show error inline (reuse dialog pattern)
         locationInput.setCustomValidity(err.message);
