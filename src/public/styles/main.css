@@ -1127,7 +1127,7 @@
 
   .c-bookmark__tag {
     display: inline;
-    font-size: 1rem;
+    font-size: 0.875rem;
     color: var(--color-muted);
   }
 
