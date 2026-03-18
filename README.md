@@ -146,6 +146,21 @@ Aside from headings and `[Title](URL)`, everything is optional.
 - `- icon: url` — custom icon override (indented, under a bookmark)
 - Everything else is silently ignored — add comments, notes, or blank lines freely
 
+## Themes
+
+Themes are CSS files in `themes/`. The server discovers them at startup and lists them in the View options toolbar.
+
+1. Create a `.css` file in `themes/` (e.g., `themes/ocean.css`)
+2. Override design tokens (`:root { --color-bg: ...; }`) and/or component styles
+3. For light/dark mode support, add `.is-light` and `.is-dark` selectors
+4. Restart the server — the theme appears in the toolbar automatically
+
+The built-in Terminal theme (`themes/terminal.css`) is a full example. See `custom.css` for the complete list of design tokens.
+
+## Accessibility
+
+**homepage.md** is a personal project, but is designed to work well for everyone including people who use screen readers, keyboard-only navigation, or other assistive technologies. In addition to skip links, respecting reduced motion, and clear focus indicators, a lot of work has gone into keyboard accessibility. Every feature works without a mouse. A single tab stop per bookmark keeps navigation fast; arrow keys reveal edit and copy actions. Press `/` to jump to search and `?` for the full shortcut list.
+
 ## Keyboard shortcuts
 
 | Key | Action |
@@ -180,20 +195,6 @@ All write endpoints require `AUTH_TOKEN` when configured. Pages with `access: op
 | `PUT` | `/api/location/{slug}` | Update the location for a page |
 | `GET` | `/api/events` | Server-Sent Events stream for live updates |
 
-## Themes
-
-Themes are CSS files in `themes/`. The server discovers them at startup and lists them in the View options toolbar.
-
-1. Create a `.css` file in `themes/` (e.g., `themes/ocean.css`)
-2. Override design tokens (`:root { --color-bg: ...; }`) and/or component styles
-3. For light/dark mode support, add `.is-light` and `.is-dark` selectors
-4. Restart the server — the theme appears in the toolbar automatically
-
-The built-in Terminal theme (`themes/terminal.css`) is a full example. See `custom.css` for the complete list of design tokens.
-
-## Accessibility
-
-**homepage.md** is a personal project, but is designed to work well for everyone including people who use screen readers, keyboard-only navigation, or other assistive technologies. In addition to skip links, respecting reduced motion, and clear focus indicators, a lot of work has gone into keyboard accessibility. Every feature works without a mouse. A single tab stop per bookmark keeps navigation fast; arrow keys reveal edit and copy actions. Press `/` to jump to search and `?` for the full shortcut list.
 
 ## Development
 

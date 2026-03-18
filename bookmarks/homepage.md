@@ -43,9 +43,11 @@
 - [Home Assistant](http://homeassistant.local:8123)
   - description: Smart home dashboard
   - icon: https://brands.home-assistant.io/homeassistant/icon.png
+  - tags: self-hosted
 - [Pi-hole](http://pihole.local/admin)
   - description: DNS and ad blocking
   - icon: https://pi-hole.net/wp-content/uploads/2016/12/cropped-Vortex-R-32x32.png
+  - tags: self-hosted
 
 ### Home Server
   - subtitle: Admin panels for self-hosted services
@@ -53,10 +55,13 @@
 - [Plex](http://synology.local:32400/web)
   - description: Media server
   - icon: https://app.plex.tv/desktop/favicon.ico
+  - tags: self-hosted
 - [Nextcloud Portal](https://portal.nextcloud.com/login)
   - description: Self hosted cloud
+  - tags: self-hosted
 - [Mealie](https://mealie.org/login)
   - description: Recipe management
+  - tags: self-hosted
 
 ### Networking
   - icon: network
@@ -96,6 +101,7 @@
   - icon: book-headphones
 - [Libro.fm](https://libro.fm)
 - [Audiobookshelf](https://www.audiobookshelf.org/)
+  - tags: self-hosted
 
 ### Games
   - icon: gamepad-2
