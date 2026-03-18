@@ -129,8 +129,13 @@ function hideTooltip() {
   tooltipEl.classList.remove('is-visible');
 
   if (tooltipTrigger) {
-    tooltipTrigger.removeAttribute('aria-labelledby');
-    tooltipTrigger.removeAttribute('aria-describedby');
+    // Only remove ARIA attributes we added
+    if (tooltipTrigger.getAttribute('aria-labelledby') === 'js-tooltip') {
+      tooltipTrigger.removeAttribute('aria-labelledby');
+    }
+    if (tooltipTrigger.getAttribute('aria-describedby') === 'js-tooltip') {
+      tooltipTrigger.removeAttribute('aria-describedby');
+    }
     tooltipTrigger = null;
   }
 }
@@ -168,6 +173,7 @@ document.addEventListener('focusout', (e) => {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && tooltipTrigger) {
     hideTooltip();
+    e.stopImmediatePropagation();
   }
 });
 
@@ -1108,7 +1114,11 @@ if (applyAllBtn) {
       for (const key of toRemove) localStorage.removeItem(key);
     } catch { /* ignore */ }
     applyAllBtn.textContent = 'Applied!';
-    setTimeout(() => { applyAllBtn.textContent = 'Apply to all pages'; }, 1500);
+    applyAllBtn.setAttribute('aria-live', 'polite');
+    setTimeout(() => {
+      applyAllBtn.textContent = 'Apply to all pages';
+      applyAllBtn.removeAttribute('aria-live');
+    }, 1500);
   });
 }
 
