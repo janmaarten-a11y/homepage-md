@@ -129,8 +129,13 @@ function hideTooltip() {
   tooltipEl.classList.remove('is-visible');
 
   if (tooltipTrigger) {
-    tooltipTrigger.removeAttribute('aria-labelledby');
-    tooltipTrigger.removeAttribute('aria-describedby');
+    // Only remove ARIA attributes we added
+    if (tooltipTrigger.getAttribute('aria-labelledby') === 'js-tooltip') {
+      tooltipTrigger.removeAttribute('aria-labelledby');
+    }
+    if (tooltipTrigger.getAttribute('aria-describedby') === 'js-tooltip') {
+      tooltipTrigger.removeAttribute('aria-describedby');
+    }
     tooltipTrigger = null;
   }
 }
@@ -168,6 +173,7 @@ document.addEventListener('focusout', (e) => {
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape' && tooltipTrigger) {
     hideTooltip();
+    e.stopImmediatePropagation();
   }
 });
 
@@ -1108,7 +1114,11 @@ if (applyAllBtn) {
       for (const key of toRemove) localStorage.removeItem(key);
     } catch { /* ignore */ }
     applyAllBtn.textContent = 'Applied!';
-    setTimeout(() => { applyAllBtn.textContent = 'Apply to all pages'; }, 1500);
+    applyAllBtn.setAttribute('aria-live', 'polite');
+    setTimeout(() => {
+      applyAllBtn.textContent = 'Apply to all pages';
+      applyAllBtn.removeAttribute('aria-live');
+    }, 1500);
   });
 }
 
@@ -1308,7 +1318,7 @@ function renderWeather(data) {
   weatherIcon.innerHTML = wi(btnIconName, '\u2601\uFE0F');
   weatherLabel.textContent = `${data.current.temp}${data.units.temp}`;
   weatherBtn.disabled = false;
-  weatherBtn.setAttribute('aria-label', `Weather for ${locationName}: ${data.current.temp}${data.units.temp}, ${data.current.condition}. Activate to show forecast.`);
+  weatherBtn.setAttribute('aria-label', `Weather for ${locationName}: ${data.current.temp}${data.units.temp}, ${data.current.condition}`);
 
   // Forecast link — national weather service based on country
   const forecastUrl = getForecastUrl(data.location);
@@ -1703,7 +1713,7 @@ if (speedBtn && speedLabel) {
 
   function showSpeedResult(down, up) {
     speedLabel.textContent = `\u2193 ${down} \u2191 ${up}`;
-    speedBtn.setAttribute('aria-label', `Speed test result: ${down} megabits per second download, ${up} megabits per second upload. Activate to test again.`);
+    speedBtn.setAttribute('aria-label', `Speed test: ${down} Mbps down, ${up} Mbps up`);
   }
 
   function formatSpeed(mbps) {
