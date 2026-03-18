@@ -1,4 +1,4 @@
-# HomepageMD
+# homepage.md
 
 **Your bookmarks, in Markdown. Your homepage, everywhere.**
 
