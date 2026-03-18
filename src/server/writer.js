@@ -10,7 +10,7 @@ import { join, dirname } from 'node:path';
 
 const HEADING_RE = /^(#{1,3})\s+(.+)$/;
 const BOOKMARK_RE = /^-\s+\[([^\]]+)\]\(([^)]+)\)\s*$/;
-const METADATA_RE = /^\s+-\s+(description|icon):\s+(.+)$/;
+const METADATA_RE = /^\s+-\s+(description|icon|tags):\s+(.+)$/;
 
 /**
  * Write file atomically: write to a temp file then rename over the original.
@@ -32,6 +32,10 @@ function bookmarkToLines(bookmark) {
   }
   if (bookmark.icon) {
     lines.push(`  - icon: ${bookmark.icon}`);
+  }
+  const tags = Array.isArray(bookmark.tags) ? bookmark.tags.join(', ') : (bookmark.tags || '');
+  if (tags) {
+    lines.push(`  - tags: ${tags}`);
   }
   return lines;
 }
@@ -201,6 +205,7 @@ export async function updateBookmark(filePath, url, updates) {
     url: bookmarkMatch[2].trim(),
     description: null,
     icon: null,
+    tags: null,
   };
 
   for (let i = range.start + 1; i <= range.end; i++) {
@@ -216,6 +221,7 @@ export async function updateBookmark(filePath, url, updates) {
     url: updates.url ?? current.url,
     description: updates.description !== undefined ? updates.description : current.description,
     icon: updates.icon !== undefined ? updates.icon : current.icon,
+    tags: updates.tags !== undefined ? updates.tags : current.tags,
   };
 
   // Replace old lines with new

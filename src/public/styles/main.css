@@ -274,7 +274,8 @@
   }
 
   /* TOC button wrapper */
-  .c-header__toc {
+  .c-header__toc,
+  .c-header__tags {
     position: relative;
     flex-shrink: 0;
   }
@@ -317,12 +318,19 @@
     border-radius: var(--radius-s);
     text-decoration: none;
     color: var(--color-text);
+    font: inherit;
     font-weight: 500;
     white-space: nowrap;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: start;
+    inline-size: 100%;
   }
 
   .c-popover__link:hover {
-    background-color: var(--color-bg);
+    color: var(--color-primary);
+    text-decoration: underline;
   }
 
   /* Weather button */
@@ -430,8 +438,8 @@
 
   .c-weather-panel__close {
     position: absolute;
-    inset-block-start: var(--space-s);
-    inset-inline-end: var(--space-s);
+    inset-block-start: var(--space-m);
+    inset-inline-end: var(--space-l);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -441,9 +449,8 @@
     border: 1px solid var(--color-border);
     background-color: var(--color-surface);
     color: var(--color-muted);
-    border-radius: var(--radius-m);
+    border-radius: 50%;
     cursor: pointer;
-    font-size: 1.25rem;
     line-height: 1;
   }
 
@@ -1110,6 +1117,24 @@
     max-inline-size: 70ch;
   }
 
+  .c-bookmark__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    padding-inline-start: calc(2rem + var(--space-s));
+    padding-block-start: var(--space-xs);
+  }
+
+  .c-bookmark__tag {
+    display: inline;
+    font-size: 0.875rem;
+    color: var(--color-muted);
+  }
+
+  .c-bookmark__tag::before {
+    content: "#";
+  }
+
   /* Hidden state for search filtering — must override layout modes */
   .c-bookmark[hidden],
   .c-category[hidden],
@@ -1240,8 +1265,8 @@
   }
 
   .c-dialog__close {
-    font-size: 1.25rem;
     flex-shrink: 0;
+    border-radius: 50%;
   }
 
   .c-dialog__label {
@@ -1464,7 +1489,8 @@
   }
 
   /* Condensed view */
-  .is-condensed .c-bookmark__description {
+  .is-condensed .c-bookmark__description,
+  .is-condensed .c-bookmark__tags {
     display: none;
   }
 
@@ -2044,8 +2070,9 @@
     margin-inline-start: auto;
   }
 
-  /* Search bar: hide TOC and Add, only show search */
-  .c-header__searchbar .c-header__toc {
+  /* Search bar: hide TOC, Tags, and Add, only show search */
+  .c-header__searchbar .c-header__toc,
+  .c-header__searchbar .c-header__tags {
     display: none;
   }
 
