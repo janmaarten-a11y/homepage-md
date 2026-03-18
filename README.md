@@ -139,7 +139,7 @@ Preferences are saved per page in the browser's `localStorage`. The "Apply to al
 
 ## Authentication
 
-When `AUTH_TOKEN` is set, HomepageMD operates in a **read-open, write-gated** mode:
+When `AUTH_TOKEN` is set, homepage.md operates in a **read-open, write-gated** mode:
 
 - **Without logging in** — visitors can browse bookmarks, use search, view weather, and run speed tests. Edit controls (Add Link, Edit, Copy URL, Edit Location) are hidden.
 - **After logging in** — a "Log in to edit" link in the footer opens a passphrase dialog. On success, a cookie is set and edit controls appear. A "Log out" link replaces it.
@@ -290,11 +290,11 @@ npm test       # Run all tests (Node.js built-in test runner)
 
 ### Remote access via Tailscale
 
-Install the [Tailscale package for Synology](https://tailscale.com/kb/1131/synology). Access HomepageMD from any device on your tailnet.
+Install the [Tailscale package for Synology](https://tailscale.com/kb/1131/synology). Access homepage.md from any device on your tailnet.
 
 ### Public sharing via Tailscale Funnel (advanced)
 
-[Tailscale Funnel](https://tailscale.com/kb/1223/funnel) can expose HomepageMD to the public internet without port forwarding or a reverse proxy:
+[Tailscale Funnel](https://tailscale.com/kb/1223/funnel) can expose homepage.md to the public internet without port forwarding or a reverse proxy:
 
 ```bash
 # On your Synology (with Tailscale installed)
@@ -303,7 +303,7 @@ tailscale funnel 2525
 
 This creates a public URL like `https://your-synology.ts.net` that anyone can access. Combined with `AUTH_TOKEN`, you can allow public read access while protecting write endpoints. Funnel handles HTTPS termination automatically.
 
-**Note:** Without Funnel, HomepageMD is only accessible within your tailnet. URL sharing only works with recipients who are on the same tailnet or have Tailscale node sharing configured.
+**Note:** Without Funnel, homepage.md is only accessible within your tailnet. URL sharing only works with recipients who are on the same tailnet or have Tailscale node sharing configured.
 
 ### Sync
 
@@ -311,7 +311,7 @@ Sync only the `bookmarks/` and `icons/` directories to family devices via Sync.c
 
 ## Accessibility
 
-HomepageMD is designed to work well for everyone, including people who use screen readers, keyboard-only navigation, or other assistive technologies.
+homepage.md is designed to work well for everyone, including people who use screen readers, keyboard-only navigation, or other assistive technologies.
 
 - **Keyboard accessible** — every feature works without a mouse. A single tab stop per bookmark keeps navigation fast; arrow keys reveal edit and copy actions. Press `/` to jump to search and `?` for the full shortcut list.
 - **Screen reader friendly** — headings, sections, and lists are structured so screen readers can navigate and announce content clearly. Search results and status messages are announced via live regions. Tooltips use `aria-describedby` to supplement button labels.
