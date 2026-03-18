@@ -21,7 +21,7 @@
 
 const HEADING_RE = /^(#{1,3})\s+(.+)$/;
 const BOOKMARK_RE = /^-\s+\[([^\]]+)\]\(([^)]+)\)\s*$/;
-const METADATA_RE = /^\s+-\s+(description|icon|subtitle|location|bang|access):\s+(.+)$/;
+const METADATA_RE = /^\s+-\s+(description|icon|subtitle|location|bang|access|tags):\s+(.+)$/;
 const WELCOME_RE = /^>\s*\[!WELCOME\]\s*(.*)$/i;
 const BLOCKQUOTE_RE = /^>\s?(.*)$/;
 
@@ -106,6 +106,7 @@ export function parseMarkdown(source) {
         url: url.trim(),
         description: null,
         icon: null,
+        tags: [],
       };
       const target = currentSubcategory || currentCategory;
       target.bookmarks.push(currentBookmark);
@@ -151,12 +152,14 @@ export function parseMarkdown(source) {
         continue;
       }
 
-      // description/icon apply to the current bookmark
+      // description/icon/tags apply to the current bookmark
       if (currentBookmark) {
         if (key === 'description') {
           currentBookmark.description = value.trim();
         } else if (key === 'icon') {
           currentBookmark.icon = value.trim();
+        } else if (key === 'tags') {
+          currentBookmark.tags = value.split(',').map((t) => t.trim()).filter(Boolean);
         }
       }
       continue;

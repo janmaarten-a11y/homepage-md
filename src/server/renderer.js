@@ -157,6 +157,10 @@ ${addDialog}
         Icon URL <span class="c-dialog__hint">(optional)</span>
         <input type="url" name="icon" class="c-dialog__input js-edit-icon" placeholder="https://…">
       </label>
+      <label class="c-dialog__label">
+        Tags <span class="c-dialog__hint">(comma-separated, optional)</span>
+        <input type="text" name="tags" class="c-dialog__input js-edit-tags">
+      </label>
       <div class="c-dialog__actions c-dialog__actions--split">
         <button type="button" class="c-btn c-btn--danger js-edit-delete">Delete</button>
         <button type="submit" class="c-btn c-btn--primary">Save</button>
@@ -333,8 +337,10 @@ function renderAddDialog(categories, currentSlug) {
       <label class="c-dialog__label">
         Icon URL <span class="c-dialog__hint">(optional)</span>
         <input type="url" name="icon" class="c-dialog__input js-add-icon" placeholder="https://…">
-      </label>
-      <div class="c-dialog__actions">
+      </label>      <label class="c-dialog__label">
+        Tags <span class="c-dialog__hint">(comma-separated, optional)</span>
+        <input type="text" name="tags" class="c-dialog__input js-add-tags" placeholder="tailscale, admin">
+      </label>      <div class="c-dialog__actions">
         <button type="submit" class="c-btn c-btn--primary">Add Link</button>
       </div>
     </form>
@@ -435,25 +441,31 @@ function renderBookmark(bookmark, faviconUrls, categoryName, subcategoryName) {
     ? `\n            <p class="c-bookmark__description">${escapeHtml(bookmark.description)}</p>`
     : '';
 
-  const searchText = [bookmark.title, bookmark.description || '', bookmark.url].join(' ');
+  const searchText = [bookmark.title, bookmark.description || '', bookmark.url, ...(bookmark.tags || [])].join(' ');
   const iconData = bookmark.icon ? ` data-icon="${escapeAttr(bookmark.icon)}"` : '';
   const catData = categoryName ? ` data-category="${escapeAttr(categoryName)}"` : '';
   const subData = subcategoryName ? ` data-subcategory="${escapeAttr(subcategoryName)}"` : '';
+  const tagsStr = (bookmark.tags || []).join(', ');
+  const tagsData = tagsStr ? ` data-tags="${escapeAttr(tagsStr)}"` : '';
 
   const ICON_EDIT = _uiIcons['pencil'] || '&#9998;';
   const ICON_COPY = _uiIcons['copy'] || '&#128203;';
 
+  const tagsHtml = bookmark.tags?.length
+    ? `\n            <div class="c-bookmark__tags">${bookmark.tags.map((t) => `<span class="c-bookmark__tag">${escapeHtml(t)}</span>`).join('')}</div>`
+    : '';
+
   let displayUrl;
   try { displayUrl = new URL(bookmark.url).hostname; } catch { displayUrl = bookmark.url; }
 
-  return `          <li class="c-bookmark" data-search="${escapeAttr(searchText.toLowerCase())}" data-url="${escapeAttr(bookmark.url)}"${iconData}${catData}${subData} aria-roledescription="bookmark, use arrow keys for actions">
+  return `          <li class="c-bookmark" data-search="${escapeAttr(searchText.toLowerCase())}" data-url="${escapeAttr(bookmark.url)}"${iconData}${catData}${subData}${tagsData} aria-roledescription="bookmark, use arrow keys for actions">
             <div class="c-bookmark__header">
               <div class="c-bookmark__content">
                 <a href="${escapeAttr(bookmark.url)}" class="c-bookmark__link">
                   <img src="${escapeAttr(faviconUrl)}" alt="" class="c-bookmark__icon" loading="lazy" width="32" height="32">
                   <span class="c-bookmark__title">${escapeHtml(bookmark.title)}</span>
                   <span class="c-bookmark__url">${escapeHtml(displayUrl)}</span>
-                </a>${description}
+                </a>${description}${tagsHtml}
               </div>
 ${_canEdit ? `              <div class="c-bookmark__actions">
                 <button type="button" class="c-btn c-btn--icon js-edit-open" aria-label="Edit ${escapeAttr(bookmark.title)}" tabindex="-1" data-tooltip="Edit" data-tooltip-type="description" data-tooltip-direction="s">${ICON_EDIT}</button>

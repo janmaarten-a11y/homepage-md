@@ -621,6 +621,7 @@ if (addForm) {
         url: formData.get('url'),
         description: formData.get('description') || null,
         icon: formData.get('icon') || null,
+        tags: formData.get('tags') || null,
         category: formData.get('category'),
         subcategory: formData.get('subcategory') || null,
       });
@@ -704,6 +705,8 @@ document.addEventListener('click', (event) => {
   editTitle.value = titleEl?.textContent || '';
   editDescription.value = descEl?.textContent || '';
   if (editIcon) editIcon.value = iconUrl;
+  const editTags = editDialog.querySelector('.js-edit-tags');
+  if (editTags) editTags.value = card.dataset.tags || '';
   const editCategory = editDialog.querySelector('.js-edit-category');
   const editSubcategory = editDialog.querySelector('.js-edit-subcategory');
   if (editCategory) editCategory.value = categoryName;
@@ -733,6 +736,7 @@ if (editForm) {
         newUrl: editUrl.value !== originalUrl ? editUrl.value : undefined,
         description: editDescription.value || null,
         icon: editIcon?.value || null,
+        tags: editDialog.querySelector('.js-edit-tags')?.value || null,
         category: categoryChanged ? editCategoryVal : undefined,
         subcategory: categoryChanged ? (editSubcategoryVal || undefined) : undefined,
       });

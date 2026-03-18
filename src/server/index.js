@@ -441,6 +441,7 @@ async function handleApiBookmark(req, res, slug) {
         url: body.url,
         description: body.description || null,
         icon: body.icon || null,
+        tags: body.tags || null,
         category: sanitizeCategoryName(body.category),
         subcategory: sanitizeCategoryName(body.subcategory) || null,
       });
@@ -488,6 +489,7 @@ async function handleApiBookmark(req, res, slug) {
           url: body.newUrl ?? current.url,
           description: body.description !== undefined ? body.description : current.description,
           icon: body.icon !== undefined ? body.icon : current.icon,
+          tags: body.tags !== undefined ? body.tags : (current.tags || []).join(', '),
           category: sanitizeCategoryName(body.category),
           subcategory: sanitizeCategoryName(body.subcategory) || null,
         });
@@ -497,6 +499,7 @@ async function handleApiBookmark(req, res, slug) {
           url: body.newUrl,
           description: body.description,
           icon: body.icon,
+          tags: body.tags,
         });
       }
       sendJSON(res, 200, { ok: true });
