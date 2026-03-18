@@ -144,6 +144,8 @@ function hideTooltip() {
 document.addEventListener('mouseenter', (e) => {
   const trigger = e.target.closest('[data-tooltip]');
   if (!trigger) return;
+  // If we're already showing a tooltip for this trigger, don't restart
+  if (tooltipTrigger === trigger) return;
   hideTooltip();
   tooltipTimeout = setTimeout(() => showTooltip(trigger), 50);
 }, true);
@@ -151,6 +153,8 @@ document.addEventListener('mouseenter', (e) => {
 document.addEventListener('mouseleave', (e) => {
   const trigger = e.target.closest('[data-tooltip]');
   if (!trigger) return;
+  // Don't hide if the cursor is moving to a child element within the same trigger
+  if (trigger.contains(e.relatedTarget)) return;
   hideTooltip();
 }, true);
 
