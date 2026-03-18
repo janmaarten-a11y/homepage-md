@@ -26,7 +26,7 @@
   - icon: home
 
 - [1Password](https://my.1password.com)
-  - description: Family credential manager
+  - description: Family credentials
 - [You Need A Budget](https://app.ynab.com)
   - description: Family budgeting
 ### Storage

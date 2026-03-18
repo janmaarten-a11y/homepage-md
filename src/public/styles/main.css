@@ -1739,6 +1739,28 @@
     display: none;
   }
 
+  .c-toolbar__apply-all {
+    display: block;
+    inline-size: 100%;
+    padding: var(--space-xs) var(--space-s);
+    border: none;
+    background: none;
+    color: var(--color-muted);
+    font-size: 1rem;
+    cursor: pointer;
+    text-align: center;
+  }
+
+  .c-toolbar__apply-all:hover {
+    color: var(--color-text);
+  }
+
+  .c-toolbar__apply-all:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: -2px;
+    border-radius: var(--radius-m);
+  }
+
   /* Small dialog variant (delete confirmation) */
   .c-dialog--small {
     max-inline-size: 24rem;

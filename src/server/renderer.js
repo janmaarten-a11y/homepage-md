@@ -226,6 +226,8 @@ ${themes.map((t) => {
           <button type="button" class="c-toolbar__btn js-color-btn" data-value="light" aria-pressed="false">${iconSun} <span class="c-toolbar__label">Light</span></button>
           <button type="button" class="c-toolbar__btn js-color-btn" data-value="dark" aria-pressed="false">${iconMoon} <span class="c-toolbar__label">Dark</span></button>
         </div>
+        <div class="c-toolbar__separator" aria-hidden="true"></div>
+        <button type="button" class="c-toolbar__apply-all js-apply-all">Apply to all pages</button>
       </div>`;
 }
 
