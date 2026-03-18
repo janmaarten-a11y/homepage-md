@@ -845,6 +845,8 @@ function getViewPrefs() {
   try {
     const stored = localStorage.getItem(`homepage-md-view-${slug}`);
     if (stored) return JSON.parse(stored);
+    const global = localStorage.getItem('homepage-md-view');
+    if (global) return JSON.parse(global);
   } catch { /* ignore */ }
   return { density: 'detailed', layout: 'grid', colorMode: 'system', theme: 'default' };
 }
@@ -931,6 +933,26 @@ for (const btn of document.querySelectorAll('.js-theme-btn')) {
     viewPrefs.theme = btn.dataset.value;
     saveViewPrefs(viewPrefs);
     applyView(viewPrefs);
+  });
+}
+
+// Apply to all pages
+const applyAllBtn = document.querySelector('.js-apply-all');
+if (applyAllBtn) {
+  applyAllBtn.addEventListener('click', () => {
+    // Save current prefs as global default
+    try {
+      localStorage.setItem('homepage-md-view', JSON.stringify(viewPrefs));
+      // Remove all per-page overrides
+      const toRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('homepage-md-view-')) toRemove.push(key);
+      }
+      for (const key of toRemove) localStorage.removeItem(key);
+    } catch { /* ignore */ }
+    applyAllBtn.textContent = 'Applied!';
+    setTimeout(() => { applyAllBtn.textContent = 'Apply to all pages'; }, 1500);
   });
 }
 
