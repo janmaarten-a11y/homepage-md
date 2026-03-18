@@ -330,7 +330,7 @@
 
   .c-popover__link:hover {
     color: var(--color-primary);
-    font-weight: 700;
+    text-decoration: underline;
   }
 
   /* Weather button */
