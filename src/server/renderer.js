@@ -62,19 +62,19 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, category
   <a href="#main-content" class="c-skip-link">Skip to content</a>
   <header class="c-header">
     <div class="c-header__top">
-      <button type="button" class="c-header__menu-btn js-menu-toggle" aria-expanded="false" aria-controls="js-menu-drawer" aria-label="Menu">${iconMenu}</button>
+      <button type="button" class="c-header__menu-btn js-menu-toggle" aria-expanded="false" aria-controls="js-menu-drawer" aria-label="Menu" data-tooltip="Menu" data-tooltip-type="description" data-tooltip-direction="s">${iconMenu}</button>
       <h1 class="c-header__title">${escapeHtml(title)}</h1>
 ${nav}
       <div class="c-header__actions">
-${hasLocation ? `        <button type="button" class="c-weather-btn js-weather-toggle" aria-expanded="false" aria-controls="js-weather-panel" aria-label="Loading weather\u2026" disabled>
+${hasLocation ? `        <button type="button" class="c-weather-btn js-weather-toggle" aria-expanded="false" aria-controls="js-weather-panel" aria-label="Loading weather\u2026" data-tooltip="Weather forecast" data-tooltip-type="description" data-tooltip-direction="s" disabled>
           <span class="c-weather-btn__icon js-weather-icon" aria-hidden="true">${weatherIcons['cloud'] || '\u2601\uFE0F'}</span>
           <span class="c-weather-btn__label js-weather-label">\u2022\u2022\u2022</span>
         </button>` : ''}
-        <button type="button" class="c-speed-btn js-speed-test" aria-live="polite">
+        <button type="button" class="c-speed-btn js-speed-test" aria-live="polite" data-tooltip="Run speed test" data-tooltip-type="description" data-tooltip-direction="s">
           <span class="c-speed-btn__icon" aria-hidden="true">${weatherIcons['signal'] || '\uD83D\uDCF6'}</span>
           <span class="c-speed-btn__label js-speed-label">Speed test</span>
         </button>
-        <button type="button" class="c-header__action-btn js-view-toggle" aria-expanded="false" aria-controls="js-view-popover" aria-label="View options">${iconSettings}</button>
+        <button type="button" class="c-header__action-btn js-view-toggle" aria-expanded="false" aria-controls="js-view-popover" aria-label="View options" data-tooltip="View options" data-tooltip-type="description" data-tooltip-direction="s">${iconSettings}</button>
         <div class="c-popover js-view-popover" id="js-view-popover" hidden>
 ${toolbar}
         </div>
@@ -114,7 +114,7 @@ ${addDialog}
     <form method="dialog" class="c-dialog__form js-edit-form">
       <div class="c-dialog__header">
         <h2 class="c-dialog__title">Edit Bookmark</h2>
-        <button type="button" class="c-btn c-btn--icon c-dialog__close js-edit-cancel" aria-label="Close">&times;</button>
+        <button type="button" class="c-btn c-btn--icon c-dialog__close js-edit-cancel" aria-label="Close" data-tooltip="Close" data-tooltip-type="description" data-tooltip-direction="w">&times;</button>
       </div>
       <div class="c-dialog__error js-edit-error" role="alert" hidden></div>
       <input type="hidden" name="originalUrl" class="js-edit-original-url">
@@ -163,7 +163,7 @@ ${hasLocation ? `  <dialog class="c-dialog c-dialog--small js-location-dialog">
     <form method="dialog" class="c-dialog__form js-location-form">
       <div class="c-dialog__header">
         <h2 class="c-dialog__title">Edit Location</h2>
-        <button type="button" class="c-btn c-btn--icon c-dialog__close js-location-cancel" aria-label="Close">&times;</button>
+        <button type="button" class="c-btn c-btn--icon c-dialog__close js-location-cancel" aria-label="Close" data-tooltip="Close" data-tooltip-type="description" data-tooltip-direction="w">&times;</button>
       </div>
       <label class="c-dialog__label">
         Location <span class="c-dialog__hint">(city, state or zip code)</span>
@@ -204,14 +204,14 @@ function renderToolbar(themes = ['default']) {
 
   return `      <div class="c-toolbar" role="toolbar" aria-label="View options">
         <div class="c-toolbar__group" role="group" aria-label="Layout">
-          <button type="button" class="c-toolbar__btn js-layout-btn" data-value="columns" aria-pressed="false" title="Columns layout">${iconColumns} <span class="c-toolbar__label">Columns</span></button>
-          <button type="button" class="c-toolbar__btn js-layout-btn" data-value="grid" aria-pressed="true" title="Rows layout">${iconRows} <span class="c-toolbar__label">Rows</span></button>
-          <button type="button" class="c-toolbar__btn js-layout-btn" data-value="list" aria-pressed="false" title="List layout">${iconList} <span class="c-toolbar__label">List</span></button>
+          <button type="button" class="c-toolbar__btn js-layout-btn" data-value="columns" aria-pressed="false">${iconColumns} <span class="c-toolbar__label">Columns</span></button>
+          <button type="button" class="c-toolbar__btn js-layout-btn" data-value="grid" aria-pressed="true">${iconRows} <span class="c-toolbar__label">Rows</span></button>
+          <button type="button" class="c-toolbar__btn js-layout-btn" data-value="list" aria-pressed="false">${iconList} <span class="c-toolbar__label">List</span></button>
         </div>
         <div class="c-toolbar__separator" aria-hidden="true"></div>
         <div class="c-toolbar__group" role="group" aria-label="Density">
-          <button type="button" class="c-toolbar__btn js-density-btn" data-value="detailed" aria-pressed="true" title="Detailed view">${iconDetailed} <span class="c-toolbar__label">Detailed</span></button>
-          <button type="button" class="c-toolbar__btn js-density-btn" data-value="condensed" aria-pressed="false" title="Condensed view">${iconCondensed} <span class="c-toolbar__label">Condensed</span></button>
+          <button type="button" class="c-toolbar__btn js-density-btn" data-value="detailed" aria-pressed="true">${iconDetailed} <span class="c-toolbar__label">Detailed</span></button>
+          <button type="button" class="c-toolbar__btn js-density-btn" data-value="condensed" aria-pressed="false">${iconCondensed} <span class="c-toolbar__label">Condensed</span></button>
         </div>
 ${themes.length > 1 ? `        <div class="c-toolbar__separator" aria-hidden="true"></div>
         <div class="c-toolbar__group" role="group" aria-label="Theme">
@@ -234,7 +234,7 @@ function renderDeleteDialog() {
     <form method="dialog" class="c-dialog__form">
       <div class="c-dialog__header">
         <h2 class="c-dialog__title">Delete Bookmark</h2>
-        <button type="button" class="c-btn c-btn--icon c-dialog__close js-delete-cancel" aria-label="Close">&times;</button>
+        <button type="button" class="c-btn c-btn--icon c-dialog__close js-delete-cancel" aria-label="Close" data-tooltip="Close" data-tooltip-type="description" data-tooltip-direction="w">&times;</button>
       </div>
       <div class="c-dialog__error js-delete-error" role="alert" hidden></div>
       <p class="c-dialog__message js-delete-message">Are you sure?</p>
@@ -252,7 +252,7 @@ function renderKeyboardHelp() {
     <div class="c-dialog__form">
       <div class="c-dialog__header">
         <h2 class="c-dialog__title">Keyboard Shortcuts</h2>
-        <button type="button" class="c-btn c-btn--icon c-dialog__close js-keyboard-help-close" aria-label="Close">&times;</button>
+        <button type="button" class="c-btn c-btn--icon c-dialog__close js-keyboard-help-close" aria-label="Close" data-tooltip="Close" data-tooltip-type="description" data-tooltip-direction="w">&times;</button>
       </div>
       <dl class="c-shortcut-list">
         <div class="c-shortcut-list__item"><dt><kbd>/</kbd></dt><dd>Focus search</dd></div>
@@ -276,7 +276,7 @@ function renderTocPopover(categories, uiIcons = {}) {
     .join('\n');
 
   return `      <div class="c-header__toc">
-        <button type="button" class="c-header__action-btn js-toc-toggle" aria-expanded="false" aria-controls="js-toc-popover" aria-label="Categories">${iconToc}</button>
+        <button type="button" class="c-header__action-btn js-toc-toggle" aria-expanded="false" aria-controls="js-toc-popover" aria-label="Categories" data-tooltip="Categories" data-tooltip-type="description" data-tooltip-direction="s">${iconToc}</button>
         <nav class="c-popover c-popover--toc js-toc-popover" id="js-toc-popover" aria-label="Categories" hidden>
 ${links}
         </nav>
@@ -288,7 +288,7 @@ function renderAddDialog(categories, currentSlug) {
     <form method="dialog" class="c-dialog__form js-add-form">
       <div class="c-dialog__header">
         <h2 class="c-dialog__title">Add Link</h2>
-        <button type="button" class="c-btn c-btn--icon c-dialog__close js-add-cancel" aria-label="Close">&times;</button>
+        <button type="button" class="c-btn c-btn--icon c-dialog__close js-add-cancel" aria-label="Close" data-tooltip="Close" data-tooltip-type="description" data-tooltip-direction="w">&times;</button>
       </div>
       <input type="hidden" name="page" value="${escapeAttr(currentSlug)}">
       <div class="c-dialog__error js-add-error" role="alert" hidden></div>
@@ -447,8 +447,8 @@ function renderBookmark(bookmark, faviconUrls, categoryName, subcategoryName) {
                 </a>${description}
               </div>
               <div class="c-bookmark__actions">
-                <button type="button" class="c-btn c-btn--icon js-edit-open" aria-label="Edit ${escapeAttr(bookmark.title)}" tabindex="-1">${ICON_EDIT}</button>
-                <button type="button" class="c-btn c-btn--icon js-copy-url" aria-label="Copy URL for ${escapeAttr(bookmark.title)}" tabindex="-1">${ICON_COPY}</button>
+                <button type="button" class="c-btn c-btn--icon js-edit-open" aria-label="Edit ${escapeAttr(bookmark.title)}" tabindex="-1" data-tooltip="Edit" data-tooltip-type="description" data-tooltip-direction="s">${ICON_EDIT}</button>
+                <button type="button" class="c-btn c-btn--icon js-copy-url" aria-label="Copy URL for ${escapeAttr(bookmark.title)}" tabindex="-1" data-tooltip="Copy link" data-tooltip-type="description" data-tooltip-direction="s">${ICON_COPY}</button>
               </div>
             </div>
           </li>`;

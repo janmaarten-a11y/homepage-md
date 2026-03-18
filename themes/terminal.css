@@ -506,3 +506,28 @@ body {
 .is-light .is-list .c-bookmark:hover {
   box-shadow: none;
 }
+
+/* Tooltip */
+.c-tooltip {
+  background-color: oklch(15% 0.02 140);
+  color: oklch(78% 0.22 140);
+  border: 1px solid var(--color-border);
+  font-family: var(--font-mono);
+  border-radius: 0;
+}
+
+.c-tooltip[data-direction="s"]::after { border-block-end-color: oklch(15% 0.02 140); }
+.c-tooltip[data-direction="n"]::after { border-block-start-color: oklch(15% 0.02 140); }
+.c-tooltip[data-direction="e"]::after { border-inline-end-color: oklch(15% 0.02 140); }
+.c-tooltip[data-direction="w"]::after { border-inline-start-color: oklch(15% 0.02 140); }
+
+.is-light .c-tooltip {
+  background-color: oklch(25% 0.04 140);
+  color: oklch(85% 0.15 140);
+  border-color: oklch(50% 0.08 140);
+}
+
+.is-light .c-tooltip[data-direction="s"]::after { border-block-end-color: oklch(25% 0.04 140); }
+.is-light .c-tooltip[data-direction="n"]::after { border-block-start-color: oklch(25% 0.04 140); }
+.is-light .c-tooltip[data-direction="e"]::after { border-inline-end-color: oklch(25% 0.04 140); }
+.is-light .c-tooltip[data-direction="w"]::after { border-inline-start-color: oklch(25% 0.04 140); }

@@ -27,6 +27,159 @@ function clearError(errorEl) {
   errorEl.hidden = true;
 }
 
+// ---------------------------------------------------------------------------
+// Tooltips — Primer-style accessible tooltips
+// ---------------------------------------------------------------------------
+
+const tooltipEl = (() => {
+  const el = document.createElement('span');
+  el.className = 'c-tooltip';
+  el.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(el);
+  return el;
+})();
+
+let tooltipTimeout = null;
+let tooltipTrigger = null;
+
+function positionTooltip(trigger, direction) {
+  const rect = trigger.getBoundingClientRect();
+  const gap = 8;
+
+  // Position based on preferred direction, then flip if out of viewport
+  const placements = {
+    s: () => ({ top: rect.bottom + gap, left: rect.left + rect.width / 2 }),
+    n: () => ({ top: rect.top - gap, left: rect.left + rect.width / 2 }),
+    e: () => ({ top: rect.top + rect.height / 2, left: rect.right + gap }),
+    w: () => ({ top: rect.top + rect.height / 2, left: rect.left - gap }),
+  };
+
+  // Try preferred, then opposite, then the other axis
+  const fallbacks = { s: ['s', 'n', 'e', 'w'], n: ['n', 's', 'e', 'w'], e: ['e', 'w', 's', 'n'], w: ['w', 'e', 's', 'n'] };
+  const attempts = fallbacks[direction] || fallbacks.s;
+
+  for (const dir of attempts) {
+    const pos = placements[dir]();
+    tooltipEl.style.top = '0';
+    tooltipEl.style.left = '0';
+    tooltipEl.dataset.direction = dir;
+
+    // Measure tooltip
+    tooltipEl.style.visibility = 'hidden';
+    tooltipEl.classList.add('is-visible');
+    const ttRect = tooltipEl.getBoundingClientRect();
+    tooltipEl.classList.remove('is-visible');
+    tooltipEl.style.visibility = '';
+
+    let top, left;
+    if (dir === 's' || dir === 'n') {
+      left = pos.left - ttRect.width / 2;
+      top = dir === 's' ? pos.top : pos.top - ttRect.height;
+    } else {
+      top = pos.top - ttRect.height / 2;
+      left = dir === 'e' ? pos.left : pos.left - ttRect.width;
+    }
+
+    // Clamp to viewport
+    const vw = document.documentElement.clientWidth;
+    const vh = document.documentElement.clientHeight;
+    if (top >= 0 && top + ttRect.height <= vh && left >= 0 && left + ttRect.width <= vw) {
+      tooltipEl.style.top = `${top}px`;
+      tooltipEl.style.left = `${left}px`;
+      return;
+    }
+  }
+
+  // Last resort: clamp to viewport with preferred direction
+  const pos = placements[direction]();
+  const ttRect2 = tooltipEl.getBoundingClientRect();
+  const vw = document.documentElement.clientWidth;
+  const vh = document.documentElement.clientHeight;
+  tooltipEl.dataset.direction = direction;
+  tooltipEl.style.top = `${Math.max(0, Math.min(pos.top - (direction === 'n' ? ttRect2.height : 0), vh - ttRect2.height))}px`;
+  tooltipEl.style.left = `${Math.max(0, Math.min(pos.left - ttRect2.width / 2, vw - ttRect2.width))}px`;
+}
+
+function showTooltip(trigger) {
+  const text = trigger.getAttribute('data-tooltip');
+  if (!text) return;
+  const type = trigger.getAttribute('data-tooltip-type') || 'label';
+  const direction = trigger.getAttribute('data-tooltip-direction') || 's';
+
+  tooltipEl.textContent = text;
+
+  // Wire up ARIA — role="tooltip" only for description type (per Primer spec)
+  const id = 'js-tooltip';
+  tooltipEl.id = id;
+  if (type === 'label') {
+    trigger.setAttribute('aria-labelledby', id);
+    tooltipEl.removeAttribute('role');
+  } else {
+    trigger.setAttribute('aria-describedby', id);
+    tooltipEl.setAttribute('role', 'tooltip');
+  }
+
+  tooltipTrigger = trigger;
+  positionTooltip(trigger, direction);
+  tooltipEl.classList.add('is-visible');
+}
+
+function hideTooltip() {
+  if (tooltipTimeout) { clearTimeout(tooltipTimeout); tooltipTimeout = null; }
+  tooltipEl.classList.remove('is-visible');
+
+  if (tooltipTrigger) {
+    tooltipTrigger.removeAttribute('aria-labelledby');
+    tooltipTrigger.removeAttribute('aria-describedby');
+    tooltipTrigger = null;
+  }
+}
+
+// Delegated event listeners
+document.addEventListener('mouseenter', (e) => {
+  const trigger = e.target.closest('[data-tooltip]');
+  if (!trigger) return;
+  hideTooltip();
+  tooltipTimeout = setTimeout(() => showTooltip(trigger), 50);
+}, true);
+
+document.addEventListener('mouseleave', (e) => {
+  const trigger = e.target.closest('[data-tooltip]');
+  if (!trigger) return;
+  hideTooltip();
+}, true);
+
+document.addEventListener('focusin', (e) => {
+  const trigger = e.target.closest('[data-tooltip]');
+  if (!trigger) return;
+  // Only show on :focus-visible
+  try { if (!trigger.matches(':focus-visible')) return; } catch { /* ignore */ }
+  hideTooltip();
+  showTooltip(trigger);
+});
+
+document.addEventListener('focusout', (e) => {
+  const trigger = e.target.closest('[data-tooltip]');
+  if (!trigger) return;
+  hideTooltip();
+});
+
+// Escape dismisses tooltip without moving focus
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && tooltipTrigger) {
+    hideTooltip();
+  }
+});
+
+// Keep tooltip visible when hovering over the tooltip itself
+tooltipEl.addEventListener('mouseenter', () => {
+  if (tooltipTimeout) { clearTimeout(tooltipTimeout); tooltipTimeout = null; }
+});
+tooltipEl.addEventListener('mouseleave', () => {
+  hideTooltip();
+});
+
+// ---------------------------------------------------------------------------
 // Track which element opened each dialog so we can return focus
 const dialogOpeners = new WeakMap();
 const dialogTargetBtns = new WeakMap();
@@ -604,17 +757,20 @@ document.addEventListener('click', (event) => {
   navigator.clipboard.writeText(url).then(() => {
     const origLabel = copyBtn.getAttribute('aria-label');
     const origHTML = copyBtn.innerHTML;
+    const origTooltip = copyBtn.getAttribute('data-tooltip');
 
     // Swap to check icon + green color
     const checkIcon = pageData.weatherIcons?.['clipboard-check'];
     if (checkIcon) copyBtn.innerHTML = checkIcon;
     copyBtn.style.color = 'oklch(55% 0.2 145)';
     copyBtn.setAttribute('aria-label', 'Copied!');
+    copyBtn.setAttribute('data-tooltip', 'Copied!');
 
     setTimeout(() => {
       copyBtn.innerHTML = origHTML;
       copyBtn.style.color = '';
       copyBtn.setAttribute('aria-label', origLabel);
+      copyBtn.setAttribute('data-tooltip', origTooltip);
       if (document.activeElement === copyBtn || document.activeElement === document.body) {
         copyBtn.focus();
       }
