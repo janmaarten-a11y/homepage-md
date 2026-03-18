@@ -274,7 +274,8 @@
   }
 
   /* TOC button wrapper */
-  .c-header__toc {
+  .c-header__toc,
+  .c-header__tags {
     position: relative;
     flex-shrink: 0;
   }
@@ -2063,8 +2064,9 @@
     margin-inline-start: auto;
   }
 
-  /* Search bar: hide TOC and Add, only show search */
-  .c-header__searchbar .c-header__toc {
+  /* Search bar: hide TOC, Tags, and Add, only show search */
+  .c-header__searchbar .c-header__toc,
+  .c-header__searchbar .c-header__tags {
     display: none;
   }
 

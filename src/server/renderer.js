@@ -34,6 +34,15 @@ export function renderPage(pageData, { pages, currentSlug, faviconUrls, category
     c.subcategories.map((s) => ({ category: c.name, subcategory: s.name }))
   );
 
+  // Collect unique tags from all bookmarks
+  const allTags = [...new Set(
+    pageData.categories.flatMap((c) => [
+      ...c.bookmarks.flatMap((b) => b.tags || []),
+      ...c.subcategories.flatMap((s) => s.bookmarks.flatMap((b) => b.tags || []))
+    ])
+  )].sort();
+  const tagsPopover = renderTagsPopover(allTags, uiIcons);
+
   const search = renderSearch();
   const toolbar = renderToolbar(themes);
   const addDialog = canEdit ? renderAddDialog(categories, currentSlug) : '';
@@ -93,6 +102,7 @@ ${hasLocation ? `    <section class="c-weather-panel js-weather-panel" id="js-we
     </section>` : ''}
     <div class="c-header__searchbar">
 ${tocPopover}
+${tagsPopover}
 ${search}
 ${canEdit ? `      <button type="button" class="c-header__add-btn c-btn c-btn--primary js-add-open">${iconAddLink} <span>Add link</span></button>` : ''}
     </div>
@@ -157,9 +167,12 @@ ${addDialog}
         Icon URL <span class="c-dialog__hint">(optional)</span>
         <input type="url" name="icon" class="c-dialog__input js-edit-icon" placeholder="https://…">
       </label>
-      <label class="c-dialog__label">
+      <label class="c-dialog__label" id="edit-tags-label">
         Tags <span class="c-dialog__hint">(comma-separated, optional)</span>
-        <input type="text" name="tags" class="c-dialog__input js-edit-tags">
+        <div class="c-combobox">
+          <input type="text" name="tags" class="c-dialog__input c-combobox__input js-edit-tags" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="js-edit-tags-listbox" aria-labelledby="edit-tags-label" autocomplete="off">
+          <ul class="c-combobox__listbox js-edit-tags-listbox" id="js-edit-tags-listbox" role="listbox" hidden></ul>
+        </div>
       </label>
       <div class="c-dialog__actions c-dialog__actions--split">
         <button type="button" class="c-btn c-btn--danger js-edit-delete">Delete</button>
@@ -184,7 +197,7 @@ ${hasLocation ? `  <dialog class="c-dialog c-dialog--small js-location-dialog">
       </div>
     </form>
   </dialog>` : ''}
-  <script id="js-page-data" type="application/json">${JSON.stringify({ categories, subcategories: subcategoryPairs, bangs: pageData.bangs || [], weatherIcons, themes, authRequired, authenticated: canEdit })}</script>
+  <script id="js-page-data" type="application/json">${JSON.stringify({ categories, subcategories: subcategoryPairs, tags: allTags, bangs: pageData.bangs || [], weatherIcons, themes, authRequired, authenticated: canEdit })}</script>
 ${loginDialog}
   <script src="/scripts/app.js" type="module"></script>
 </body>
@@ -296,6 +309,23 @@ ${links}
       </div>`;
 }
 
+function renderTagsPopover(tags, uiIcons = {}) {
+  if (!tags.length) return '';
+
+  const iconTags = uiIcons['tags'] || '&#128196;';
+
+  const buttons = tags
+    .map((tag) => `        <button type="button" class="c-popover__link js-tag-filter" data-tag="${escapeAttr(tag)}">${escapeHtml(tag)}</button>`)
+    .join('\n');
+
+  return `      <div class="c-header__tags">
+        <button type="button" class="c-header__action-btn js-tags-toggle" aria-expanded="false" aria-controls="js-tags-popover" aria-label="Tags" data-tooltip="Tags" data-tooltip-type="description" data-tooltip-direction="s">${iconTags}</button>
+        <div class="c-popover c-popover--toc js-tags-popover" id="js-tags-popover" aria-label="Tags" hidden>
+${buttons}
+        </div>
+      </div>`;
+}
+
 function renderAddDialog(categories, currentSlug) {
   return `  <dialog class="c-dialog js-add-dialog">
     <form method="dialog" class="c-dialog__form js-add-form">
@@ -337,9 +367,12 @@ function renderAddDialog(categories, currentSlug) {
       <label class="c-dialog__label">
         Icon URL <span class="c-dialog__hint">(optional)</span>
         <input type="url" name="icon" class="c-dialog__input js-add-icon" placeholder="https://…">
-      </label>      <label class="c-dialog__label">
+      </label>      <label class="c-dialog__label" id="add-tags-label">
         Tags <span class="c-dialog__hint">(comma-separated, optional)</span>
-        <input type="text" name="tags" class="c-dialog__input js-add-tags" placeholder="tailscale, admin">
+        <div class="c-combobox">
+          <input type="text" name="tags" class="c-dialog__input c-combobox__input js-add-tags" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="js-add-tags-listbox" aria-labelledby="add-tags-label" autocomplete="off" placeholder="tailscale, admin">
+          <ul class="c-combobox__listbox js-add-tags-listbox" id="js-add-tags-listbox" role="listbox" hidden></ul>
+        </div>
       </label>      <div class="c-dialog__actions">
         <button type="submit" class="c-btn c-btn--primary">Add Link</button>
       </div>

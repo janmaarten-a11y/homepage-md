@@ -849,6 +849,8 @@ const viewToggle = document.querySelector('.js-view-toggle');
 const viewPopover = document.querySelector('.js-view-popover');
 const tocToggle = document.querySelector('.js-toc-toggle');
 const tocPopover = document.querySelector('.js-toc-popover');
+const tagsToggle = document.querySelector('.js-tags-toggle');
+const tagsPopover = document.querySelector('.js-tags-popover');
 const mainContent = document.getElementById('main-content');
 
 // --- Popover helpers (desktop) ---
@@ -879,6 +881,7 @@ function togglePopover(toggle, popover) {
     // Close other popovers first
     if (isPopoverOpen(viewPopover) && popover !== viewPopover) closePopover(viewToggle, viewPopover);
     if (isPopoverOpen(tocPopover) && popover !== tocPopover) closePopover(tocToggle, tocPopover);
+    if (isPopoverOpen(tagsPopover) && popover !== tagsPopover) closePopover(tagsToggle, tagsPopover);
     openPopover(toggle, popover);
   }
 }
@@ -891,10 +894,27 @@ if (tocToggle && tocPopover) {
   tocToggle.addEventListener('click', () => togglePopover(tocToggle, tocPopover));
 }
 
+if (tagsToggle && tagsPopover) {
+  tagsToggle.addEventListener('click', () => togglePopover(tagsToggle, tagsPopover));
+}
+
 // Close TOC popover when a link is clicked
 for (const link of document.querySelectorAll('.js-toc-link')) {
   link.addEventListener('click', () => {
     closePopover(tocToggle, tocPopover);
+  });
+}
+
+// Tag filter — clicking a tag populates search
+for (const btn of document.querySelectorAll('.js-tag-filter')) {
+  btn.addEventListener('click', () => {
+    closePopover(tagsToggle, tagsPopover);
+    const tag = btn.dataset.tag;
+    if (searchInput && tag) {
+      searchInput.value = tag;
+      searchInput.dispatchEvent(new Event('input', { bubbles: true }));
+      searchInput.focus();
+    }
   });
 }
 
@@ -910,6 +930,11 @@ document.addEventListener('click', (event) => {
       closePopover(tocToggle, tocPopover);
     }
   }
+  if (tagsPopover && isPopoverOpen(tagsPopover)) {
+    if (!tagsPopover.contains(event.target) && !tagsToggle.contains(event.target)) {
+      closePopover(tagsToggle, tagsPopover);
+    }
+  }
 });
 
 // Close popovers when tabbing out
@@ -922,6 +947,11 @@ document.addEventListener('focusin', (event) => {
   if (tocPopover && isPopoverOpen(tocPopover)) {
     if (!tocPopover.contains(event.target) && !tocToggle.contains(event.target)) {
       closePopover(tocToggle, tocPopover);
+    }
+  }
+  if (tagsPopover && isPopoverOpen(tagsPopover)) {
+    if (!tagsPopover.contains(event.target) && !tagsToggle.contains(event.target)) {
+      closePopover(tagsToggle, tagsPopover);
     }
   }
 });
@@ -988,6 +1018,11 @@ document.addEventListener('keydown', (event) => {
   if (isPopoverOpen(tocPopover)) {
     closePopover(tocToggle, tocPopover);
     tocToggle?.focus();
+    return;
+  }
+  if (isPopoverOpen(tagsPopover)) {
+    closePopover(tagsToggle, tagsPopover);
+    tagsToggle?.focus();
     return;
   }
   if (menuDrawer && isDrawerOpen(menuDrawer)) {
@@ -1239,6 +1274,114 @@ function initCombobox(input, listbox, options, { onSelect } = {}) {
   });
 }
 
+/** Combobox for comma-separated tags — autocompletes the tag after the last comma. */
+function initTagsCombobox(input, listbox, allTags) {
+  if (!input || !listbox || !allTags.length) return;
+
+  let activeIndex = -1;
+
+  function currentTag() {
+    const parts = input.value.split(',');
+    return (parts[parts.length - 1] || '').trim().toLowerCase();
+  }
+
+  function existingTags() {
+    return input.value.split(',').slice(0, -1).map((t) => t.trim().toLowerCase()).filter(Boolean);
+  }
+
+  function renderOptions() {
+    const term = currentTag();
+    const used = new Set(existingTags());
+    const matches = allTags.filter((t) =>
+      t.toLowerCase().includes(term) && !used.has(t.toLowerCase())
+    );
+
+    listbox.innerHTML = '';
+    activeIndex = -1;
+
+    matches.forEach((tag, i) => {
+      const li = document.createElement('li');
+      li.textContent = tag;
+      li.dataset.value = tag;
+      li.className = 'c-combobox__option';
+      li.setAttribute('role', 'option');
+      li.id = `${listbox.id}-opt-${i}`;
+      li.addEventListener('click', () => selectTag(tag));
+      listbox.appendChild(li);
+    });
+
+    // Offer to create a new tag
+    if (term && !allTags.some((t) => t.toLowerCase() === term) && !used.has(term)) {
+      const li = document.createElement('li');
+      li.textContent = `Create "${term}"`;
+      li.dataset.value = term;
+      li.className = 'c-combobox__option c-combobox__option--new';
+      li.setAttribute('role', 'option');
+      li.id = `${listbox.id}-opt-new`;
+      li.addEventListener('click', () => selectTag(term));
+      listbox.appendChild(li);
+    }
+
+    const hasItems = listbox.children.length > 0;
+    listbox.hidden = !hasItems;
+    input.setAttribute('aria-expanded', String(!listbox.hidden));
+  }
+
+  function selectTag(tag) {
+    const parts = input.value.split(',').map((t) => t.trim()).filter(Boolean);
+    parts[parts.length - 1] = tag;
+    input.value = parts.join(', ') + ', ';
+    listbox.hidden = true;
+    input.setAttribute('aria-expanded', 'false');
+    input.removeAttribute('aria-activedescendant');
+    input.focus();
+  }
+
+  function setActive(index) {
+    const items = listbox.querySelectorAll('[role="option"]');
+    items.forEach((item) => item.removeAttribute('aria-selected'));
+    if (index >= 0 && index < items.length) {
+      activeIndex = index;
+      items[index].setAttribute('aria-selected', 'true');
+      input.setAttribute('aria-activedescendant', items[index].id);
+      items[index].scrollIntoView({ block: 'nearest' });
+    } else {
+      activeIndex = -1;
+      input.removeAttribute('aria-activedescendant');
+    }
+  }
+
+  input.addEventListener('input', () => renderOptions());
+  input.addEventListener('focus', () => renderOptions());
+
+  input.addEventListener('keydown', (event) => {
+    const items = listbox.querySelectorAll('[role="option"]');
+    if (!items.length || listbox.hidden) return;
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      setActive(Math.min(activeIndex + 1, items.length - 1));
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setActive(Math.max(activeIndex - 1, 0));
+    } else if (event.key === 'Enter' && activeIndex >= 0) {
+      event.preventDefault();
+      const selected = items[activeIndex];
+      if (selected) selectTag(selected.dataset.value);
+    } else if (event.key === 'Escape') {
+      listbox.hidden = true;
+      input.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!event.target.closest('.c-combobox') || !input.contains(event.target)) {
+      listbox.hidden = true;
+      input.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
+
 // Helper: find the parent category for a subcategory
 function findCategoryForSubcategory(subcategoryName) {
   const pair = (pageData.subcategories || []).find((s) => s.subcategory === subcategoryName);
@@ -1279,6 +1422,19 @@ initCombobox(
       if (cat && catInput) catInput.value = cat;
     },
   }
+);
+
+// Tags comboboxes
+const allTagOptions = (pageData.tags || []);
+initTagsCombobox(
+  document.querySelector('.js-add-tags'),
+  document.querySelector('.js-add-tags-listbox'),
+  allTagOptions
+);
+initTagsCombobox(
+  document.querySelector('.js-edit-tags'),
+  document.querySelector('.js-edit-tags-listbox'),
+  allTagOptions
 );
 
 // ---------------------------------------------------------------------------
