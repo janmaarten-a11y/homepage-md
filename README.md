@@ -18,7 +18,6 @@ A household bookmark dashboard that reads Markdown files and renders them as a c
 - **View modes** — Rows, Columns, or List layout × Detailed or Condensed density, saved per page with an option to apply to all pages
 - **Themes** — switchable themes via the View options toolbar; ships with Default and Terminal (CRT-inspired green-on-black)
 - **Dark mode** — automatic via `prefers-color-scheme`, or toggle manually between System, Light, and Dark
-- **Tooltips** — accessible Primer-style tooltips on icon buttons, showing on hover and keyboard focus
 - **Live updates** — Server-Sent Events push changes to all open browsers when files change
 - **Keyboard accessible** — every feature is reachable by keyboard, with shortcuts for common actions
 - **Category jump links** — table of contents for quick access to sections
@@ -298,7 +297,6 @@ HomepageMD is designed to work well for everyone, including people who use scree
 - **Dark mode** — respects the system color scheme preference.
 - **Target sizes** — buttons and links meet minimum touch and pointer target sizes.
 - **Reviewed against WCAG 2.2** — built with Level AA conformance as the goal.
-- **Tooltips** — Primer-style accessible tooltips on icon buttons: visible on hover and `:focus-visible`, dismissed with Escape, positioned with automatic viewport flipping.
 
 ## License
 
