@@ -1261,9 +1261,20 @@ function initCombobox(input, listbox, options, { onSelect } = {}) {
       if (selected) selectOption(selected.dataset.value || selected.textContent);
     } else if (event.key === 'Escape') {
       event.stopPropagation();
+      event.preventDefault();
       listbox.hidden = true;
       input.setAttribute('aria-expanded', 'false');
     }
+  });
+
+  // Close listbox when focus leaves the input
+  input.addEventListener('blur', () => {
+    setTimeout(() => {
+      if (!listbox.contains(document.activeElement)) {
+        listbox.hidden = true;
+        input.setAttribute('aria-expanded', 'false');
+      }
+    }, 150);
   });
 
   // Close listbox when clicking outside
@@ -1376,9 +1387,21 @@ function initTagsCombobox(input, listbox, allTags) {
       if (selected) selectTag(selected.dataset.value);
     } else if (event.key === 'Escape') {
       event.stopPropagation();
+      event.preventDefault();
       listbox.hidden = true;
       input.setAttribute('aria-expanded', 'false');
     }
+  });
+
+  // Close listbox when focus leaves the input
+  input.addEventListener('blur', () => {
+    // Delay to allow click on listbox option to fire first
+    setTimeout(() => {
+      if (!listbox.contains(document.activeElement)) {
+        listbox.hidden = true;
+        input.setAttribute('aria-expanded', 'false');
+      }
+    }, 150);
   });
 
   document.addEventListener('click', (event) => {

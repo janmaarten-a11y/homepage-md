@@ -318,8 +318,14 @@
     border-radius: var(--radius-s);
     text-decoration: none;
     color: var(--color-text);
+    font: inherit;
     font-weight: 500;
     white-space: nowrap;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: start;
+    inline-size: 100%;
   }
 
   .c-popover__link:hover {
