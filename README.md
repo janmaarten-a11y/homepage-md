@@ -322,6 +322,12 @@ homepage.md is designed to work well for everyone, including people who use scre
 - **Target sizes** — buttons and links meet minimum touch and pointer target sizes.
 - **Reviewed against WCAG 2.2** — built with Level AA conformance as the goal.
 
+## Roadmap
+
+- **Cross-page search** — search bookmarks across all pages, not just the current one
+- **More themes** — additional built-in themes beyond Default and Terminal
+- **Drag-and-drop reordering** — rearrange bookmarks and categories visually
+
 ## License
 
 [MIT](LICENSE)
