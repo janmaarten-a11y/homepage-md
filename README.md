@@ -69,9 +69,15 @@ cp .env.example .env
 npm start
 ```
 
-### NAS devices
+### NAS / Portainer
 
-Most NAS devices (Synology, QNAP, Unraid, etc.) support Docker via their package managers. Clone the repo, configure `.env`, and run `docker compose up -d`.
+A pre-built image is published to GitHub Container Registry on every push to main. Use `docker-compose.registry.yml` to pull it without building locally:
+
+```bash
+docker compose -f docker-compose.registry.yml up -d
+```
+
+In Portainer, create a new stack and paste the contents of `docker-compose.registry.yml`. Mount your `bookmarks/`, `icons/`, `themes/`, `custom.css`, and `footer.md` as volumes. Pull the latest image to update.
 
 ### Remote access
 

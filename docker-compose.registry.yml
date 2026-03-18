@@ -1,6 +1,11 @@
+# Docker Compose for pulling from GitHub Container Registry.
+# Use this with Portainer or on a NAS where you don't want to build locally.
+#
+# For local development, use docker-compose.yml instead (builds from source).
+
 services:
   homepage-md:
-    build: .
+    image: ghcr.io/janmaarten-a11y/homepage-md:latest
     container_name: homepage-md
     ports:
       - "2525:2525"
@@ -13,11 +18,6 @@ services:
       - favicon-cache:/app/favicon-cache
     env_file:
       - .env
-    environment:
-      - PORT=2525
-      - DEFAULT_PAGE=homepage
-      # - AUTH_TOKEN=your-secret-token
-      # - FAVICON_TTL_DAYS=7
     restart: unless-stopped
 
 volumes:

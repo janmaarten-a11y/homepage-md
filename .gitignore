@@ -6,4 +6,6 @@ Thumbs.db
 .env
 bookmarks/family.md
 .vscode/settings.json
-.github/
+.github/skills/
+.github/agents/
+.github/accessibility-instructions.md
