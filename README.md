@@ -66,6 +66,7 @@ All configuration is via environment variables. Copy `.env.example` to `.env` an
 | `THEMES_DIR` | `./themes` | Path to the themes directory |
 | `FOOTER_PATH` | `./footer.md` | Path to the footer Markdown file |
 | `AUTH_TOKEN` | *(none)* | Shared passphrase for write endpoints (disabled by default) |
+| `AUTH_COOKIE_DAYS` | `30` | Days the login cookie remains valid |
 | `FAVICON_TTL_DAYS` | `7` | Days before a cached favicon is re-fetched |
 
 ## Data format

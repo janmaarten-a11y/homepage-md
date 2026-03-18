@@ -1394,6 +1394,35 @@
     color: var(--color-text);
   }
 
+  .c-footer__auth {
+    margin-block-start: var(--space-s);
+  }
+
+  .c-footer__login,
+  .c-footer__logout {
+    background: none;
+    border: none;
+    color: var(--color-muted);
+    font: inherit;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    text-decoration-color: transparent;
+  }
+
+  .c-footer__login:hover,
+  .c-footer__logout:hover {
+    color: var(--color-text);
+    text-decoration-color: currentColor;
+  }
+
+  .c-footer__login:focus-visible,
+  .c-footer__logout:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+    border-radius: var(--radius-s);
+  }
+
   /* Keyboard shortcut help */
   .c-shortcut-list {
     margin: 0;
