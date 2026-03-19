@@ -11,7 +11,7 @@ services:
     image: ghcr.io/janmaarten-a11y/homepage-md:latest
     container_name: homepage-md
     ports:
-      - "${PORT:-2525}:${PORT:-2525}"
+      - "2525:2525"
     volumes:
       - ./bookmarks:/app/bookmarks
       - ./icons:/app/icons:ro
