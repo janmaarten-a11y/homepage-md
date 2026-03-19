@@ -8,7 +8,7 @@ RUN npm ci --omit=dev
 COPY src/ ./src/
 COPY themes/ ./themes/
 
-RUN mkdir -p favicon-cache
+RUN mkdir -p favicon-cache && chown node:node favicon-cache
 
 EXPOSE 2525
 
