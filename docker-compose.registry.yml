@@ -1,9 +1,6 @@
 # Docker Compose for pulling from GitHub Container Registry.
 # Use this with Portainer or on a NAS where you don't want to build locally.
 #
-# For Portainer: paste this into a new stack. Set environment variables
-# (PORT, DEFAULT_PAGE, AUTH_TOKEN, etc.) in the Portainer UI.
-#
 # For local development, use docker-compose.yml instead (builds from source).
 
 services:
@@ -13,18 +10,14 @@ services:
     ports:
       - "2525:2525"
     volumes:
-      - ./bookmarks:/app/bookmarks
-      - ./icons:/app/icons:ro
-      - ./custom.css:/app/custom.css:ro
-      - ./footer.md:/app/footer.md:ro
-      - ./themes:/app/themes:ro
-      - favicon-cache:/app/favicon-cache
-    environment:
-      - PORT=${PORT:-2525}
-      - DEFAULT_PAGE=${DEFAULT_PAGE:-homepage}
-      - AUTH_TOKEN=${AUTH_TOKEN:-}
-      - AUTH_COOKIE_DAYS=${AUTH_COOKIE_DAYS:-30}
-      - FAVICON_TTL_DAYS=${FAVICON_TTL_DAYS:-7}
+      - "./bookmarks:/app/bookmarks"
+      - "./icons:/app/icons:ro"
+      - "./custom.css:/app/custom.css:ro"
+      - "./footer.md:/app/footer.md:ro"
+      - "./themes:/app/themes:ro"
+      - "favicon-cache:/app/favicon-cache"
+    env_file:
+      - .env
     restart: unless-stopped
 
 volumes:
