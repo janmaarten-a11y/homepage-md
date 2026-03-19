@@ -1580,7 +1580,7 @@
     flex: 1;
   }
 
-  .is-columns .c-subcategory .c-bookmark__description {
+  .is-condensed.is-columns .c-subcategory .c-bookmark__description {
     display: none;
   }
 

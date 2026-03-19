@@ -1,23 +1,20 @@
-# Docker Compose for pulling from GitHub Container Registry.
-# Use this with Portainer or on a NAS where you don't want to build locally.
-#
-# For local development, use docker-compose.yml instead (builds from source).
-
 services:
   homepage-md:
     image: ghcr.io/janmaarten-a11y/homepage-md:latest
     container_name: homepage-md
     ports:
-      - "2525:2525"
+    - "2525:2525"
     volumes:
-      - "./bookmarks:/app/bookmarks"
-      - "./icons:/app/icons:ro"
-      - "./custom.css:/app/custom.css:ro"
-      - "./footer.md:/app/footer.md:ro"
-      - "./themes:/app/themes:ro"
-      - "favicon-cache:/app/favicon-cache"
-    env_file:
-      - .env
+    - /volume1/docker/homepage-md/bookmarks:/app/bookmarks
+    - /volume1/docker/homepage-md/icons:/app/icons:ro
+    - /volume1/docker/homepage-md/custom.css:/app/custom.css:ro
+    - /volume1/docker/homepage-md/footer.md:/app/footer.md:ro
+    - /volume1/docker/homepage-md/themes:/app/themes:ro
+    - favicon-cache:/app/favicon-cache
+    environment:
+    - PORT=2525
+    - DEFAULT_PAGE=homepage
+    - AUTH_TOKEN=your-passphrase-here
     restart: unless-stopped
 
 volumes:
