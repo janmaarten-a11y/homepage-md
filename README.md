@@ -15,7 +15,7 @@ A household bookmark dashboard that reads Markdown files and renders them as a c
 - **Multiple pages** — each `.md` file in `bookmarks/` becomes a page in the top navigation
 - **Categories, subcategories, and tags** — organize bookmarks with headings, subtitles, and filterable tags
 - **Real-time search** — filter bookmarks instantly by title, description, URL, or tag (press `/` to focus)
-- **Search engine shortcuts** — type `!g climate change` to search Google, `!w cats` for Wikipedia, and more — configurable per page
+- **Search engine shortcuts** — type `!g climate change` to search Google, `!w cats` for Wikipedia, and more — configured in `config/bangs.md` with optional custom labels
 - **Favicon resolution** — automatic icons via local cache, direct fetch, DuckDuckGo fallback, or manual overrides
 - **Live updates** — Server-Sent Events push changes to all open browsers when files change
 
@@ -29,7 +29,7 @@ A household bookmark dashboard that reads Markdown files and renders them as a c
 - **View modes** — Rows, Columns, or List layout × Detailed or Condensed density, saved per page with an option to apply to all pages
 - **Themes** — switchable via the toolbar; ships with Default and Terminal (CRT-inspired green-on-black). Add your own by dropping a CSS file in `themes/`.
 - **Color modes** — System, Light, or Dark — automatic via `prefers-color-scheme` or manual toggle
-- **Custom CSS** — override any design token via `custom.css`, which loads after themes and always wins
+- **Custom CSS** — override any design token via `config/custom.css`, which loads after themes and always wins
 
 ### Access & security
 
@@ -55,7 +55,7 @@ docker compose up -d
 
 Access at `http://localhost:2525`.
 
-To persist data across container rebuilds, mount `bookmarks/`, `icons/`, `favicon-cache/`, and `custom.css` as volumes.
+To persist data across container rebuilds, mount `bookmarks/`, `icons/`, `favicon-cache/`, and `config/` as volumes.
 
 ### Node.js
 
@@ -77,7 +77,7 @@ A pre-built image is published to GitHub Container Registry on every push to mai
 docker compose -f docker-compose.registry.yml up -d
 ```
 
-In Portainer, create a new stack and paste the contents of `docker-compose.registry.yml`. Mount your `bookmarks/`, `icons/`, `themes/`, `custom.css`, and `footer.md` as volumes. Pull the latest image to update.
+In Portainer, create a new stack and paste the contents of `docker-compose.registry.yml`. Mount your `bookmarks/`, `icons/`, `themes/`, and `config/` as volumes. Pull the latest image to update.
 
 ### Remote access
 
@@ -98,9 +98,10 @@ All configuration is via environment variables. Copy `.env.example` to `.env` an
 | `BOOKMARKS_DIR` | `./bookmarks` | Path to the bookmarks directory |
 | `ICONS_DIR` | `./icons` | Path to manual favicon overrides |
 | `FAVICON_CACHE_DIR` | `./favicon-cache` | Path to the favicon cache |
-| `CUSTOM_CSS_PATH` | `./custom.css` | Path to the user CSS overrides file |
+| `CUSTOM_CSS_PATH` | `./config/custom.css` | Path to the user CSS overrides file |
 | `THEMES_DIR` | `./themes` | Path to the themes directory |
-| `FOOTER_PATH` | `./footer.md` | Path to the footer Markdown file |
+| `FOOTER_PATH` | `./config/footer.md` | Path to the footer Markdown file |
+| `BANGS_PATH` | `./config/bangs.md` | Path to the search shortcuts file |
 | `AUTH_TOKEN` | *(none)* | Shared passphrase for write endpoints (disabled by default) |
 | `AUTH_COOKIE_DAYS` | `30` | Days the login cookie remains valid |
 | `FAVICON_TTL_DAYS` | `7` | Days before a cached favicon is re-fetched |
@@ -113,8 +114,6 @@ Each `.md` file in the `bookmarks/` directory is a page.
 # Page Title
   - location: City, State
   - access: open
-  - bang: !g https://google.com/search?q=%s
-  - bang: !w https://en.wikipedia.org/w/index.php?search=%s
 
 > [!WELCOME] Welcome!
 > Your household dashboard for bookmarks and quick searches.
@@ -140,7 +139,6 @@ Aside from headings and `[Title](URL)`, everything is optional.
 - `# Heading 1` — page title (one per file)
 - `- location:` — location for the weather widget (indented, under the title)
 - `- access: open` — allows anyone to edit this page without logging in (indented, under the title)
-- `- bang: !prefix url` — search shortcut; `%s` is replaced with the query (indented, under the title)
 - `> [!WELCOME] Title` — welcome banner with optional description on subsequent `>` lines
 - `## Heading 2` — category
 - `### Heading 3` — subcategory (within the parent category)
@@ -152,6 +150,18 @@ Aside from headings and `[Title](URL)`, everything is optional.
 - `- icon: url` — custom icon override (indented, under a bookmark)
 - Everything else is silently ignored — add comments, notes, or blank lines freely
 
+### Search shortcuts (bangs)
+
+Search shortcuts are defined in `config/bangs.md`, shared across all pages:
+
+```markdown
+- !g https://google.com/search?q=%s
+- !w https://en.wikipedia.org/w/index.php?search=%s
+- !copilot https://github.com/copilot?prompt=%s Copilot prompt
+```
+
+Each line: `- !prefix url` with an optional label after the URL. Without a label, the hint derives the name from the hostname. With a label (e.g., `Copilot prompt`), the hint displays that instead of "Search github.com".
+
 ## Themes
 
 Themes are CSS files in `themes/`. The server discovers them at startup and lists them in the View options toolbar.
@@ -161,7 +171,7 @@ Themes are CSS files in `themes/`. The server discovers them at startup and list
 3. For light/dark mode support, add `.is-light` and `.is-dark` selectors
 4. Restart the server — the theme appears in the toolbar automatically
 
-The built-in Terminal theme (`themes/terminal.css`) is a full example. See `custom.css` for the complete list of design tokens.
+The built-in Terminal theme (`themes/terminal.css`) is a full example. See `config/custom.css` for the complete list of design tokens.
 
 ## Accessibility
 

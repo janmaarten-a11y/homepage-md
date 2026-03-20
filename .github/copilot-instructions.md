@@ -12,7 +12,7 @@ Server-rendered MPA (Node.js 22+, ES modules, zero frameworks) serving a househo
 
 - **`src/server/index.js`** — HTTP server, API routes, SSE, file watcher, theme scanning, static file serving
 - **`src/server/renderer.js`** — Full HTML page generation (header, toolbar, dialogs, bookmarks, footer)
-- **`src/server/parser.js`** — Markdown → structured data (title, location, bangs, categories, bookmarks)
+- **`src/server/parser.js`** — Markdown → structured data (title, location, categories, bookmarks); also parses `bangs.md`
 - **`src/server/writer.js`** — Markdown write-back for CRUD operations and location updates
 - **`src/server/weather.js`** — Open-Meteo + NWS alerts + AQI + astronomy data
 - **`src/server/favicon.js`** — Favicon resolution chain (SSRF-protected)
@@ -20,6 +20,7 @@ Server-rendered MPA (Node.js 22+, ES modules, zero frameworks) serving a househo
 - **`src/public/scripts/app.js`** — All client-side interactivity (~1700 lines): tooltips, search, keyboard nav, view modes, CRUD, weather, speed test, SSE
 - **`src/public/styles/main.css`** — All styles in CSS cascade layers (`@layer config, resets, components, utilities`), OKLCH colors, CSS logical properties
 - **`themes/terminal.css`** — CRT-inspired terminal theme (green-on-black, scanlines, monospace)
+- **`config/`** — User-customizable files: `custom.css` (design overrides), `footer.md` (footer content), `bangs.md` (search shortcuts)
 
 ## Styling Conventions
 
@@ -31,7 +32,7 @@ Server-rendered MPA (Node.js 22+, ES modules, zero frameworks) serving a househo
 - **Icons:** Lucide (via `lucide-static` npm package) resolved server-side as inline SVGs
 - Use CSS custom properties for all colors — never raw hex or raw oklch in component rules
 - Minimum font-size: `1rem` (project convention)
-- Theme overrides use the same custom properties; `custom.css` loads last and always wins
+- Theme overrides use the same custom properties; `config/custom.css` loads last and always wins
 
 ## Accessibility Standards
 
