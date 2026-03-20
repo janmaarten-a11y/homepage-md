@@ -9,8 +9,7 @@ services:
     volumes:
     - /volume1/docker/homepage-md/bookmarks:/app/bookmarks
     - /volume1/docker/homepage-md/icons:/app/icons:ro
-    - /volume1/docker/homepage-md/custom.css:/app/custom.css:ro
-    - /volume1/docker/homepage-md/footer.md:/app/footer.md:ro
+    - /volume1/docker/homepage-md/config:/app/config:ro
     - /volume1/docker/homepage-md/themes:/app/themes:ro
     - favicon-cache:/app/favicon-cache
     environment:

@@ -7,6 +7,7 @@ RUN npm ci --omit=dev
 
 COPY src/ ./src/
 COPY themes/ ./themes/
+COPY config/ ./config/
 
 RUN mkdir -p favicon-cache && chown node:node favicon-cache
 

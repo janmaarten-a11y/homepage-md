@@ -7,8 +7,7 @@ services:
     volumes:
       - ./bookmarks:/app/bookmarks
       - ./icons:/app/icons:ro
-      - ./custom.css:/app/custom.css:ro
-      - ./footer.md:/app/footer.md:ro
+      - ./config:/app/config:ro
       - ./themes:/app/themes:ro
       - favicon-cache:/app/favicon-cache
     env_file:
