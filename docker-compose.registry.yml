@@ -2,6 +2,8 @@ services:
   homepage-md:
     image: ghcr.io/janmaarten-a11y/homepage-md:latest
     container_name: homepage-md
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
     ports:
     - "2525:2525"
     volumes:
