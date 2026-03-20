@@ -4,4 +4,4 @@
 - !sp https://www.startpage.com/do/dsearch?query=%s
 - !eco https://www.ecosia.org/search?q=%s
 - !w https://en.wikipedia.org/w/index.php?search=%s
-- !co https://github.com/copilot?prompt=%s
+- !co https://github.com/copilot?prompt=%s Ask GitHub Copilot

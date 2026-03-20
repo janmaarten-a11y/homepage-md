@@ -362,7 +362,7 @@ function showBangHint(prefix, bang, query) {
   if (query) {
     bangHint.textContent = `Press Enter to search ${name} for \u201C${query}\u201D`;
   } else {
-    bangHint.textContent = `${prefix} \u2192 ${name} \u2014 type your search query`;
+    bangHint.textContent = `${prefix} \u2192 ${name} \u2014 type your query or prompt`;
   }
   bangHint.hidden = false;
 }
