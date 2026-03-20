@@ -2,7 +2,7 @@ import { createServer } from 'node:http';
 import { readFile, readdir, stat, watch } from 'node:fs/promises';
 import { join, extname, resolve } from 'node:path';
 import { config } from './config.js';
-import { parseMarkdown } from './parser.js';
+import { parseMarkdown, parseBangs } from './parser.js';
 import { renderPage } from './renderer.js';
 import { getFaviconUrl, refreshFavicons, extractDomain, cleanFaviconCache } from './favicon.js';
 import { addBookmark, removeBookmark, updateBookmark, updateLocation } from './writer.js';
@@ -75,6 +75,19 @@ async function loadFooter() {
     return source.trim() || null;
   } catch {
     return null;
+  }
+}
+
+/**
+ * Load shared bangs from the bangs Markdown file.
+ * Returns an empty array if the file doesn't exist.
+ */
+async function loadBangs() {
+  try {
+    const source = await readFile(config.bangsPath, 'utf-8');
+    return parseBangs(source);
+  } catch {
+    return [];
   }
 }
 
@@ -310,6 +323,21 @@ async function startWatcher() {
   } catch (err) {
     console.error('File watcher error:', err.message);
     console.error('Live updates will not work. Restart the server to retry.');
+  }
+}
+
+async function startBangsWatcher() {
+  try {
+    const watcher = watch(config.bangsPath);
+    let timer = null;
+    for await (const _event of watcher) {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        broadcastSSE({ type: 'update', file: 'bangs.md' });
+      }, 500);
+    }
+  } catch {
+    // bangs.md may not exist yet — that's fine
   }
 }
 
@@ -766,6 +794,7 @@ async function handleRequest(req, res) {
       const weatherIcons = await getWeatherIcons();
       const uiIcons = await getUIIcons();
       const footerContent = await loadFooter();
+      const bangs = await loadBangs();
       const themes = await getThemeList();
 
       // Read theme preference from cookie (avoids FOUC)
@@ -777,7 +806,7 @@ async function handleRequest(req, res) {
       const pageIsOpen = pageData.access === 'open';
       const authed = isAuthenticated(req);
 
-      const html = renderPage(pageData, { pages, currentSlug: slug, faviconUrls, categoryIcons, weatherIcons, uiIcons, defaultPage: config.defaultPage, footerContent, themes, activeTheme, authRequired: isAuthRequired(), authenticated: authed || pageIsOpen });
+      const html = renderPage(pageData, { pages, currentSlug: slug, faviconUrls, categoryIcons, weatherIcons, uiIcons, defaultPage: config.defaultPage, footerContent, themes, activeTheme, authRequired: isAuthRequired(), authenticated: authed || pageIsOpen, bangs });
 
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       res.end(html);
@@ -806,5 +835,6 @@ server.listen(config.port, () => {
 });
 
 startWatcher();
+startBangsWatcher();
 cleanFaviconCache(config);
 loadIconIndex();

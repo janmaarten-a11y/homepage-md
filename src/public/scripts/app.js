@@ -358,7 +358,7 @@ function matchBang(value) {
 
 function showBangHint(prefix, bang, query) {
   if (!bangHint) return;
-  const name = extractBangName(bang.url);
+  const name = getBangName(bang);
   if (query) {
     bangHint.textContent = `Press Enter to search ${name} for \u201C${query}\u201D`;
   } else {
@@ -371,7 +371,7 @@ function showBangList() {
   if (!bangHint) return;
   const entries = Object.values(allBangs);
   if (entries.length === 0) return;
-  bangHint.textContent = entries.map((b) => `${b.prefix} ${extractBangName(b.url)}`).join('  \u00B7  ');
+  bangHint.textContent = entries.map((b) => `${b.prefix} ${getBangName(b)}`).join('  \u00B7  ');
   bangHint.hidden = false;
 }
 
@@ -381,10 +381,10 @@ function hideBangHint() {
   bangHint.hidden = true;
 }
 
-function extractBangName(url) {
+function getBangName(bang) {
+  if (bang.label) return bang.label;
   try {
-    const host = new URL(url).hostname.replace('www.', '');
-    // Capitalize first letter
+    const host = new URL(bang.url).hostname.replace('www.', '');
     return host.charAt(0).toUpperCase() + host.slice(1);
   } catch {
     return 'the web';

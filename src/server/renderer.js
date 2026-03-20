@@ -20,7 +20,7 @@ let _canEdit = true;
  * @param {object} options.faviconUrls - Map of bookmark URL → resolved favicon path
  * @returns {string} Complete HTML document
  */
-export function renderPage(pageData, { pages, currentSlug, faviconUrls, categoryIcons = {}, weatherIcons = {}, uiIcons = {}, defaultPage, footerContent, themes = ['default'], activeTheme = 'default', authRequired = false, authenticated = true }) {
+export function renderPage(pageData, { pages, currentSlug, faviconUrls, categoryIcons = {}, weatherIcons = {}, uiIcons = {}, defaultPage, footerContent, themes = ['default'], activeTheme = 'default', authRequired = false, authenticated = true, bangs = [] }) {
   _uiIcons = uiIcons;
   const title = pageData.title || 'homepage.md';
   const hasLocation = !!pageData.location;
@@ -198,7 +198,7 @@ ${hasLocation ? `  <dialog class="c-dialog c-dialog--small js-location-dialog">
       </div>
     </form>
   </dialog>` : ''}
-  <script id="js-page-data" type="application/json">${JSON.stringify({ categories, subcategories: subcategoryPairs, tags: allTags, bangs: pageData.bangs || [], weatherIcons, themes, authRequired, authenticated: canEdit })}</script>
+  <script id="js-page-data" type="application/json">${JSON.stringify({ categories, subcategories: subcategoryPairs, tags: allTags, bangs, weatherIcons, themes, authRequired, authenticated: canEdit })}</script>
 ${loginDialog}
   <script src="/scripts/app.js" type="module"></script>
 </body>

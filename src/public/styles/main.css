@@ -1079,8 +1079,12 @@
 
   /* Action buttons sit above the link overlay */
   .c-bookmark__actions {
-    position: relative;
+    position: absolute;
+    inset-block-start: var(--space-s);
+    inset-inline-end: var(--space-s);
     z-index: 1;
+    background-color: var(--color-surface);
+    padding-inline-start: var(--space-xs);
   }
 
   /* Card outline only when the bookmark link is focused (not edit/delete) */
@@ -1582,18 +1586,6 @@
 
   .is-condensed.is-columns .c-subcategory .c-bookmark__description {
     display: none;
-  }
-
-  .is-columns .c-bookmark {
-    position: relative;
-  }
-
-  .is-columns .c-bookmark__actions {
-    position: absolute;
-    inset-block-start: var(--space-s);
-    inset-inline-end: var(--space-s);
-    background-color: var(--color-surface);
-    padding-inline-start: var(--space-xs);
   }
 
   /* URL display — hidden by default, shown in list and table views */

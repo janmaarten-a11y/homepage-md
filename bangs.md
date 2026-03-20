@@ -1,0 +1,6 @@
+- !g https://www.google.com/search?q=%s&udm=14
+- !ddg https://duckduckgo.com/?q=%s
+- !kagi https://kagi.com/search?q=%s
+- !sp https://www.startpage.com/do/dsearch?query=%s
+- !eco https://www.ecosia.org/search?q=%s
+- !w https://en.wikipedia.org/w/index.php?search=%s

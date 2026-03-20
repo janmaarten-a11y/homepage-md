@@ -21,7 +21,7 @@
 
 const HEADING_RE = /^(#{1,3})\s+(.+)$/;
 const BOOKMARK_RE = /^-\s+\[([^\]]+)\]\(([^)]+)\)\s*$/;
-const METADATA_RE = /^\s+-\s+(description|icon|subtitle|location|bang|access|tags):\s+(.+)$/;
+const METADATA_RE = /^\s+-\s+(description|icon|subtitle|location|access|tags):\s+(.+)$/;
 const WELCOME_RE = /^>\s*\[!WELCOME\]\s*(.*)$/i;
 const BLOCKQUOTE_RE = /^>\s?(.*)$/;
 
@@ -34,7 +34,7 @@ function slugify(text) {
 
 export function parseMarkdown(source) {
   const lines = source.split('\n');
-  const result = { title: null, location: null, access: null, bangs: [], welcome: null, categories: [] };
+  const result = { title: null, location: null, access: null, welcome: null, categories: [] };
 
   let currentCategory = null;
   let currentSubcategory = null;
@@ -130,14 +130,7 @@ export function parseMarkdown(source) {
         continue;
       }
 
-      // bang: search shortcut, format "!prefix https://url?q=%s"
-      if (key === 'bang' && !currentBookmark && !currentCategory) {
-        const bangMatch = value.trim().match(/^(![\w-]+)\s+(\S+)$/);
-        if (bangMatch) {
-          result.bangs.push({ prefix: bangMatch[1], url: bangMatch[2] });
-        }
-        continue;
-      }
+
 
       // access: page-level access control (e.g. "open")
       if (key === 'access' && !currentBookmark && !currentCategory) {
@@ -169,4 +162,23 @@ export function parseMarkdown(source) {
   }
 
   return result;
+}
+
+const BANG_RE = /^-\s+(?:bang:\s+)?(![\w-]+)\s+(\S+)(?:\s+(.+))?$/;
+
+/**
+ * Parse a bangs-only Markdown file.
+ * Each line: `- !prefix https://url` or `- bang: !prefix https://url Label`
+ */
+export function parseBangs(source) {
+  const bangs = [];
+  for (const line of source.split('\n')) {
+    const m = line.match(BANG_RE);
+    if (m) {
+      const bang = { prefix: m[1], url: m[2] };
+      if (m[3]) bang.label = m[3].trim();
+      bangs.push(bang);
+    }
+  }
+  return bangs;
 }
