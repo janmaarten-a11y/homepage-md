@@ -341,6 +341,30 @@ async function startBangsWatcher() {
   }
 }
 
+/**
+ * Periodically refresh stale favicons for all bookmark pages.
+ * Runs every 24 hours so cached icons are re-fetched in the background
+ * without requiring a bookmark edit or file change.
+ */
+async function refreshAllFavicons() {
+  try {
+    const slugs = await getPageSlugs();
+    for (const slug of slugs) {
+      try {
+        const pageData = await loadPage(slug);
+        const bookmarks = flattenBookmarks(pageData);
+        await refreshFavicons(bookmarks, config);
+      } catch {
+        // Skip pages that can't be loaded
+      }
+    }
+  } catch {
+    // Silently ignore — will retry next cycle
+  }
+}
+
+const FAVICON_REFRESH_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours
+
 // ---------------------------------------------------------------------------
 // JSON body parser
 // ---------------------------------------------------------------------------
@@ -838,3 +862,4 @@ startWatcher();
 startBangsWatcher();
 cleanFaviconCache(config);
 loadIconIndex();
+setInterval(refreshAllFavicons, FAVICON_REFRESH_INTERVAL);

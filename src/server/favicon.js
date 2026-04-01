@@ -115,13 +115,16 @@ async function checkManualOverride(domain, iconsDir) {
 }
 
 /**
- * Check cached favicon. Returns the URL path if cached and not stale, else null.
+ * Check cached favicon. Returns the URL path if cached, else null.
+ * When ignoreAge is false (default), only returns fresh entries within TTL.
+ * When ignoreAge is true, returns any cached entry regardless of age.
  */
-async function checkCache(domain, cacheDir, ttlDays) {
+async function checkCache(domain, cacheDir, ttlDays, ignoreAge = false) {
   for (const ext of ICON_EXTENSIONS) {
     const filePath = join(cacheDir, `${domain}${ext}`);
     try {
       const info = await stat(filePath);
+      if (ignoreAge) return `/favicon-cache/${domain}${ext}`;
       const ageMs = Date.now() - info.mtimeMs;
       const ttlMs = ttlDays * 24 * 60 * 60 * 1000;
       if (ageMs < ttlMs) {
@@ -227,7 +230,11 @@ export async function getFaviconUrl(url, inlineIcon, config) {
   const ddgCached = await downloadAndCache(ddgUrl, domain, config.faviconCacheDir);
   if (ddgCached) return ddgCached;
 
-  // 6. Generic placeholder
+  // 6. Stale cache fallback — prefer an expired icon over the generic placeholder
+  const stale = await checkCache(domain, config.faviconCacheDir, config.faviconTtlDays, true);
+  if (stale) return stale;
+
+  // 7. Generic placeholder
   return '/icons/default.svg';
 }
 
@@ -264,15 +271,17 @@ export async function refreshFavicons(bookmarks, config) {
 }
 
 /**
- * Remove stale entries from the favicon cache.
- * Deletes files older than the configured TTL.
+ * Remove abandoned entries from the favicon cache.
+ * Only deletes files much older than the configured TTL (10×) to allow
+ * stale-while-revalidate behaviour — expired icons are served as fallback
+ * while re-fetching is attempted in the background.
  *
  * @param {object} config - App configuration
  */
 export async function cleanFaviconCache(config) {
   try {
     const files = await readdir(config.faviconCacheDir);
-    const ttlMs = config.faviconTtlDays * 24 * 60 * 60 * 1000;
+    const abandonedMs = config.faviconTtlDays * 10 * 24 * 60 * 60 * 1000;
     const now = Date.now();
     let removed = 0;
 
@@ -280,7 +289,7 @@ export async function cleanFaviconCache(config) {
       const filePath = join(config.faviconCacheDir, file);
       try {
         const info = await stat(filePath);
-        if (now - info.mtimeMs > ttlMs) {
+        if (now - info.mtimeMs > abandonedMs) {
           await unlink(filePath);
           removed++;
         }
@@ -290,7 +299,7 @@ export async function cleanFaviconCache(config) {
     }
 
     if (removed > 0) {
-      console.log(`Favicon cache: removed ${removed} stale file${removed === 1 ? '' : 's'}`);
+      console.log(`Favicon cache: removed ${removed} abandoned file${removed === 1 ? '' : 's'}`);
     }
   } catch {
     // Cache directory may not exist yet
